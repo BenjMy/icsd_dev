@@ -54,7 +54,7 @@ CHANGELOG
 Authors
 -------
 
-* B.Mary
+* B. Mary
 * L. Peruzzo 
 
 
