@@ -1,0 +1,27 @@
+image: python:3.7-stretch
+
+test:
+  script:
+  - pip install -r requirements.txt
+  - pip install rasterio pykrige
+  - pip install coverage
+  - cd src
+  - coverage run --source=emagpy test.py
+  - coverage report --omit emagpy/invertHelper.py
+  
+pages:
+  script:
+  - pip install -r requirements.txt
+  - apt-get update
+  - apt-get install --assume-yes pandoc
+  - pip install sphinx==1.8.4 numpydoc==0.7.0 sphinx_rtd_theme sphinx-nbexamples
+  - cd doc
+  - make html
+  - cd ..
+  - mv doc/_build/html/ public/
+  - ls public
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
