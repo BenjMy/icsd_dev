@@ -1,7 +1,7 @@
 import os
 import re
 import argparse
-# import numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 from scipy.interpolate import griddata

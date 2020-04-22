@@ -15,7 +15,7 @@
 import os
 import sys
 sys.path.append(os.path.relpath('../src'))
-from icsd3d_class import iCSD3d_Class
+# from icsd3d_class import iCSD3d_Class
 
 
 # -- Project information -----------------------------------------------------
