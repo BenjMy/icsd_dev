@@ -42,7 +42,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
-    'numpydoc',
+    #'numpydoc',
     #'nbsphinx', # to include jupyter notebook as sphinx doc page
     #'sphinx_gallery.gen_gallery', # to generate the gallery
     'sphinx_nbexamples', # needs pandoc (apt-get install pandoc)
