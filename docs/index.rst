@@ -6,20 +6,11 @@
 Welcome to ICSD's documentation!
 ================================
 
-Introduction
-------------
-
-Should show a very short overview of what can be done with the product, using one or two extremely simplified use cases. This is the thirty-second pitch for your project.
-
-getting-started
----------------
-
-The getting-started should show some primary use cases in more detail. The reader will follow a step-by-step procedure to set-up a working prototype
-
 .. toctree::
    :maxdepth: 2
-   :caption: About the ICSD code:
-   
+   :caption: About
+
+   introduction
    getting-started
 
 
@@ -28,7 +19,7 @@ Gallery of examples
 
 .. toctree::
    :maxdepth: 2
-   :caption: About ICSD:
+   :caption: Gallery of examples:
    
    example1
    example2
@@ -70,16 +61,13 @@ API documentation
 About
 =====
 
-License
--------
+.. toctree::
+   :maxdepth: 2
+   :caption: About
 
-The project is licensed under the ??
+	licence
+	authors
 
-Authors
--------
-
-* B. Mary
-* L. Peruzzo 
 
 
 Indices and tables

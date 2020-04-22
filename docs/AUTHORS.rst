@@ -1,7 +1,5 @@
 Authors
 -------
 
-* Eric (New contributor)
-* Anthony 
-
-
+* B. Mary
+* L. Peruzzo 
