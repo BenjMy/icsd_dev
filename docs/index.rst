@@ -6,11 +6,17 @@
 Welcome to ICSD's documentation!
 ================================
 
+Introduction
+------------
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-
+  
+   getting-started
+   gui
+   api
+   auto_examples/index
 
 Indices and tables
 ==================
