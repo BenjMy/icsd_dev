@@ -10,7 +10,7 @@ from scipy.optimize import lsq_linear, curve_fit, least_squares, leastsq
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import MultipleLocator
-from kneed import KneeLocator
+# from kneed import KneeLocator
 from scipy.interpolate import griddata as gd
 from mpl_toolkits.mplot3d import Axes3D
 import pyvista as pv
