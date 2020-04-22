@@ -15,7 +15,7 @@
 import os
 import sys
 sys.path.append(os.path.relpath('../src'))
-# from icsd3d_class import iCSD3d_Class
+from icsd3d_class import iCSD3d_Class
 
 
 # -- Project information -----------------------------------------------------
@@ -26,7 +26,7 @@ author = 'L. Peruzzo and B. Mary'
 # The short X.Y version
 version = '0.1.0'
 # The full version, including alpha/beta/rc tags
-release = ''
+release = '0.1.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -47,6 +47,15 @@ extensions = [
     #'sphinx_gallery.gen_gallery', # to generate the gallery
     #'sphinx_nbexamples', # needs pandoc (apt-get install pandoc)
 ]
+
+# example_gallery_config = {
+#     'examples_dirs': '../jupyter-notebook',
+#     'gallery_dirs': 'auto_examples',
+#     'dont_preprocess': '../jupyter-notebook/nb_comparison-inversion-cover-crop.ipynb',
+#     'pattern': 'nb_.+.ipynb',
+#     'urls': 'https://github.com/hkexgroup/emagpy/blob/stable/jupyter-notebook',
+#     'binder_url': 'https://mybinder.org/v2/gl/hkex%2Femagpy/stable?filepath=jupyter-notebook',
+# }
 
 
 # Add any paths that contain templates here, relative to this directory.
