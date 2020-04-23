@@ -10,7 +10,7 @@ from scipy.optimize import lsq_linear, curve_fit, least_squares, leastsq
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import MultipleLocator
-# from kneed import KneeLocator
+from kneed import KneeLocator
 from scipy.interpolate import griddata as gd
 from mpl_toolkits.mplot3d import Axes3D
 import pyvista as pv
@@ -136,7 +136,7 @@ class iCSD3d_Class():
 # load_names for tl analysis
 # Introduce error weigting using reciprocal error instead of constant or w = 1/sqrt(abs(obs))
 # use the ERT mesh as mesh for virtual position of current sources
-        
+
 # NEW FUNCTIONS COMPARE TO the 2d case    
 
     def load_geom(self):
@@ -470,7 +470,8 @@ class iCSD3d_Class():
     def createdirs(self):
         self.path2load = self.dirName
         
-        self.path2save= self.dirName + 'fig/'
+        self.path2save= self.path2load + '_fig/'
+        # self.path2save= self.dirName + 'fig/'
         try:
             # Create target Directory
             os.mkdir(self.path2save)
@@ -625,7 +626,15 @@ class iCSD3d_Class():
     ### RELATIVE SMALLNESS conditions (m-m0)
         
     def regularize_smallnessX0(self):
-        print('reg smallnessX0')
+        """ Create relative smallness instance 
+        
+        .. math ::
+
+              \mathbf{X} \mathbf{0} = A*\mathbf{\alpha} \mathbf{ \mathbf{X} \mathbf{0}}\\\\
+        Parameters
+        ------------
+        self
+        """
         if self.alphaSxy==True:
             self.reg_smallx0 = np.ones(self.reg_Ax.shape)*self.alphax0
         else:
@@ -794,6 +803,12 @@ class iCSD3d_Class():
                
     ### PLOT
     def plot_knee_icsd(self):
+        """ Plot CSD for the best regularisation parameter after L-curve automatic analysis using a knee-locator
+        
+        Parameters
+        ------------
+        self
+        """
         self.KneeWr=self.wr
         # self.wr=float(self.pareto_weights[self.IdPtkneew])
         self.kn.plot_knee_normalized()
@@ -874,6 +889,12 @@ class iCSD3d_Class():
         axes.set_aspect('equal')
         
     def plotCSD(self):
+        """ Plot CSD in 2d, using matplotlib and scipy interpolation
+        
+        Parameters
+        ------------
+        self
+        """
         self.f = plt.figure('surface')
         if self.mesh!=None:
             self.f, ax = plt.subplots('surface',nrows=2)
