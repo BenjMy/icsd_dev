@@ -1,12 +1,8 @@
-Welcome to Getting Started with Sphinx's documentation!
-=======================================================
-.. automodule:: icsd3d.icsd3d_class
-    :members:
+API documentation
+=================
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-Indices and tables
-==================
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. automodule:: icsd3d.icsd3d_class
+   :members:
+
