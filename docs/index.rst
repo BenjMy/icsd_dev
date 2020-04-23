@@ -3,12 +3,11 @@ Welcome to Getting Started with Sphinx's documentation!
 
 API documentation
 =================
-
 .. toctree::
    :maxdepth: 2
-   :caption: API
-
-   content/api_core/api
+   :caption: Contents:
+.. automodule:: icsd3d.icsd3d_class
+   :members:
 
 Indices and tables
 ==================
