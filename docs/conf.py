@@ -12,11 +12,11 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.append(os.path.relpath('../src'))
-# sys.path.insert(0, os.path.abspath('../src/'))
-# from icsd3d_class import iCSD3d_Class
+import os
+import sys
+# sys.path.insert(0, os.path.abspath('../src'))
+sys.path.append(os.path.relpath('../src'))
+from icsd3d_class import iCSD3d_Class
 
 
 # -- Project information -----------------------------------------------------
@@ -43,7 +43,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
     #'numpydoc',
     #'nbsphinx', # to include jupyter notebook as sphinx doc page
     #'sphinx_gallery.gen_gallery', # to generate the gallery
