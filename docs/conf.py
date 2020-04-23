@@ -14,8 +14,9 @@
 #
 import os
 import sys
-# sys.path.insert(0, os.path.abspath('../src'))
-sys.path.append(os.path.relpath('../src/icsd3d'))
+sys.path.append(0, os.path.relpath('../src'))
+sys.path.append(os.path.relpath('../src/icsd3d/'))
+sys.path.append(0, os.path.abspath('../src'))
 #sys.path.append(os.path.abspath('..{}'.format(os.path.sep)))
 from icsd3d_class import iCSD3d_Class
 
