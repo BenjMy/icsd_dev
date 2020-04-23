@@ -1,6 +1,6 @@
 Welcome to Getting Started with Sphinx's documentation!
 =======================================================
-.. automodule:: icsd3d.icsd3d_class
+.. automodule:: icsd3d.main
     :members:
 .. toctree::
    :maxdepth: 2
