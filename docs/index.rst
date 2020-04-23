@@ -38,16 +38,6 @@ API documentation
    content/api_core/api
 
 
-.. TODO
-.. ----
-
-.. List the planned development for the code
-
-.. CHANGELOG
-.. ---------
-
-.. See readthedocs version control
-
 About
 =====
 
@@ -68,6 +58,15 @@ Indices and tables
 * :ref:`search`
 
 
+.. TODO
+.. ----
+
+.. List the planned development for the code
+
+.. CHANGELOG
+.. ---------
+
+.. See readthedocs version control
 
 
 
