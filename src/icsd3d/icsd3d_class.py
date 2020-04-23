@@ -957,6 +957,14 @@ class iCSD3d_Class():
 
         
     def run_single(self):
+        """Run a single inversion (unique regularisation weight)
+        Equivalent to several steps::
+            self.prepare4iCSD()
+            self.plotCSD()
+            self.RMSAnalysis()
+            
+        """
+        
         self.prepare4iCSD()            
         self.iCSD()
         if self.type=='2d':
