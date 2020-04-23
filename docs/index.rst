@@ -3,10 +3,11 @@ Welcome to ICSD's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Getting Started
+   :caption: ICSD
 
    content/started/introduction
    content/started/getting-started
+   content/started/documentation
 
 
 Gallery of examples
