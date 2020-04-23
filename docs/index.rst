@@ -27,6 +27,16 @@ Gallery of examples
    example1
    example2
 
+About
+=====
+
+.. toctree::
+   :maxdepth: 2
+   :caption: About
+
+   content/licence
+   content/authors
+
 
 API documentation
 =================
@@ -36,18 +46,6 @@ API documentation
    :caption: API
 
    content/api_core/api
-
-
-About
-=====
-
-.. toctree::
-   :maxdepth: 2
-   :caption: About
-
-	content/licence
-	content/authors
-
 
 
 Indices and tables
