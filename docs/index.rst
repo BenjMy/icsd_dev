@@ -1,5 +1,24 @@
-Welcome to Getting Started with Sphinx's documentation!
-=======================================================
+Welcome to ICSD's documentation!
+================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Getting Started
+
+   content/started/introduction
+   content/started/getting-started
+
+
+Gallery of examples
+===================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Gallery of examples:
+   
+   example1
+   example2
+
 
 API documentation
 =================
@@ -10,17 +29,49 @@ API documentation
 
    content/api_core/api
 
+.. Contribute
+.. ----------
 
-API documentation2
-==================
+.. - Issue Tracker: github.com/$project/$project/issues
+.. - Source Code: github.com/$project/$project
 
-.. automodule:: icsd3d.icsd3d_class
-    :members:
+.. Support
+.. -------
+
+.. If you are having issues, please let us know.
+.. We have a mailing list located at: project@google-groups.com
+
+
+.. TODO
+.. ----
+
+.. List the planned development for the code
+
+.. CHANGELOG
+.. ---------
+
+.. See readthedocs version control
+
+About
+=====
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: About
+
+	content/licence
+	content/authors
+
+
+
 Indices and tables
 ==================
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+
+
+
