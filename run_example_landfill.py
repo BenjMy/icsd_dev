@@ -39,9 +39,14 @@ icsd3d_landfill.x0_ini_guess=True # initial guess
 icsd3d_landfill.obs_err='sqrt' # choose between constant weight and w = 1/sqrt(abs(obs))
 icsd3d_landfill.mesh='mesh3d_rhomap.vtk'
 icsd3d_landfill.plotElecs=True  
-icsd3d_landfill.gif3d=True     
+icsd3d_landfill.gif3d=False     
 icsd3d_landfill.icsd_init()  
 icsd3d_landfill.run_single()
+
+
+icsd3d_landfill.invert(pareto=True,showfig=False)
+icsd3d_landfill.showResults(clim=[0,0.0001],gif3d=True)
+icsd3d_landfill.DataImport(clim=[0,0.0001],gif3d=True)
 
 
 # icsd3d_landfill.pareto_MinErr=0.01

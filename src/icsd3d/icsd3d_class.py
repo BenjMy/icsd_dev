@@ -67,6 +67,7 @@ class iCSD3d_Class():
         self.gif3d=False # create gif orbit
         self.title=None #
 
+
     def icsd_init(self):
         """ these functions are called only once, even for pareto,
         as they do not depend on the regularization weight"""
@@ -288,6 +289,9 @@ class iCSD3d_Class():
         ax=self.f.gca(projection='3d')
         sc=ax.scatter(self.coord_x, self.coord_y, self.coord_z, c=data_2_plot, cmap ='coolwarm', s=data_2_plot*1e4,
                  )
+        # if self.clim is None:
+        #     print('none clim')
+        # sc.set_clim(self.clim)
         cbar = plt.colorbar(sc)
         cbar.set_label('# current density')
                 
@@ -968,12 +972,13 @@ class iCSD3d_Class():
         
         self.prepare4iCSD()            
         self.iCSD()
-        if self.type=='2d':
-            self.plotCSD()
-        else:
-            print('3d case to plot using pyvista')
-            self.plotCSD3d()
-            self.plotCSD3d_pyvista()
+        self.showResults()
+        # if self.type=='2d':
+        #     self.plotCSD()
+        # else:
+        #     print('3d case to plot using pyvista')
+        #     self.plotCSD3d()
+        #     self.plotCSD3d_pyvista()
         self.RMSAnalysis()
         self.writeFIT()
         self.f.savefig(self.path2save+'iCSD', dpi = 600)
@@ -981,7 +986,101 @@ class iCSD3d_Class():
         
     
 
+    def showResults(self,ax=None, clim=None ,cmap='viridis_r',
+                    plotElecs=False,sc=None,retElec=None,
+                    mesh=None, gif3d=False, title=None):
+        """Show inverted model.
         
+        Parameters
+        ----------
+        ax : Matplotlib.Axes, optional
+            If specified, the graph will be plotted against this axis.
+        clim : array, optional
+            Minimum and Maximum value of the colorbar.
+        cmap : str, optional
+            Name of the Matplotlib colormap to use.
+        plotElecs : bool, optional
+            If `True` add to the ICSD plot measuring electrodes as points
+        sc : array, optional
+            Coordinates of the sources, format = x1,y1 x2,y2'
+            If Not None add to the ICSD plot the source A electrode
+        retElec : array, optional
+            Coordinates of the return electrode, format = x1,y1')
+            If Not None add to the ICSD plot the return B electrode
+        mesh :  str, optional
+            Specify name of the vtk file
+            If Not None add mesh3d.vtk to plot with the results of icsd (for 3d using pyvista)
+        gif3d :  bool, optional
+            If `True` record a gif using orbital function of pyvista
+         title :  str, optional
+            Specify inversion titlename to be add to the plot         
+        """
+        self.clim=clim
+        self.plotElecs=plotElecs
+        self.sc=sc
+        self.retElec=retElec
+        self.mesh_over=mesh
+        self.gif3d=gif3d
+        self.title=title
+        
+        if self.type=='2d':
+            self.plotCSD()
+        else:
+            print('3d case to plot using pyvista')
+            self.plotCSD3d()
+            self.plotCSD3d_pyvista()
+        return
+       
+        
+    def DataImport(self,SimFile=None,ObsFile=None):
+        """Data importer for common data files (Resipy and Gimli)
+        
+        Parameters
+        ----------
 
-             
+        """
+        
+        if fileExt=='*.data':
+            print('pygimli format import')
+        if fileExt=='*.data':
+            print('resipy format import') 
+            
+    def CreateSurvey(self):
+        """Data container for survey paramaters such as geometry file
+        
+        Parameters
+        ----------
+
+        """
+
+
+    def CreateTimeLapseSurvey(self):
+        """Description here
+        
+        Parameters
+        ----------
+
+        """
+        
+    def Invert(self,pareto=False):
+        """Invert the voltage to current densities.
+        
+        Parameters
+        ----------
+
+        """
+        if self.pareto==False:
+            self.run_single()
+        else:
+             self.run_pareto()
+
+    def saveInvData(self, outputdir):
+        """Save inverted data
+        
+        Parameters
+        ----------
+        outputdir : str
+            Path where the .csv files will be saved.
+        """
+
 
