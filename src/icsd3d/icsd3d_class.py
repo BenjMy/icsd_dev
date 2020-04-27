@@ -635,9 +635,8 @@ class iCSD3d_Class():
     def regularize_smallnessX0(self):
         """ Create relative smallness instance 
         
-        .. math ::
+        .. math :: X_{0} = A*\alpha_{x_{0}}
 
-              \mathbf{X} \mathbf{0} = A*\mathbf{\alpha} \mathbf{ \mathbf{X} \mathbf{0}}\\\\
         Parameters
         ------------
         self
@@ -651,8 +650,8 @@ class iCSD3d_Class():
     def regularize_sum_AX0(self):
         """sum smallness and spatial regularisation
 
-        .. math:: $W_{m}=\alpha_{s}I+{D_{x}}^{T}D_{x} + D_{z}}^{T}D_{z}$
-        
+        .. math:: W_{m}=\alpha_{s}I+{D_{x}}^{T}D_{x} + D_{z}}^{T}D_{z}
+
         Parameters
         ------------
         self
