@@ -653,8 +653,7 @@ class iCSD3d_Class():
 
 		.. math::
 
-		   \label{eq:regularize_sum_AX0}
-		   $W_{m}=\alpha_{s}I+{D_{x}}^{T}D_{x} + D_{z}}^{T}D_{z}$
+		   W_{m}=\alpha_{s}I+{D_{x}}^{T}D_{x} + D_{z}}^{T}D_{z}
         Parameters
         ------------
         self
