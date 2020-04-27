@@ -24,9 +24,10 @@ The MALM forward operator
 Voltage V depends on the density of current sources C according to
 Poisson’s equation:
 
-.. math:: 
+.. math::
 
-   \Delta \cdot (\sigma \Delta V) = C
+   \label{eq:PoissonEq}
+       \Delta \cdot (\sigma \Delta V) = C
 
 where :math:`\sigma` is the conductivity of the medium, here assumed to
 be defined by the conductivity distribution. The lattest is in general
@@ -107,9 +108,8 @@ simple misfit between a single source current and the measured data:
 
 .. math::
 
-   \begin{aligned}
    \label{eq:PriorObjFct}
-       F_{1,i}\left(d_{m},\ d_{f,i}\right)=\left\|d_{m}-d_{f,i}\right\|^{2}\end{aligned}
+       F_{1,i}\left(d_{m},\ d_{f,i}\right)=\left\|d_{m}-d_{f,i}\right\|^{2}
 
 The goal of this step is to select “plausible” locations of current
 release, to be then used as starting points for a regularized search of
@@ -145,9 +145,8 @@ function:
 
 .. math::
 
-   \begin{aligned}
    \label{eq:ObjFctFull}
-       \widetilde{\mathbit{m}}=\ min \left\{\left\|Lr\right\|^{2} + \lambda(\alpha_{s}\left\|m-m0\right\|^{2}+ \alpha_{x}\left\|D_{x}(m-m0)\right\|^{2} + \alpha_{z}\left\|D_{z}(m-m0)\right\|^{2})\right\}\end{aligned}
+       \widetilde{\mathbit{m}}=\ min \left\{\left\|Lr\right\|^{2} + \lambda(\alpha_{s}\left\|m-m0\right\|^{2}+ \alpha_{x}\left\|D_{x}(m-m0)\right\|^{2} + \alpha_{z}\left\|D_{z}(m-m0)\right\|^{2})\right\}
 
 where :math:`\textbf{m}_{0}` is a reference model to which we believe
 the physical property distribution should be close. Often
@@ -182,17 +181,21 @@ Equation `[eq:ObjFctFull] <#eq:ObjFctFull>`__ can be rewritten as:
 
 .. math::
 
-   \begin{aligned}
    \label{eq:ObjFct2}
-   \widetilde{m}=\ min\left\{{(Gm-d)}^TW_d(Gm-d)\ +\ \lambda{(m-m_0)}^{T}W_m(m-m_0)\right\}\end{aligned}
+   \widetilde{m}=\ min\left\{{(Gm-d)}^TW_d(Gm-d)\ +\ \lambda{(m-m_0)}^{T}W_m(m-m_0)\right\}
 
 Where
 
 .. math::
 
-   \begin{aligned}
    \label{eq:Wd}
-   W_{d}=L^{T}L\end{aligned}
+   W_{d}=L^{T}L
+
+-  Luca’s version: :math:`W_m`\ =1st order spatial regularisation
+   (-1,1))
+
+-  New version:
+   :math:`W_{m}=\alpha_{s}I+{D_{x}}^{T} D_{x} +D_{z}^{T}D_{z}`
 
 The trade-off between data misfit and solution regularization is
 controlled by :math:`\lambda`. The numerical routine includes a “pareto”
@@ -210,23 +213,20 @@ problem:
 
 .. math::
 
-   \begin{aligned}
    \label{eq:m}
-   m={(G^{T}W_{d}G\ +\ \lambda W_{m})}^{-1}(G^{T}W_{d}d\ +\ \lambda W_{m}m_{0})\end{aligned}
+   m={(G^{T}W_{d}G\ +\ \lambda W_{m})}^{-1}(G^{T}W_{d}d\ +\ \lambda W_{m}m_{0})
 
 by solving the system Am=b, with:
 
 .. math::
 
-   \begin{aligned}
    \label{eq:Aside}
-   A=(G^{T}W_{d}G\ +\ \lambda W_{m})\end{aligned}
+   A=(G^{T}W_{d}G\ +\ \lambda W_{m})
 
 .. math::
 
-   \begin{aligned}
    \label{eq:Bside}
-   b=(G^{T}W_{d}d\ +\ \lambda W_{m}m_{0})\end{aligned}
+   b=(G^{T}W_{d}d\ +\ \lambda W_{m}m_{0})
 
 Model appraisal
 ---------------

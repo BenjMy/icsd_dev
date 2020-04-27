@@ -651,9 +651,8 @@ class iCSD3d_Class():
     def regularize_sum_AX0(self):
         """sum smallness and spatial regularisation
 
-		.. math::
-
-		   W_{m}=\alpha_{s}I+{D_{x}}^{T}D_{x} + D_{z}}^{T}D_{z}
+        .. math:: $W_{m}=\alpha_{s}I+{D_{x}}^{T}D_{x} + D_{z}}^{T}D_{z}$
+        
         Parameters
         ------------
         self
