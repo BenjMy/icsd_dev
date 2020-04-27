@@ -652,8 +652,9 @@ class iCSD3d_Class():
         """sum smallness and spatial regularisation
 
         .. math ::
-
-              W_{m}=\\alpha_{s}I+{D_{x}}^{T}D_{x} + D_{z}}^{T}D_{z}
+				 \begin{aligned}		
+	              W_{m}=\\alpha_{s}I+{D_{x}}^{T}D_{x} + D_{z}}^{T}D_{z}
+	              \end{aligned}
         Parameters
         ------------
         self
