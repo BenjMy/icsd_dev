@@ -26,9 +26,8 @@ Poisson’s equation:
 
 .. math::
 
-   \begin{aligned}
    \label{eq:PoissonEq}
-       \Delta \cdot (\sigma \Delta V) = C \end{aligned}
+       \Delta \cdot (\sigma \Delta V) = C
 
 where :math:`\sigma` is the conductivity of the medium, here assumed to
 be defined by the conductivity distribution. The lattest is in general
