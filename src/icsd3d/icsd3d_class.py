@@ -4,14 +4,14 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-# import kneed
+import kneed
 from scipy.interpolate import griddata
 from scipy.linalg import lu
 from scipy.optimize import lsq_linear, curve_fit, least_squares, leastsq
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import MultipleLocator
-# from kneed import KneeLocator
+from kneed import KneeLocator
 from scipy.interpolate import griddata as gd
 from mpl_toolkits.mplot3d import Axes3D
 import pyvista as pv
@@ -59,6 +59,7 @@ class iCSD3d_Class():
         self.regMesh='strc' # strc or unstrc
         self.plotElecs=False 
         self.alphax0=1 # weight on model smallness relative to m0
+        self.inix0=None # or 'cst' if constant vector *0.1
         self.alphaSxy=False # weight on model smoothness in z-direction 
         self.alphaSx=1 # weight on model smoothness in x-direction
         self.alphaSy=1 # weight on model smoothness in y-direction
@@ -341,7 +342,8 @@ class iCSD3d_Class():
     def misfit_2_initialX0(self):
         self.x0F1=1./((self.norm_F1+1)*(self.norm_F1+1))
         self.x0F1_sum= self.x0F1/sum(self.x0F1) # normlize such as sum equal to 1
-        self.x0F1_sum=np.ones(self.x0F1_sum.shape)*0.1
+        if self.inix0=='cst':
+            self.x0F1_sum=np.ones(self.x0F1_sum.shape)*0.1
 
 
     def plotmisfitF1(self):
@@ -647,7 +649,15 @@ class iCSD3d_Class():
         # self.reg_smallx0 = np.ones(self.x0F1_sum.shape)*self.alphax0
         
     def regularize_sum_AX0(self):
-        """sum smallness and spatial regularisation"""
+        """sum smallness and spatial regularisation
+
+        .. math ::
+
+              W_{m}=\\alpha_{s}I+{D_{x}}^{T}D_{x} + D_{z}}^{T}D_{z}
+        Parameters
+        ------------
+        self
+        """
         if (self.alphaSxy==True and self.x0_prior==True):
             print("""sum small x0, reg Ax, reg Ay""") 
             self.reg_A= self.reg_smallx0 + self.reg_Ax + self.reg_Ay
@@ -884,6 +894,7 @@ class iCSD3d_Class():
             # pg.show(mesh,data=rhomap,label='rhomap')
             
     def _fig_Axis_Labels_(self):
+        # plt.title(self.title)
         plt.ylabel('y [m]',fontsize=12)
         plt.xlabel('x [m]',fontsize=12)
         axes = plt.gca()
@@ -931,15 +942,17 @@ class iCSD3d_Class():
         plt.savefig(self.path2save+'ParetoFront.png', dpi = 600)
 
     def _plotFIT_(self):
+        stopat=len(self.b) # 204
+        # print(stopat)
         plt.figure()
         plt.subplot(121)
-        plt.plot(self.x.fun[:204] + self.b_w[:204], 'or', label = 'Inverted CSD')
-        plt.plot(self.b_w[:204], 'ob', label = 'True model')
+        plt.plot(self.x.fun[:stopat] + self.b_w[:stopat], 'or', label = 'Inverted CSD')
+        plt.plot(self.b_w[:stopat], 'ob', label = 'True model')
         plt.xlabel('Measurement number')
         plt.ylabel('R [Ohm]')
         plt.legend()
         plt.subplot(122)
-        plt.plot(self.x.fun[:204] + self.b_w[:204], self.b_w[:204], 'or')
+        plt.plot(self.x.fun[:stopat] + self.b_w[:stopat], self.b_w[:stopat], 'or')
         plt.xlabel('Inverted CSD, R [Ohm]')
         plt.ylabel('True model, R [Ohm]')
         plt.tight_layout()
