@@ -64,8 +64,8 @@ extensions = [
     'sphinx.ext.intersphinx',
     # 'sphinxcontrib.napoleon',
     'matplotlib.sphinxext.plot_directive',
-    'sphinx_gallery.gen_gallery',
-    'edit_on_github',
+    # 'sphinx_gallery.gen_gallery',
+    # 'edit_on_github',
 ]
 
 
