@@ -651,10 +651,10 @@ class iCSD3d_Class():
     def regularize_sum_AX0(self):
         """sum smallness and spatial regularisation
 
-        .. math ::
-				 \begin{aligned}		
-	              W_{m}=\\alpha_{s}I+{D_{x}}^{T}D_{x} + D_{z}}^{T}D_{z}
-	              \end{aligned}
+		.. math::
+
+		   \label{eq:regularize_sum_AX0}
+		   $W_{m}=\alpha_{s}I+{D_{x}}^{T}D_{x} + D_{z}}^{T}D_{z}$
         Parameters
         ------------
         self
