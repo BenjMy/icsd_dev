@@ -24,11 +24,7 @@ The MALM forward operator
 Voltage V depends on the density of current sources C according to
 Poisson’s equation:
 
-.. math::
-
-   \begin{aligned}
-   \label{eq:PoissonEq}
-       \Delta \cdot (\sigma \Delta V) = C \end{aligned}
+.. math:: \Delta \cdot (\sigma \Delta V) = C
 
 where :math:`\sigma` is the conductivity of the medium, here assumed to
 be defined by the conductivity distribution. The lattest is in general
