@@ -13,8 +13,8 @@ import datetime
 #
 # sys.path.append(os.path.relpath('../src/icsd3d'))
 # sys.path.insert(0, os.path.abspath('../src/icsd3d'))
-# sys.path.append(os.path.relpath('../src'))
-# sys.path.insert(0, os.path.abspath('../src'))
+sys.path.append(os.path.relpath('../src'))
+sys.path.insert(0, os.path.abspath('../src'))
 
 sys.path.append(os.path.pardir)
 
