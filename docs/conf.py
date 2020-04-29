@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-#
-# Configuration file for the Sphinx documentation builder.
-#
-# This file does only contain a selection of the most common options. For a
-# full list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
+import sys
+import os
+import datetime
+import sphinx_rtd_theme
+import sphinx_gallery
+from sphinx_gallery.sorting import FileNameSortKey
 
 # -- Path setup --------------------------------------------------------------
 
@@ -12,12 +11,13 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
-import sys
 sys.path.append(os.path.relpath('../src/icsd3d'))
 sys.path.insert(0, os.path.abspath('../src/icsd3d'))
 sys.path.append(os.path.relpath('../src'))
 sys.path.insert(0, os.path.abspath('../src'))
+
+sys.path.append(os.path.pardir)
+
 
 #sys.path.append(os.path.abspath('..{}'.format(os.path.sep)))
 from icsd3d_class import iCSD3d_Class
@@ -55,18 +55,31 @@ release = '0.1.1'
 #     #'sphinx_gallery.gen_gallery', # to generate the gallery
 #     #'sphinx_nbexamples', # needs pandoc (apt-get install pandoc)
 # ]
-
 extensions = [
-    'sphinx.ext.todo',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
     'sphinx.ext.autodoc',
-    'sphinx.ext.intersphinx',
-    # 'sphinxcontrib.napoleon',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.coverage',
+    'sphinx.ext.mathjax',
+    'sphinx.ext.doctest',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.extlinks',
+    "sphinx.ext.intersphinx",
     'matplotlib.sphinxext.plot_directive',
-    # 'sphinx_gallery.gen_gallery',
-    # 'edit_on_github',
+    'sphinx.ext.napoleon',
+    'sphinx_gallery.gen_gallery',
 ]
+
+# extensions = [
+#     'sphinx.ext.todo',
+#     'sphinx.ext.mathjax',
+#     'sphinx.ext.viewcode',
+#     'sphinx.ext.autodoc',
+#     'sphinx.ext.intersphinx',
+#     # 'sphinxcontrib.napoleon',
+#     'matplotlib.sphinxext.plot_directive',
+#     # 'sphinx_gallery.gen_gallery',
+#     # 'edit_on_github',
+# ]
 
 
 # example_gallery_config = {
@@ -77,6 +90,25 @@ extensions = [
 #     'urls': 'https://github.com/hkexgroup/emagpy/blob/stable/jupyter-notebook',
 #     'binder_url': 'https://mybinder.org/v2/gl/hkex%2Femagpy/stable?filepath=jupyter-notebook',
 # }
+
+sphinx_gallery_conf = {
+    # path to your examples scripts
+    'examples_dirs': ['../examples'],
+    # path where to save gallery generated examples
+    'gallery_dirs': 'auto_examples',
+    'filename_pattern': '\.py',
+    # Remove the "Download all examples" button from the top level gallery
+    'download_all_examples': False,
+    # Sort gallery example by file name instead of number of lines (default)
+    'within_subsection_order': FileNameSortKey,
+    # directory where function granular galleries are stored
+    'backreferences_dir': 'api/generated/backreferences',
+    # Modules for which function level galleries are created.  In
+    # this case sphinx_gallery and numpy in a tuple of strings.
+    # 'doc_module': 'harmonica',
+    # Insert links to documentation of objects in the examples
+    # 'reference_url': {'harmonica': None},
+}
 
 
 # Add any paths that contain templates here, relative to this directory.
