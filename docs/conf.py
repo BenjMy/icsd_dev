@@ -2,8 +2,8 @@ import sys
 import os
 import datetime
 import sphinx_rtd_theme
-import sphinx_gallery
-from sphinx_gallery.sorting import FileNameSortKey
+# import sphinx_gallery
+# from sphinx_gallery.sorting import FileNameSortKey
 
 # -- Path setup --------------------------------------------------------------
 
@@ -100,7 +100,7 @@ sphinx_gallery_conf = {
     # Remove the "Download all examples" button from the top level gallery
     'download_all_examples': False,
     # Sort gallery example by file name instead of number of lines (default)
-    'within_subsection_order': FileNameSortKey,
+    # 'within_subsection_order': FileNameSortKey,
     # directory where function granular galleries are stored
     'backreferences_dir': 'api/generated/backreferences',
     # Modules for which function level galleries are created.  In
