@@ -1,0 +1,10 @@
+name: icsd3d
+dependencies:
+    - python=3.6
+    - numpy
+    - scipy
+    - matplotlib
+    - jupyter
+    - sphinx
+    - sphinx-gallery
+    - sphinx_bootstrap_theme
