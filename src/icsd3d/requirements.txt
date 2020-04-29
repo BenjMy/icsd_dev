@@ -1,8 +1,0 @@
-numpy
-matplotlib
-pandas
-scipy
-pyproj
-spotpy
-joblib
-tqdm

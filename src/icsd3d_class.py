@@ -1100,4 +1100,10 @@ class iCSD3d_Class():
             Path where the .csv files will be saved.
         """
 
+    def productmoment(self):
+        """ Compute the product moment correlation after Binley et al. 1999
+        .. math:: 
+
+            r_{k}= \frac{\sum_{i}(D_{I}-\overline{D})(F_{i}(I_{k})-\overline{F}(I_{k}))}{\sqrt{\sum_{i}(D_{I}-\overline{D})^{2}}\sum_{i}(F_{i}(I_{k})-\overline{F}(I_{k}))^{2}}
+        """
 

@@ -1,7 +1,7 @@
 import sys
 import os
 import datetime
-import sphinx_rtd_theme
+# import sphinx_rtd_theme
 # import sphinx_gallery
 # from sphinx_gallery.sorting import FileNameSortKey
 
@@ -11,10 +11,10 @@ import sphinx_rtd_theme
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-sys.path.append(os.path.relpath('../src/icsd3d'))
-sys.path.insert(0, os.path.abspath('../src/icsd3d'))
-sys.path.append(os.path.relpath('../src'))
-sys.path.insert(0, os.path.abspath('../src'))
+# sys.path.append(os.path.relpath('../src/icsd3d'))
+# sys.path.insert(0, os.path.abspath('../src/icsd3d'))
+# sys.path.append(os.path.relpath('../src'))
+# sys.path.insert(0, os.path.abspath('../src'))
 
 sys.path.append(os.path.pardir)
 
@@ -45,29 +45,29 @@ release = '0.1.1'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-# extensions = [
-#     'sphinx.ext.autodoc',
-#     'sphinx.ext.coverage',
-#     'sphinx.ext.mathjax',
-#     'sphinx.ext.napoleon',
-#     #'numpydoc',
-#     #'nbsphinx', # to include jupyter notebook as sphinx doc page
-#     #'sphinx_gallery.gen_gallery', # to generate the gallery
-#     #'sphinx_nbexamples', # needs pandoc (apt-get install pandoc)
-# ]
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
-    'sphinx.ext.doctest',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.extlinks',
-    "sphinx.ext.intersphinx",
-    'matplotlib.sphinxext.plot_directive',
     'sphinx.ext.napoleon',
-    'sphinx_gallery.gen_gallery',
+    'numpydoc',
+    #'nbsphinx', # to include jupyter notebook as sphinx doc page
+    'sphinx_gallery.gen_gallery', # to generate the gallery
+    #'sphinx_nbexamples', # needs pandoc (apt-get install pandoc)
 ]
+# extensions = [
+#     'sphinx.ext.autodoc',
+#     'sphinx.ext.autosummary',
+#     'sphinx.ext.coverage',
+#     'sphinx.ext.mathjax',
+#     'sphinx.ext.doctest',
+#     'sphinx.ext.viewcode',
+#     'sphinx.ext.extlinks',
+#     "sphinx.ext.intersphinx",
+#     'matplotlib.sphinxext.plot_directive',
+#     'sphinx.ext.napoleon',
+#     'sphinx_gallery.gen_gallery',
+# ]
 
 # extensions = [
 #     'sphinx.ext.todo',
