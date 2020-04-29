@@ -1,6 +1,14 @@
 name: icsd3d
+
+pages:
+  script:
+  - pip install -r requirements.txt
+  - apt-get update
+  - apt-get install --assume-yes pandoc
+  - pip install sphinx==1.8.4 numpydoc==0.7.0 sphinx_rtd_theme sphinx-nbexamples
+
 dependencies:
-    - python=3.6
+    - python=3.7
     - numpy
     - scipy
     - matplotlib
