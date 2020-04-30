@@ -35,7 +35,8 @@ path2files= '../examples/Nail1/'
 
 # -----------------------------------#
 # apply here a smallness contrainst to the regularisation
-from icsd3d_class import iCSD3d_Class as i3d
+# from src import iCSD3d_Class as 
+from src.icsd3d_class import iCSD3d_Class as i3d
 
 icsd=i3d(dirName=path2files)   
 icsd.type='2d'
