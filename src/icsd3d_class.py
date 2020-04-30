@@ -479,15 +479,15 @@ class iCSD3d_Class():
         print(self.path2load)
         self.path2save= self.path2load + 'figs'
         # self.path2save= self.dirName + 'fig/'
-        print(self.path2save)
+        # print(self.path2save)
         # cwd = os.getcwd()
         # print(cwd+self.path2save)
-        try:
-            # Create target Directory
-            os.mkdir(self.path2save)
-            print("Directory " , self.path2save ,  " Created ") 
-        except FileExistsError:
-            print("Directory " , self.path2save ,  " already exists")
+        # try:
+        #     # Create target Directory
+        #     os.mkdir(self.path2save)
+        #     print("Directory " , self.path2save ,  " Created ") 
+        # except FileExistsError:
+        #     print("Directory " , self.path2save ,  " already exists")
             
     ### LOAD 
     def load_coord(self):
