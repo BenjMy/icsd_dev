@@ -48,16 +48,6 @@ Gallery of examples
 
    auto_examples/index
    
-API documentation
-=================
-
-.. toctree::
-   :maxdepth: 2
-   :caption: API
-
-   content/api_core/api
-
-
 
 Indices and tables
 ==================

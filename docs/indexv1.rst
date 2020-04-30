@@ -49,6 +49,16 @@ Peruzzo, L., Chou, C., Wu, Y. et al. Imaging of plant current pathways for non-i
 .. content/doc/documentationV1
 
 
+API documentation
+=================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API
+
+   content/api_core/api
+   
+
 Gallery of examples
 ===================
 
