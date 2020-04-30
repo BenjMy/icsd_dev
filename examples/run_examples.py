@@ -14,8 +14,11 @@ import os
 # path2files="examples/Cotton_Soil/Nail1/"
 # path2files="/examples/Cotton_Soil/Nail1/"
 
-path2files = os.path.join(os.path.dirname(__file__), '/Cotton_Soil/Nail1/')
+# path2files = os.path.join(os.path.dirname('__file__'), '/Cotton_Soil/Nail1/')
+print(os.getcwd())
+path2files= './Cotton_Soil/Nail1/'
 
+# path2files = 
 
 # from icsd2d_class import iCSD2d_Class as i2d
 # icsd=i2d(dirName=path2files)   
