@@ -13,14 +13,14 @@ import datetime
 #
 # sys.path.append(os.path.relpath('../src/icsd3d'))
 # sys.path.insert(0, os.path.abspath('../src/icsd3d'))
-sys.path.append(os.path.relpath('../src'))
-sys.path.insert(0, os.path.abspath('../src'))
+sys.path.append(os.path.relpath('../icsd3d'))
+sys.path.insert(0, os.path.abspath('../icsd3d'))
 
 sys.path.append(os.path.pardir)
 
 
 #sys.path.append(os.path.abspath('..{}'.format(os.path.sep)))
-from src.icsd3d_class import iCSD3d_Class
+from icsd3d.icsd3d_class import iCSD3d_Class
 
 
 # -- Project information -----------------------------------------------------
