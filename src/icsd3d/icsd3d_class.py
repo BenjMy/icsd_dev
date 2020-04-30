@@ -476,9 +476,10 @@ class iCSD3d_Class():
     ### mkdirs 
     def createdirs(self):
         self.path2load = self.dirName
-        
-        self.path2save= self.path2load + '_fig/'
+        print(self.path2load)
+        self.path2save= self.path2load + 'figs/'
         # self.path2save= self.dirName + 'fig/'
+        print(self.path2save)
         try:
             # Create target Directory
             os.mkdir(self.path2save)
