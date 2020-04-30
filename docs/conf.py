@@ -61,24 +61,24 @@ extensions = [
 autosummary_generate = True
 autodoc_default_flags = ['members', 'inherited-members']
 
-# sphinx_gallery_conf = {
-#     # path to your examples scripts
-#     'examples_dirs': ['../examples'],
-#     # path where to save gallery generated examples
-#     'gallery_dirs': 'auto_examples',
-#     'filename_pattern': '\.py',
-#     # Remove the "Download all examples" button from the top level gallery
-#     'download_all_examples': False,
-#     # Sort gallery example by file name instead of number of lines (default)
-#     # 'within_subsection_order': FileNameSortKey,
-#     # directory where function granular galleries are stored
-#     'backreferences_dir': False,
-#     # Modules for which function level galleries are created.  In
-#     # this case sphinx_gallery and numpy in a tuple of strings.
-#     # 'doc_module': 'harmonica',
-#     # Insert links to documentation of objects in the examples
-#     # 'reference_url': {'harmonica': None},
-# }
+sphinx_gallery_conf = {
+    # path to your examples scripts
+    'examples_dirs': ['../examples'],
+    # path where to save gallery generated examples
+    'gallery_dirs': 'auto_examples',
+    'filename_pattern': '\.py',
+    # Remove the "Download all examples" button from the top level gallery
+    'download_all_examples': False,
+    # Sort gallery example by file name instead of number of lines (default)
+    # 'within_subsection_order': FileNameSortKey,
+    # directory where function granular galleries are stored
+    'backreferences_dir': False,
+    # Modules for which function level galleries are created.  In
+    # this case sphinx_gallery and numpy in a tuple of strings.
+    # 'doc_module': 'harmonica',
+    # Insert links to documentation of objects in the examples
+    # 'reference_url': {'harmonica': None},
+}
 
 # Configure the inline plots from matplotlib plot_directive
 plot_formats = [("png", 90)]
