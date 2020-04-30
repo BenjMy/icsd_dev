@@ -12,7 +12,10 @@ Inversion of current source density apply to a roots imaging
 # Exemple cotton
 # -----------------------------------#
 # path2files="examples/Cotton_Soil/Nail1/"
-path2files="/examples/Cotton_Soil/Nail1/"
+# path2files="/examples/Cotton_Soil/Nail1/"
+
+path2files = os.path.join(os.path.dirname(__file__), '/Cotton_Soil/Nail1/')
+
 
 # from icsd2d_class import iCSD2d_Class as i2d
 # icsd=i2d(dirName=path2files)   
