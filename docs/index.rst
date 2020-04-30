@@ -57,9 +57,7 @@ Gallery of examples
    :maxdepth: 2
    :caption: Gallery of examples
    
-   example1
-   example2
-
+   
 .. About
 .. =====
 

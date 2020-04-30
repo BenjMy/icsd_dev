@@ -55,61 +55,35 @@ extensions = [
     'sphinx_gallery.gen_gallery', # to generate the gallery
     #'sphinx_nbexamples', # needs pandoc (apt-get install pandoc)
 ]
-# extensions = [
-#     'sphinx.ext.autodoc',
-#     'sphinx.ext.autosummary',
-#     'sphinx.ext.coverage',
-#     'sphinx.ext.mathjax',
-#     'sphinx.ext.doctest',
-#     'sphinx.ext.viewcode',
-#     'sphinx.ext.extlinks',
-#     "sphinx.ext.intersphinx",
-#     'matplotlib.sphinxext.plot_directive',
-#     'sphinx.ext.napoleon',
-#     'sphinx_gallery.gen_gallery',
-# ]
-
-# extensions = [
-#     'sphinx.ext.todo',
-#     'sphinx.ext.mathjax',
-#     'sphinx.ext.viewcode',
-#     'sphinx.ext.autodoc',
-#     'sphinx.ext.intersphinx',
-#     # 'sphinxcontrib.napoleon',
-#     'matplotlib.sphinxext.plot_directive',
-#     # 'sphinx_gallery.gen_gallery',
-#     # 'edit_on_github',
-# ]
 
 
-# example_gallery_config = {
-#     'examples_dirs': '../jupyter-notebook',
+# Produce pages for each class and function
+autosummary_generate = True
+autodoc_default_flags = ['members', 'inherited-members']
+
+# sphinx_gallery_conf = {
+#     # path to your examples scripts
+#     'examples_dirs': ['../examples'],
+#     # path where to save gallery generated examples
 #     'gallery_dirs': 'auto_examples',
-#     'dont_preprocess': '../jupyter-notebook/nb_comparison-inversion-cover-crop.ipynb',
-#     'pattern': 'nb_.+.ipynb',
-#     'urls': 'https://github.com/hkexgroup/emagpy/blob/stable/jupyter-notebook',
-#     'binder_url': 'https://mybinder.org/v2/gl/hkex%2Femagpy/stable?filepath=jupyter-notebook',
+#     'filename_pattern': '\.py',
+#     # Remove the "Download all examples" button from the top level gallery
+#     'download_all_examples': False,
+#     # Sort gallery example by file name instead of number of lines (default)
+#     # 'within_subsection_order': FileNameSortKey,
+#     # directory where function granular galleries are stored
+#     'backreferences_dir': False,
+#     # Modules for which function level galleries are created.  In
+#     # this case sphinx_gallery and numpy in a tuple of strings.
+#     # 'doc_module': 'harmonica',
+#     # Insert links to documentation of objects in the examples
+#     # 'reference_url': {'harmonica': None},
 # }
 
-sphinx_gallery_conf = {
-    # path to your examples scripts
-    'examples_dirs': ['../examples'],
-    # path where to save gallery generated examples
-    'gallery_dirs': 'auto_examples',
-    'filename_pattern': '\.py',
-    # Remove the "Download all examples" button from the top level gallery
-    'download_all_examples': False,
-    # Sort gallery example by file name instead of number of lines (default)
-    # 'within_subsection_order': FileNameSortKey,
-    # directory where function granular galleries are stored
-    'backreferences_dir': 'api/generated/backreferences',
-    # Modules for which function level galleries are created.  In
-    # this case sphinx_gallery and numpy in a tuple of strings.
-    # 'doc_module': 'harmonica',
-    # Insert links to documentation of objects in the examples
-    # 'reference_url': {'harmonica': None},
-}
-
+# Configure the inline plots from matplotlib plot_directive
+plot_formats = [("png", 90)]
+plot_html_show_formats = False
+plot_html_show_source_link = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
