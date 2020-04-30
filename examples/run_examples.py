@@ -15,9 +15,12 @@ import os
 # path2files="/examples/Cotton_Soil/Nail1/"
 
 # path2files = os.path.join(os.path.dirname('__file__'), '/Cotton_Soil/Nail1/')
-# print(os.getcwd())
-path2files= './Cotton_Soil/Nail1/'
+cwd=os.getcwd()
 
+path2files= '/Cotton_Soil/Nail1/'
+DIR= cwd + path2files
+
+# os.chdir(DIR)
 # path2files = 
 
 # from icsd2d_class import iCSD2d_Class as i2d
@@ -33,7 +36,7 @@ path2files= './Cotton_Soil/Nail1/'
 # apply here a smallness contrainst to the regularisation
 from icsd3d_class import iCSD3d_Class as i3d
 
-icsd=i3d(dirName=path2files)   
+icsd=i3d(dirName=DIR)   
 icsd.type='2d'
 icsd.obs_err='sqrt' # choose between constant weight and w = 1/sqrt(abs(obs))
 icsd.wr=1 #weight regularization
