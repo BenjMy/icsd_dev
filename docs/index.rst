@@ -43,7 +43,7 @@ Peruzzo, L., Chou, C., Wu, Y. et al. Imaging of plant current pathways for non-i
    :maxdepth: 2
    :caption: Documentation
 
-   content/doc/documentationV0
+   content/doc/documentation
 .. content/doc/documentationV1
 
 Gallery of examples
