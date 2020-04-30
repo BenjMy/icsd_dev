@@ -20,7 +20,7 @@ cwd=os.getcwd()
 path2files= '/Cotton_Soil/Nail1/'
 DIR= cwd + path2files
 
-# os.chdir(DIR)
+os.chdir(DIR)
 # path2files = 
 
 # from icsd2d_class import iCSD2d_Class as i2d
