@@ -21,16 +21,35 @@ MALM implementation is based on three assumptions:
 The MALM forward operator
 -------------------------
 
-Voltage V depends on the density of current sources C according to
-Poisson’s equation:
+For a 3-D, isotropic electrical-conductivity distribution,
+:math:`\sigma(r)`, the electric potential, :math:`V(r)`, at a point r
+due to a single current electrode, idealized as a point source at the
+origin with strength I, is defined by the Poisson equation:
 
 .. math::
 
    \label{eq:PoissonEq}
-       \Delta \cdot (\sigma \Delta V) = C
+       \Delta \cdot (\sigma \Delta V) = -I \varsigma(r)
+
+subject to the condition:
+
+.. math::
+
+   \label{eq:PoissonEqCond}
+   \frac{\partial V}{\partial n} = 0
+
+at the ground surface and the condition
+
+.. math::
+
+   \label{eq:PoissonEqCond2}
+   V = 0
+
+at other, infinite boundaries; with :math:`\varsigma` the Dirac delta
+function and n the outward normal.
 
 where :math:`\sigma` is the conductivity of the medium, here assumed to
-be defined by the conductivity distribution. The lattest is in general
+be defined by the conductivity distribution. The latest is in general
 obtained from an Electrical Resistivity Tomography (ERT) data inversion.
 
 Green functions simulation
@@ -64,17 +83,19 @@ investigated CSD into the sum of point current sources. For linearity,
 the potential field of multiple current sources is the sum of their
 potential fields: the measured :math:`\Delta`\ V can be viewed as, and
 decomposed into, the sum of multiple :math:`\Delta` V due to a set of
-possible current sources :raw-latex:`\cite{LucaPlantAndSoil}`.
+possible current sources :raw-latex:`\cite{LucaPlantAndSoil}`. Let’s
+then assume, a linear system of equations linking data and model for
+potential fields:
 
 .. math:: Ax=b
 
-Where :math:`\textbf{A}` is a matrix, its columns are the simulated VRTe
-R sequences; x is a vector containing the unknown VRTe weights;
-:math:`\textbf{b}` is a vector containing the measured sequence of
-resistance. Each row in A corresponds to the relative R in the
-acquisition sequence, e.g., :math:`\textbf{A}_{1,1}` is the first
-resistance extracted from the potential field simulated with injection
-at the first VRTe.
+Where :math:`\textbf{b}` is a vector containing the measured sequence of
+resistance. :math:`\textbf{A}` is the source kernel matrix, its columns
+are the simulated VRTe R sequences;and x is the source model, a vector
+containing the unknown VRTe weights; Each row in A corresponds to the
+relative R in the acquisition sequence, e.g., :math:`\textbf{A}_{1,1}`
+is the first resistance extracted from the potential field simulated
+with injection at the first VRTe.
 
 Including Constraints
 ~~~~~~~~~~~~~~~~~~~~~
@@ -119,6 +140,19 @@ source manages, alone, to explain the entire observed MALM voltage
 distribution. Other approaches can be considered as a 1st attempt to
 describe regions of influences without having to go trough a complete
 inversion (see sect. ).
+
+Depth weighting function
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Additional weightings can also be incorporated through, such as depth
+weighting, which is important in potential field inversions (such as
+magnetics and gravity), or sensitivity weightings to prevent model
+structure from concentrating close to sources or receivers (Li and
+Oldenburg, 1996a, Li and Oldenburg, 2000c).
+
+A depth weighting matrix is generally applied to the kernel during
+inversion to counteract the sensitivity of the kernel matrix to near
+surface model parameters cite Zhenlu Shao, Revil 2018
 
 Spatial regularization
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -238,6 +272,76 @@ TO WRITE
 Other approaches
 ----------------
 
-TO WRITE: vraisemblance fct from Binley’s article cite binley paper
+We describe here approaches than can help to interpret the
+mise-à-la-masse prospection. At most, they indicate an approximate
+source location. It is crucial to remember that these solutions are
+subject to nonuniqueness and bias just like any other geophysical
+inverse problem.
+
+Imaging methods derived from gravity methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The voltage as a potential in resistivity methods is actually a
+pseudo-potential since it is modulated by the conductivity. If the
+conductivity is homogeneous (case where CT=1, in figure 1), the partial
+differential equation (PDE) that is regulating the flux of current in
+steady state (DC), boils down to Laplace’s equation because the
+conductivity goes out from the derivative.
+
+In steady state, we introduced the governing equations for the direct
+current problem (i.e. Poisson equation, Eq.
+`[eq:PoissonEq] <#eq:PoissonEq>`__).
+
+.. math::
+
+   \label{eq:PoissonEq}
+       \Delta \cdot (\sigma \Delta V) = -I \varsigma(r)
+
+Poisson’s Equation simplifies to Laplace’s Equation.
+
+.. math::
+
+   \label{LaplaceEq}
+   \Delta^{2} U = 0
+
+Ultimately, we get the same equation than for pure potential methods
+(like gravity of magnetism). Imaging methods may be defined in terms of
+the self-adjoint operator GT only [18], leading to some sort of
+approximation of the inversion approach.
+
+.. math:: \textbf{m} \approx \textbf{G}^{T}\textbf{d}.
+
+As first observed in [17] and [18], :math:`\textbf{G}^{T}` is the upward
+continuation operator.
+
+[17] M. Fedi and M. Pilkington, “Understanding imaging methods for
+potential field data,” Geophysics, vol. 77, no. 1, pp. G13–G24, 2012.
+[18] M. S. Zhdanov, Inverse Theory and Applications in Geophysics, 2nd
+ed. Amsterdam, The Netherlands: Elsevier, 2015.
+
+-  Euler deconvolution;
+
+-  dEXP, Sandwich, Migrate ...;
+
+-  CWT: continuous wavelets transformations.
+
+cite paper in prep: “The dEXP and wawelets algorithm applied to current
+source inversion for Mise-à-la-masse prospection”
+
+The product-moment correlation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rather than approach the measure of misfit between the model and the
+data in terms of a least squares fit, the correlation of data to model
+may be used. The product-moment correlation is expressed here as:
+
+.. math::
+
+   \label{eq:productmoment_corr}
+   r_{k}= \frac{\sum_{i}(D_{I}-\overline{D})(F_{i}(I_{k})-\overline{F}(I_{k}))}{\sqrt{\sum_{i}(D_{I}-\overline{D})^{2}}\sum_{i}(F_{i}(I_{k})-\overline{F}(I_{k}))^{2}}
+
+where :math:`D_{i}` is the :math:`i^{th}` measured transfer resistance
+and :math:`F_{i}(I_{k})` is the :math:`i^{th}` transfer resistance
+computed to unit current at location k.
 
 :raw-latex:`\cite{binley1997detecting}`
