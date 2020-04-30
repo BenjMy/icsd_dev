@@ -72,7 +72,7 @@ sphinx_gallery_conf = {
     # Sort gallery example by file name instead of number of lines (default)
     # 'within_subsection_order': FileNameSortKey,
     # directory where function granular galleries are stored
-    'backreferences_dir': False,
+    # 'backreferences_dir': False,
     # Modules for which function level galleries are created.  In
     # this case sphinx_gallery and numpy in a tuple of strings.
     # 'doc_module': 'harmonica',
