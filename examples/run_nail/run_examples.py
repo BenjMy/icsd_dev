@@ -17,7 +17,7 @@ import os
 # path2files = os.path.join(os.path.dirname('__file__'), '/Cotton_Soil/Nail1/')
 cwd=os.getcwd()
 
-path2files= '../examples/nail1/'
+path2files= '../examples/Nail1/'
 # DIR= cwd + path2files
 
 # os.chdir(DIR)
