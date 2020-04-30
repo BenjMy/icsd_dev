@@ -2,7 +2,7 @@
 Inversion of current source density apply to a roots imaging
 ------------------------------------------------------------
 """
-# import os
+import os
 # import numpy as np
 
 # maindir='E:/Padova/Software/SourceInversion/icsd_dev/'
