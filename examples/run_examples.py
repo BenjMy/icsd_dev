@@ -1,3 +1,7 @@
+"""
+Inversion of current source density apply to a roots imaging
+------------------------------------------------------------
+"""
 import os
 import numpy as np
 

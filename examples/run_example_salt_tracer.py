@@ -1,3 +1,7 @@
+"""
+Inversion of current source density apply to a salt tracer
+----------------------------------------------------------
+"""
 import os
 import numpy as np
 

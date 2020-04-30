@@ -1,3 +1,8 @@
+"""
+Inversion of current source density apply to a landfill leakage
+---------------------------------------------------------------
+"""
+
 import os
 import numpy as np
 
