@@ -56,7 +56,9 @@ Gallery of examples
 .. toctree::
    :maxdepth: 2
    :caption: Gallery of examples
-   
+
+   auto_examples/index
+
    
 .. About
 .. =====
