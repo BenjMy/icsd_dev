@@ -476,9 +476,10 @@ class iCSD3d_Class():
     ### mkdirs 
     def createdirs(self):
         self.path2load = self.dirName
-        
-        self.path2save= self.path2load + '_fig/'
+        print(self.path2load)
+        self.path2save= self.path2load + 'figs/'
         # self.path2save= self.dirName + 'fig/'
+        print(self.path2save)
         try:
             # Create target Directory
             os.mkdir(self.path2save)
@@ -746,13 +747,7 @@ class iCSD3d_Class():
     ### LSQ 
 
     def iCSD(self):
-        """solve linear system, given A matrix (VRTe, constrain, regul) and b (observations)
-        .. math::
-                Ax=b 
-                A=(G^{T}W_{d}G\ +\ \lambda W_{m})
-                b=(G^{T}W_{d}d\ +\ \lambda W_{m}m_{0})
-        """
-
+        """solve linear system, given A matrix (VRTe, constrain, regul) and b (observations)"""
         if self.x0_ini_guess==False:
             print('No initial guess')
             self.x = lsq_linear(self.A_w, self.b_w, bounds = (0, 1))
