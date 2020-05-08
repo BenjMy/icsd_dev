@@ -8,7 +8,7 @@ Clone the gitlab repository::
 
     git clone https://github.com/Peruz/icsd
 
-From the same `src` directory you can import the module from source using python. 
+From the same `icsd3d` directory you can import the module from source using python. 
 
 
 Contribute and support

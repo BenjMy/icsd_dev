@@ -4,14 +4,15 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-# import kneed
+import kneed
+from scipy.stats import pearsonr
 from scipy.interpolate import griddata
 from scipy.linalg import lu
 from scipy.optimize import lsq_linear, curve_fit, least_squares, leastsq
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import MultipleLocator
-# from kneed import KneeLocator
+from kneed import KneeLocator
 from scipy.interpolate import griddata as gd
 from mpl_toolkits.mplot3d import Axes3D
 import pyvista as pv
@@ -35,7 +36,7 @@ class iCSD3d_Class():
         self.dirName = dirName
         self.clim = []
        # load
-        self.type='3d'
+        self.type='2d'
         self.sim='VRTeSim.txt'
         self.obs='ObsData.txt'
         self.coord_file='VRTeCoord.txt'
@@ -96,6 +97,10 @@ class iCSD3d_Class():
             self.nx_ny_nz()
         self.mkGrid_XI_YI()
         # # append spatial regularization
+        self.parseModelReg()
+        self.parseDataReg()
+        self.parseIniModel()
+        
         if self.type=='2d': # 2D CASE -----------------------------------------
             if self.regMesh=='strc':
                 if self.alphaSxy==True:
@@ -132,6 +137,8 @@ class iCSD3d_Class():
         # # stack data, constrain, and regularization 
         self.stack_A()
         self.stack_b()
+        
+        # return self.A,self.b
         
         
 # NEW FUNCTIONS to introduce 
@@ -273,6 +280,40 @@ class iCSD3d_Class():
         pvfig.close()
 
         
+    def plotScattered3d(self,data):
+        print(data)
+        self.f = plt.figure('volume')
+
+        step=(max(self.coord_x)-min(self.coord_x))/10
+
+        xlin=np.arange(min(self.coord_x),max(self.coord_x),step)
+        ylin=np.arange(min(self.coord_y),max(self.coord_y),step)
+        zlin=np.arange(min(self.coord_z),max(self.coord_z),step)
+        #generate new grid
+        X,Y,Z=np.meshgrid(xlin,ylin,zlin)
+        #interpolate "data.v" on new grid "inter_mesh"
+        # V = gd((self.coord_x,self.coord_y,self.coord_z), data_2_plot, (X,Y,Z), method='linear')
+        
+        ax=self.f.gca(projection='3d')
+        sc=ax.scatter(self.coord_x, self.coord_y, self.coord_z, c=data, cmap ='coolwarm')
+        # if self.clim is None:
+        #     print('none clim')
+        # sc.set_clim(self.clim)
+        cbar = plt.colorbar(sc)
+        cbar.set_label('# current density')
+                
+        if self.sc:
+            ax.scatter(self.coordE[self.RemLineNb:self.RemLineNb+2,1], self.coordE[self.RemLineNb:self.RemLineNb+2,2], self.coordE[self.RemLineNb:self.RemLineNb+2,3],
+                       marker="v", color='black',s=60, label = 'Remotes')
+            ax.scatter(self.coordE[self.Injection,1], self.coordE[self.Injection,2], self.coordE[self.Injection,3],
+                       marker="*", color='black',s=60, label = 'A')
+            ax.scatter(self.coordE[:self.RemLineNb,1], self.coordE[:self.RemLineNb,2], self.coordE[:self.RemLineNb,3],
+                       marker="s", color='black',s=60, label = 'Velecs')
+        plt.legend()
+        # plt.title(title)
+        plt.savefig(self.path2save+  self.obs + '_icsd_scatter.png' , dpi=550,bbox_inches='tight',pad_inches = 0)
+        plt.show()
+
     def plotCSD3d(self):
         self.f = plt.figure('volume')
 
@@ -294,7 +335,8 @@ class iCSD3d_Class():
         #     print('none clim')
         # sc.set_clim(self.clim)
         cbar = plt.colorbar(sc)
-        cbar.set_label('# current density')
+        self.labels()
+        cbar.set_label(self.physLabel)
                 
         if self.sc!=None:
             ax.scatter(self.coordE[self.RemLineNb:self.RemLineNb+2,1], self.coordE[self.RemLineNb:self.RemLineNb+2,2], self.coordE[self.RemLineNb:self.RemLineNb+2,3],
@@ -316,7 +358,7 @@ class iCSD3d_Class():
            if self.wr==self.KneeWr:
                plt.savefig(self.path2save+ self.obs + 'icsd_knee_scatter'+ str(self.KneeWr) + '.png',dpi=550,bbox_inches='tight',pad_inches = 0)
         plt.show()
-
+        
       
     def DetectKneePt(self):
         self.kn = KneeLocator(self.pareto_list_FitRes,self.pareto_list_RegRes, 
@@ -388,6 +430,34 @@ class iCSD3d_Class():
         fig.tight_layout()
         # fig.savefig('F1_x0F1'+ self.ObsName, dpi = 450, bbox_inches='tight')
 
+    def plotmisfitIni(self,Mini):
+        fig, ax = plt.subplots()
+        if self.type=='2d':
+            points = np.column_stack((self.coord_x, self.coord_y))
+            grid = griddata(points, Mini, (self.XI, self.YI), method = 'linear') # grid is a np array
+            im1 = ax.imshow(grid,norm=LogNorm(vmin=0.3, vmax=0.7), extent = (min (self.coord_x), max(self.coord_x), min(self.coord_y), max(self.coord_y)),
+            aspect = 'auto', origin = 'lower', cmap= 'jet')
+            ax.set_ylabel('y [m]',fontsize=15)
+            ax.set_xlabel('x [m]',fontsize=15)
+            ax.set_title('Misfit',fontsize=15)
+
+            #axes = plt.gca()
+            #axes.set_xlim([0,0.53])
+            #axes.set_ylim([0,0.52])
+            ax.tick_params(axis='both', which='major', labelsize=15)
+            #ax.set_tight_layout()
+            ax.set_aspect(1.0)
+            cbar1 = plt.colorbar(im1,ax=ax, format="%.2f",fraction=0.046, pad=0.04)
+            cbar1.set_label('Normalised misfit', labelpad = 5, fontsize=14)
+    
+          
+        else:
+            self.plotScattered3d(Mini)
+            
+        # fig.suptitle(self.ObsName, y=0.80)
+        fig.tight_layout()
+        # fig.savefig('F1_x0F1'+
+        
 
     def run_misfitF1(self):
         self.normF1()
@@ -1004,6 +1074,21 @@ class iCSD3d_Class():
         self.f.savefig(self.path2save+'iCSD', dpi = 600)
         plt.show()
         
+    def showResultsFini(self, method='Pearson',ax=None, clim=None ,cmap='viridis_r',title=None):
+        """Show non-inverted model.
+        
+        Parameters
+        ----------       
+        """
+        self.clim=clim
+        self.title=title
+        
+        if method=='misfitF1':
+            Mini= self.run_misfitF1()
+        elif method=='Pearson':
+            Mini= self.run_productmoment()
+            self.plotmisfitIni(Mini)
+        return
     
 
     def showResults(self,ax=None, clim=None ,cmap='viridis_r',
@@ -1103,10 +1188,31 @@ class iCSD3d_Class():
             Path where the .csv files will be saved.
         """
 
-    def productmoment(self):
+    def run_productmoment(self):
         """ Compute the product moment correlation after Binley et al. 1999
         .. math:: 
 
             r_{k}= \frac{\sum_{i}(D_{I}-\overline{D})(F_{i}(I_{k})-\overline{F}(I_{k}))}{\sqrt{\sum_{i}(D_{I}-\overline{D})^{2}}\sum_{i}(F_{i}(I_{k})-\overline{F}(I_{k}))^{2}}
+        where $D_{i}$ is the $i^{th}$ measured transfer resistance and $F_{i}(I_{k})$ is the $i^{th}$  transfer resistance computed to unit current at location k. 
         """
+        print('run_productmoment')
+        self.icsd_init()            
+        # Estimate a covariance matrix, given data observation and weights and tranfert resitances measured.
+        self.rpearson=[]
+        for i in range(np.shape(self.A)[1]):
+            corr, _ = pearsonr(self.b, self.A[:,i])
+            self.rpearson.append(corr)
+            
+        return self.rpearson
+        
+        
+    def regularise(self):
+        """ Parse regularisation parameters before inversion
+        """    
+        
 
+    def labels(self):
+        """ Parse graphical labels to plot
+        """
+        if method=='Pearson':      
+            self.physLabel= 'Pearson r coeff'
