@@ -15,4 +15,4 @@ The simpliest processing can be achieved with the python API::
 	icsd3d_landfill.coord_file="VRTeCoord.txt" # Coordin
 	icsd3d_landfill.regMesh='unstrc' # spatial regularisation VRTE mesh type
 
-More examples are available in the Example pseudo-section.
+More examples are available in the Example gallery section.

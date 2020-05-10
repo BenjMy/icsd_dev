@@ -1,27 +1,29 @@
 import os
-import re
-import argparse
+
+
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib
-import kneed
+from numpy import linalg as LA
 from scipy.stats import pearsonr
 from scipy.interpolate import griddata
-from scipy.linalg import lu
-from scipy.optimize import lsq_linear, curve_fit, least_squares, leastsq
-from matplotlib.backends.backend_pdf import PdfPages
-from matplotlib.colors import LogNorm
-from matplotlib.ticker import MultipleLocator
-from kneed import KneeLocator
-from scipy.interpolate import griddata as gd
-from mpl_toolkits.mplot3d import Axes3D
-import pyvista as pv
+from scipy.optimize import lsq_linear, least_squares
 from scipy.sparse import diags
 
-import sys
-from numpy import linalg as LA
+from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.colors import LogNorm
+
+import kneed
+from kneed import KneeLocator
+
+import matplotlib.pyplot as plt
+import matplotlib
+from mpl_toolkits.mplot3d import Axes3D
+import pyvista as pv
+
+
 
 class iCSD3d_Class():
+    
+    
     """ Create a icsd inversion object.
     
     Parameters
@@ -98,57 +100,13 @@ class iCSD3d_Class():
         self.mkGrid_XI_YI()
         # # append spatial regularization
         self.parseModelReg()
-        self.parseDataReg()
-        self.parseIniModel()
-        
-        if self.type=='2d': # 2D CASE -----------------------------------------
-            if self.regMesh=='strc':
-                if self.alphaSxy==True:
-                    self.regularize_A_x_y()
-                    if self.x0_prior==True:
-                        self.regularize_smallnessX0() #add smallness regularisation
-                    self.regularize_sum_AX0()
-                else:
-                    if self.x0_prior==True:
-                        # print('not possible')
-                        raise ValueError('#### dimensions of matrices do not agree - change regularisation types')
-                    else:
-                        self.regularize_A()
-            else:
-                self.regularize_A_UnstructuredMesh3d()
-        else:              # 3D CASE -----------------------------------------
-            if self.regMesh=='strc':
-                if self.x0_prior==True:
-                        self.regularize_A_x_y_z()
-                        self.regularize_smallnessX0() #add smallness regularisation
-                        self.regularize_sum_AX0()
-                        # raise ValueError('### dimensions of matrices do not agree - change regularisation type')
-                else:
-                    self.regularize_A_3d() # working for structured mesh
-            elif self.regMesh=='unstrc':
-                self.regularize_A_UnstructuredMesh3d() # working for unstructured mesh
-                if self.x0_prior==True:
-                    self.regularize_smallnessX0() #add smallness regularisation
-            elif self.alphaSxy==True:
-                if self.x0_prior==True:
-                    self.regularize_smallnessX0() #add smallness regularisation
-                self.regularize_sum_AX0()
+        # self.parseDataReg()
         self.regularize_b()
         # # stack data, constrain, and regularization 
         self.stack_A()
         self.stack_b()
-        
-        # return self.A,self.b
-        
-        
-# NEW FUNCTIONS to introduce 
-# function penalized some virtual sources (split rhizotron)
-# load_names for tl analysis
-# Introduce error weigting using reciprocal error instead of constant or w = 1/sqrt(abs(obs))
-# use the ERT mesh as mesh for virtual position of current sources
-
-# NEW FUNCTIONS COMPARE TO the 2d case    
-
+                
+    
     def load_geom(self):
         geom_files = [f for f in os.listdir(self.path2load) if f.endswith('.geom')]
         if len(geom_files) != 1:
@@ -179,20 +137,19 @@ class iCSD3d_Class():
         self.coordE = np.loadtxt(self.path2load+ fileNameElec)
         self.pointsE= np.vstack(self.coordE[:self.RemLineNb,1:4])
 
-    def plotCSD3d_pyvista(self):
+    def plotCSD3d_pyvista(self,**kwarg): # add kwards or *args for pyvista plot
 
         filename = self.path2load + 'ExportSol.dat'
+        
         data_2_plot =np.genfromtxt(filename)
         coord_x= data_2_plot[:,0]
         coord_y= data_2_plot[:,1]
         coord_z= data_2_plot[:,2]
-        step=(max(coord_x)-min(coord_x))/10
-        num =10
-        opacity = [0, 0, 0.1, 0.3, 0.6, 0.9, 1]
+        coord= data_2_plot[:,:-1]
 
+        opacity = [0, 0, 0.1, 0.3, 0.6, 0.9, 1]
         grid = pv.UniformGrid()
         spc=(max(coord_x)-min(coord_x))/10
-        # spc=1
         xdim = int(round((max(coord_x)-min(coord_x))/spc))
         ydim = int(round((max(coord_y)-min(coord_y))/spc))
         zdim = int(round((max(coord_z)-min(coord_z))/spc))
@@ -202,7 +159,6 @@ class iCSD3d_Class():
         grid.spacing = (spc, spc,spc) # These are the cell sizes along each axis
         
 
-        coord= data_2_plot[:,:-1]
         pv.set_plot_theme('document')
         poly = pv.PolyData(coord)
         pvfig = pv.Plotter(notebook=False,window_size=[600, 600])
@@ -279,40 +235,6 @@ class iCSD3d_Class():
                     
         pvfig.close()
 
-        
-    def plotScattered3d(self,data):
-        print(data)
-        self.f = plt.figure('volume')
-
-        step=(max(self.coord_x)-min(self.coord_x))/10
-
-        xlin=np.arange(min(self.coord_x),max(self.coord_x),step)
-        ylin=np.arange(min(self.coord_y),max(self.coord_y),step)
-        zlin=np.arange(min(self.coord_z),max(self.coord_z),step)
-        #generate new grid
-        X,Y,Z=np.meshgrid(xlin,ylin,zlin)
-        #interpolate "data.v" on new grid "inter_mesh"
-        # V = gd((self.coord_x,self.coord_y,self.coord_z), data_2_plot, (X,Y,Z), method='linear')
-        
-        ax=self.f.gca(projection='3d')
-        sc=ax.scatter(self.coord_x, self.coord_y, self.coord_z, c=data, cmap ='coolwarm')
-        # if self.clim is None:
-        #     print('none clim')
-        # sc.set_clim(self.clim)
-        cbar = plt.colorbar(sc)
-        cbar.set_label('# current density')
-                
-        if self.sc:
-            ax.scatter(self.coordE[self.RemLineNb:self.RemLineNb+2,1], self.coordE[self.RemLineNb:self.RemLineNb+2,2], self.coordE[self.RemLineNb:self.RemLineNb+2,3],
-                       marker="v", color='black',s=60, label = 'Remotes')
-            ax.scatter(self.coordE[self.Injection,1], self.coordE[self.Injection,2], self.coordE[self.Injection,3],
-                       marker="*", color='black',s=60, label = 'A')
-            ax.scatter(self.coordE[:self.RemLineNb,1], self.coordE[:self.RemLineNb,2], self.coordE[:self.RemLineNb,3],
-                       marker="s", color='black',s=60, label = 'Velecs')
-        plt.legend()
-        # plt.title(title)
-        plt.savefig(self.path2save+  self.obs + '_icsd_scatter.png' , dpi=550,bbox_inches='tight',pad_inches = 0)
-        plt.show()
 
     def plotCSD3d(self):
         self.f = plt.figure('volume')
@@ -335,8 +257,8 @@ class iCSD3d_Class():
         #     print('none clim')
         # sc.set_clim(self.clim)
         cbar = plt.colorbar(sc)
-        self.labels()
-        cbar.set_label(self.physLabel)
+        # self.labels()
+        # cbar.set_label(self.physLabel)
                 
         if self.sc!=None:
             ax.scatter(self.coordE[self.RemLineNb:self.RemLineNb+2,1], self.coordE[self.RemLineNb:self.RemLineNb+2,2], self.coordE[self.RemLineNb:self.RemLineNb+2,3],
@@ -375,11 +297,11 @@ class iCSD3d_Class():
              
     ### Individual Misfit  
     def normF1(self):
-        self.F1=[]
+        F1=[]
         for i in range(np.shape(self.A)[1]):
             F1i = LA.norm((self.b-self.A[:,i]))
-            self.F1.append(F1i)
-        self.norm_F1 = (self.F1 - min(self.F1)) / (max(self.F1) - min(self.F1))
+            F1.append(F1i)
+        self.norm_F1 = (F1 - min(F1)) / (max(F1) - min(F1))
 
     def misfit_2_initialX0(self):
         self.x0F1=1./((self.norm_F1+1)*(self.norm_F1+1))
@@ -399,16 +321,13 @@ class iCSD3d_Class():
             ax.set_ylabel('y [m]',fontsize=15)
             ax.set_xlabel('x [m]',fontsize=15)
             ax.set_title('F1 misfit',fontsize=15)
-
-            #axes = plt.gca()
-            #axes.set_xlim([0,0.53])
-            #axes.set_ylim([0,0.52])
             ax.tick_params(axis='both', which='major', labelsize=15)
             #ax.set_tight_layout()
             ax.set_aspect(1.0)
             cbar1 = plt.colorbar(im1,ax=ax, format="%.2f",fraction=0.046, pad=0.04)
             cbar1.set_label('Normalised misfit', labelpad = 5, fontsize=14)
-    
+            # cbar1.set_label('Product-moment coefficient (Pearson)', labelpad = 5, fontsize=14)
+
             ax = axs[1]
             grid = griddata(points, self.x0F1, (self.XI, self.YI), method = 'linear') # grid is a np array
             im2 = ax.imshow(grid,norm=LogNorm(vmin=0.3, vmax=0.7), extent = (min (self.coord_x), max(self.coord_x), min(self.coord_y), max(self.coord_y)),
@@ -416,54 +335,14 @@ class iCSD3d_Class():
             ax.set_ylabel('y [m]',fontsize=15)
             ax.set_xlabel('x [m]',fontsize=15)
             ax.set_title('x0 solution',fontsize=15)
-            #axes = plt.gca()
-            #axes.set_xlim([0,0.53])
-            #axes.set_ylim([0,0.52])
             ax.tick_params(axis='both', which='major', labelsize=15)
             ax.set_aspect(1.0)
             cbar2 = plt.colorbar(im2,ax=ax, format="%.3f",fraction=0.046, pad=0.04)
             cbar2.set_label('x0 solution', labelpad = 5, fontsize=14)
         else:
             print('3d case to write')
-            
-        # fig.suptitle(self.ObsName, y=0.80)
         fig.tight_layout()
-        # fig.savefig('F1_x0F1'+ self.ObsName, dpi = 450, bbox_inches='tight')
-
-    def plotmisfitIni(self,Mini):
-        fig, ax = plt.subplots()
-        if self.type=='2d':
-            points = np.column_stack((self.coord_x, self.coord_y))
-            grid = griddata(points, Mini, (self.XI, self.YI), method = 'linear') # grid is a np array
-            im1 = ax.imshow(grid,norm=LogNorm(vmin=0.3, vmax=0.7), extent = (min (self.coord_x), max(self.coord_x), min(self.coord_y), max(self.coord_y)),
-            aspect = 'auto', origin = 'lower', cmap= 'jet')
-            ax.set_ylabel('y [m]',fontsize=15)
-            ax.set_xlabel('x [m]',fontsize=15)
-            ax.set_title('Misfit',fontsize=15)
-
-            #axes = plt.gca()
-            #axes.set_xlim([0,0.53])
-            #axes.set_ylim([0,0.52])
-            ax.tick_params(axis='both', which='major', labelsize=15)
-            #ax.set_tight_layout()
-            ax.set_aspect(1.0)
-            cbar1 = plt.colorbar(im1,ax=ax, format="%.2f",fraction=0.046, pad=0.04)
-            cbar1.set_label('Normalised misfit', labelpad = 5, fontsize=14)
     
-          
-        else:
-            self.plotScattered3d(Mini)
-            
-        # fig.suptitle(self.ObsName, y=0.80)
-        fig.tight_layout()
-        # fig.savefig('F1_x0F1'+
-        
-
-    def run_misfitF1(self):
-        self.normF1()
-        self.misfit_2_initialX0()
-        self.plotmisfitF1()
-        
     def regularize_A_UnstructuredMesh3d(self): # should also work for the 2d case
         print('regularize_A_UnstructuredMesh3d')
         reg = []
@@ -667,17 +546,9 @@ class iCSD3d_Class():
         self.reg_Ay = self.alphaSy*np.array(Dy.transpose()*Dy)
 
     def regularize_A_x_y_z(self):
-        # """create and append rows for spatial regularization to A - NOT IMPLEMENTED YET"""
         self.run_misfitF1()
-        print('regularize_A_x_y_z')
-        print('length ini vector =' + str(len(self.x0F1_sum)))
-        print('length nx =' + str(self.nx))
-        print('length ny =' + str(self.ny))
-        print('length nz =' + str(self.nz))
-
         self.reg_Axz = []
         self.reg_Ayz = []
-
         for z in range(self.nz):
             ncells = self.nx*self.ny;       
             Dx=diags([1, -2, 1], [-1, 0, 1], shape=(ncells, ncells)).todense()
@@ -837,18 +708,7 @@ class iCSD3d_Class():
         self.Export_sol()
         
         
-    def ResidualAnalysis(self):
-        fitting_res = self.x.fun[0 : self.b.shape[0]]
-        # constrain_res = self.x.fun[self.b.shape[0] + 1] / self.wc
-        regularization_res = self.x.fun[self.b.shape[0] + 2 :] / self.wr # constrain not included in the reg function
-        self.reg_sum = np.sum(np.square(regularization_res))
-        self.fit_sum = np.sum(np.square(fitting_res))
-        self.pareto_list_FitRes.append(self.fit_sum)
-        self.pareto_list_RegRes.append(self.reg_sum)
 
-    def RMSAnalysis(self):
-        self.rms = np.sum(np.square(self.x.fun))/len(self.x.fun)
-        print('RMS error='+ str(self.rms))
         
     def run_pareto(self):
         """
@@ -1074,22 +934,194 @@ class iCSD3d_Class():
         self.f.savefig(self.path2save+'iCSD', dpi = 600)
         plt.show()
         
-    def showResultsFini(self, method='Pearson',ax=None, clim=None ,cmap='viridis_r',title=None):
-        """Show non-inverted model.
+    # def showResultsFini(self, method='Pearson',ax=None, clim=None ,cmap='viridis_r',title=None):
+    #     """Show non-inverted model.
+        
+    #     Parameters
+    #     ----------       
+    #     """
+    #     self.clim=clim
+    #     self.title=title
+        
+    #     if method=='misfitF1':
+    #         Mini= self.run_misfitF1()
+    #     elif method=='Pearson':
+    #         Mini= self.run_productmoment()
+    #         self.plotmisfitIni(Mini)
+    #     return
+                
+
+        
+    def Invert(self,pareto=False):
+        """Invert the voltage to current densities.
         
         Parameters
-        ----------       
+        ----------
+
         """
-        self.clim=clim
-        self.title=title
+        if self.pareto==False:
+            self.run_single()
+        else:
+             self.run_pareto()
+       
         
-        if method=='misfitF1':
-            Mini= self.run_misfitF1()
-        elif method=='Pearson':
-            Mini= self.run_productmoment()
-            self.plotmisfitIni(Mini)
-        return
+    def parseModelReg(self):
+        """ Parse regularisation parameters before inversion
+        """    
+        print('parseModelReg')
+        if self.type=='2d': # 2D CASE -----------------------------------------
+            if self.regMesh=='strc': # structure mesh of virtual sources
+                if self.alphaSxy==True:
+                    self.regularize_A_x_y()
+                    if self.x0_prior==True:
+                        self.regularize_smallnessX0() #add smallness regularisation
+                    self.regularize_sum_AX0()
+                else:
+                    if self.x0_prior==True:
+                        # print('not possible')
+                        raise ValueError('#### dimensions of matrices do not agree - change regularisation types')
+                    else:
+                        self.regularize_A()
+            else:
+                self.regularize_A_UnstructuredMesh3d()
+        else:              # 3D CASE -----------------------------------------
+            if self.regMesh=='strc':
+                if self.x0_prior==True:
+                        self.regularize_A_x_y_z()
+                        self.regularize_smallnessX0() #add smallness regularisation
+                        self.regularize_sum_AX0()
+                        # raise ValueError('### dimensions of matrices do not agree - change regularisation type')
+                else:
+                    self.regularize_A_3d() # working for structured mesh
+            elif self.regMesh=='unstrc':
+                self.regularize_A_UnstructuredMesh3d() # working for unstructured mesh
+                if self.x0_prior==True:
+                    self.regularize_smallnessX0() #add smallness regularisation
+            elif self.alphaSxy==True:
+                if self.x0_prior==True:
+                    self.regularize_smallnessX0() #add smallness regularisation
+                self.regularize_sum_AX0()
+                
+    def parseDataReg(self):
+        """ Parse regularisation parameters before inversion
+        """    
+
+#%% DEFINE SURVEY container for observations and simulations     
+
+    def CreateSurvey(self):
+        """Data container for survey paramaters such as geometry file
+        
+        Parameters
+        ----------
+
+        """
+
+
+    def CreateTimeLapseSurvey(self):
+        """Description here
+        
+        Parameters
+        ----------
+
+        """
+        
+
+#%% INITIAL MODEL          
+
+    def estimateM0(self,method='F1',show=True):
+        self.parseM0(method)
+        self.labelsM0(method)
+        print(show)
+        if show == True:
+            self.showEstimateM0()
+        
+    def parseM0(self,method):
+        """ Parse M0 parameters
+        """
+        if method=='F1': self.run_misfitF1()
+        elif method=='Pearson': self.run_productmoment()
+            
+    def labelsM0(self,method):
+        """ Parse graphical labels to plot estimate M0 model
+        """
+        if method=='F1':      
+            self.physLabel= 'normed misfit F1'
+        if method=='Pearson':      
+            self.physLabel= 'Pearson r coeff' 
+            
+    def showEstimateM0(self):
+        fig, ax = plt.subplots()
+        if self.type=='2d':
+            points = np.column_stack((self.coord_x, self.coord_y))
+            grid = griddata(points, self.M0, (self.XI, self.YI), method = 'linear') # grid is a np array
+            im1 = ax.imshow(grid,norm=LogNorm(vmin=0.3, vmax=0.7), extent = (min (self.coord_x), max(self.coord_x), min(self.coord_y), max(self.coord_y)),
+            aspect = 'auto', origin = 'lower', cmap= 'jet')
+            ax.set_ylabel('y [m]',fontsize=15)
+            ax.set_xlabel('x [m]',fontsize=15)
+            # ax.set_title('Misfit',fontsize=15)
+            ax.tick_params(axis='both', which='major', labelsize=15)
+            ax.set_aspect(1.0)
+            cbar1 = plt.colorbar(im1,ax=ax, format="%.2f",fraction=0.046, pad=0.04)
+            # cbar1.set_label('Normalised misfit', labelpad = 5, fontsize=14)
+            cbar1.set_label('Product-moment coefficient (Pearson)', labelpad = 5, fontsize=14)
+        else:
+            self._plotScattered3d()
+        fig.tight_layout()
+        
+    def run_misfitF1(self):
+        self.icsd_init()            
+        self.normF1()
+        self.misfit_2_initialX0()
+        self.plotmisfitF1()
+
+    def run_productmoment(self):
+        """ Compute the product moment correlation after Binley et al. 1999
+        .. math:: 
+
+            r_{k}= \frac{\sum_{i}(D_{I}-\overline{D})(F_{i}(I_{k})-\overline{F}(I_{k}))}{\sqrt{\sum_{i}(D_{I}-\overline{D})^{2}}\sum_{i}(F_{i}(I_{k})-\overline{F}(I_{k}))^{2}}
+        where $D_{i}$ is the $i^{th}$ measured transfer resistance and $F_{i}(I_{k})$ is the $i^{th}$  transfer resistance computed to unit current at location k. 
+        """
+        print('run_productmoment')
+        self.icsd_init()            
+        # Estimate a covariance matrix, given data observation and weights and tranfert resitances measured.
+        self.rpearson=[]
+        for i in range(np.shape(self.A)[1]):
+            corr, _ = pearsonr(self.b, self.A[:,i])
+            self.rpearson.append(corr)
+        self.M0=self.rpearson
     
+
+#%% PLOT fcts     
+    # def plotScattered3d(self,data):
+    #     self._plotScattered3d(**kwargs)
+
+        
+    def _plotScattered3d(self):
+        self.f = plt.figure('volume')
+        step=(max(self.coord_x)-min(self.coord_x))/10
+        xlin=np.arange(min(self.coord_x),max(self.coord_x),step)
+        ylin=np.arange(min(self.coord_y),max(self.coord_y),step)
+        zlin=np.arange(min(self.coord_z),max(self.coord_z),step)
+        X,Y,Z=np.meshgrid(xlin,ylin,zlin)
+        ax=self.f.gca(projection='3d')
+        sc=ax.scatter(self.coord_x, self.coord_y, self.coord_z, c=self.M0, cmap ='coolwarm')
+        cbar = plt.colorbar(sc)
+        # cbar.set_label('# current density')
+        cbar.set_label('Product moment correlation coeff r (Pearson)')
+        ax.set_ylabel('y [m]',fontsize=15)
+        ax.set_xlabel('x [m]',fontsize=15)
+        if self.sc:
+            ax.scatter(self.coordE[self.RemLineNb:self.RemLineNb+2,1], self.coordE[self.RemLineNb:self.RemLineNb+2,2], self.coordE[self.RemLineNb:self.RemLineNb+2,3],
+                       marker="v", color='black',s=60, label = 'Remotes')
+            ax.scatter(self.coordE[self.Injection,1], self.coordE[self.Injection,2], self.coordE[self.Injection,3],
+                       marker="*", color='black',s=60, label = 'A')
+            ax.scatter(self.coordE[:self.RemLineNb,1], self.coordE[:self.RemLineNb,2], self.coordE[:self.RemLineNb,3],
+                       marker="s", color='black',s=60, label = 'Velecs')
+        plt.legend()
+        # plt.title(title)
+        plt.savefig(self.path2save+  self.obs + '_icsd_scatter.png' , dpi=550,bbox_inches='tight',pad_inches = 0)
+        plt.show()
+        
 
     def showResults(self,ax=None, clim=None ,cmap='viridis_r',
                     plotElecs=False,sc=None,retElec=None,
@@ -1135,10 +1167,42 @@ class iCSD3d_Class():
             self.plotCSD3d()
             self.plotCSD3d_pyvista()
         return
-       
+
+
+#%% POST inversion analysis        
+
+    def ResidualAnalysis(self):
+        fitting_res = self.x.fun[0 : self.b.shape[0]]
+        # constrain_res = self.x.fun[self.b.shape[0] + 1] / self.wc
+        regularization_res = self.x.fun[self.b.shape[0] + 2 :] / self.wr # constrain not included in the reg function
+        self.reg_sum = np.sum(np.square(regularization_res))
+        self.fit_sum = np.sum(np.square(fitting_res))
+        self.pareto_list_FitRes.append(self.fit_sum)
+        self.pareto_list_RegRes.append(self.reg_sum)
+
+    def RMSAnalysis(self):
+        self.rms = np.sum(np.square(self.x.fun))/len(self.x.fun)
+        print('RMS error='+ str(self.rms))
         
+#%% SAVE FCTS          
+
+             
+    def saveInvData(self, outputdir):
+        """Save inverted data
+        
+        Parameters
+        ----------
+        outputdir : str
+            Path where the .csv files will be saved.
+        """           
+
+#%% UTILS         
+
+class icsd_utils():
+    
     def DataImport(self,SimFile=None,ObsFile=None):
         """Data importer for common data files (Resipy and Gimli)
+        Import and parse observation files, simulated file and geometry file
         
         Parameters
         ----------
@@ -1149,70 +1213,11 @@ class iCSD3d_Class():
             print('pygimli format import')
         if fileExt=='*.data':
             print('resipy format import') 
-            
-    def CreateSurvey(self):
-        """Data container for survey paramaters such as geometry file
-        
-        Parameters
-        ----------
 
-        """
+#%% TO DO         
 
-
-    def CreateTimeLapseSurvey(self):
-        """Description here
-        
-        Parameters
-        ----------
-
-        """
-        
-    def Invert(self,pareto=False):
-        """Invert the voltage to current densities.
-        
-        Parameters
-        ----------
-
-        """
-        if self.pareto==False:
-            self.run_single()
-        else:
-             self.run_pareto()
-
-    def saveInvData(self, outputdir):
-        """Save inverted data
-        
-        Parameters
-        ----------
-        outputdir : str
-            Path where the .csv files will be saved.
-        """
-
-    def run_productmoment(self):
-        """ Compute the product moment correlation after Binley et al. 1999
-        .. math:: 
-
-            r_{k}= \frac{\sum_{i}(D_{I}-\overline{D})(F_{i}(I_{k})-\overline{F}(I_{k}))}{\sqrt{\sum_{i}(D_{I}-\overline{D})^{2}}\sum_{i}(F_{i}(I_{k})-\overline{F}(I_{k}))^{2}}
-        where $D_{i}$ is the $i^{th}$ measured transfer resistance and $F_{i}(I_{k})$ is the $i^{th}$  transfer resistance computed to unit current at location k. 
-        """
-        print('run_productmoment')
-        self.icsd_init()            
-        # Estimate a covariance matrix, given data observation and weights and tranfert resitances measured.
-        self.rpearson=[]
-        for i in range(np.shape(self.A)[1]):
-            corr, _ = pearsonr(self.b, self.A[:,i])
-            self.rpearson.append(corr)
-            
-        return self.rpearson
-        
-        
-    def regularise(self):
-        """ Parse regularisation parameters before inversion
-        """    
-        
-
-    def labels(self):
-        """ Parse graphical labels to plot
-        """
-        if method=='Pearson':      
-            self.physLabel= 'Pearson r coeff'
+# NEW FUNCTIONS to introduce 
+# function penalized some virtual sources (split rhizotron)
+# load_names for tl analysis
+# Introduce error weigting using reciprocal error instead of constant or w = 1/sqrt(abs(obs))
+# use the ERT mesh as mesh for virtual position of current sources
