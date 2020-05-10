@@ -361,7 +361,8 @@ synthetic test.
    point in a nail located at [0.15,0.45].
    :name: fig:ICSD_2d_nail2
 
-.. image:: ICSD_2d_nail2.png
+.. image:: ./content/doc/images/ICSD_2d_nail2.png
+
 
 .. image:: ./images/F1misfitM02d_nail2.png
 
