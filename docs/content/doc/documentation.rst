@@ -361,10 +361,10 @@ synthetic test.
    point in a nail located at [0.15,0.45].
    :name: fig:ICSD_2d_nail2
 
-.. image:: images/ICSD_2d_nail2.png
-   :alt: ICSD inversion for a synthetic case with a punctual injection
-   point in a nail located at [0.15,0.45].
-   :name: fig:ICSD_2d_nail2
+.. image:: ICSD_2d_nail2.png
+
+.. image:: ./images/F1misfitM02d_nail2.png
+
 
 Imaging methods derived from gravity methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
