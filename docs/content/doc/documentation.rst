@@ -332,7 +332,7 @@ synthetic test.
    :alt: Product moment correlation coefficient computed for a synthetic
    case with a punctual injection point in a nail located at
    [0.15,0.45].
-   :name: fig:Eq
+   :name: fig:Pearson2d_nail2
 
    Product moment correlation coefficient computed for a synthetic case
    with a punctual injection point in a nail located at [0.15,0.45].
@@ -341,7 +341,7 @@ synthetic test.
    :alt: F1 misfit coefficient as describes in `0.0.0.1 <#para_prior>`__
    for a synthetic case with a punctual injection point in a nail
    located at [0.15,0.45].
-   :name: fig:Eq
+   :name: fig:F1misfitM02d_nail2
 
    F1 misfit coefficient as describes in `0.0.0.1 <#para_prior>`__ for a
    synthetic case with a punctual injection point in a nail located at
@@ -350,10 +350,21 @@ synthetic test.
 .. figure:: ./images/ICSD_2d_nail2.png
    :alt: ICSD inversion for a synthetic case with a punctual injection
    point in a nail located at [0.15,0.45].
-   :name: fig:Eq
+   :name: fig:ICSD_2d_nail2
 
    ICSD inversion for a synthetic case with a punctual injection point
    in a nail located at [0.15,0.45].
+
+
+.. image:: ./images/ICSD_2d_nail2.png
+   :alt: ICSD inversion for a synthetic case with a punctual injection
+   point in a nail located at [0.15,0.45].
+   :name: fig:ICSD_2d_nail2
+
+.. image:: images/ICSD_2d_nail2.png
+   :alt: ICSD inversion for a synthetic case with a punctual injection
+   point in a nail located at [0.15,0.45].
+   :name: fig:ICSD_2d_nail2
 
 Imaging methods derived from gravity methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
