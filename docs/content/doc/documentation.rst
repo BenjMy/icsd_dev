@@ -332,40 +332,12 @@ synthetic test.
    :alt: Product moment correlation coefficient computed for a synthetic
    case with a punctual injection point in a nail located at
    [0.15,0.45].
-   :name: fig:Pearson2d_nail2
+   :name: Pearson2d_nail2
 
-   Product moment correlation coefficient computed for a synthetic case
-   with a punctual injection point in a nail located at [0.15,0.45].
-
-.. figure:: ./images/F1misfitM02d_nail2.png
+.. image:: ./images/F1misfitM02d_nail2.png
    :alt: F1 misfit coefficient as describes in `0.0.0.1 <#para_prior>`__
    for a synthetic case with a punctual injection point in a nail
    located at [0.15,0.45].
-   :name: fig:F1misfitM02d_nail2
-
-   F1 misfit coefficient as describes in `0.0.0.1 <#para_prior>`__ for a
-   synthetic case with a punctual injection point in a nail located at
-   [0.15,0.45].
-
-.. figure:: ./images/ICSD_2d_nail2.png
-   :alt: ICSD inversion for a synthetic case with a punctual injection
-   point in a nail located at [0.15,0.45].
-   :name: fig:ICSD_2d_nail2
-
-   ICSD inversion for a synthetic case with a punctual injection point
-   in a nail located at [0.15,0.45].
-
-
-.. image:: ./images/ICSD_2d_nail2.png
-   :alt: ICSD inversion for a synthetic case with a punctual injection
-   point in a nail located at [0.15,0.45].
-   :name: fig:ICSD_2d_nail2
-
-.. image:: ./content/doc/images/ICSD_2d_nail2.png
-
-
-.. image:: ./images/F1misfitM02d_nail2.png
-
 
 Imaging methods derived from gravity methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -406,7 +378,7 @@ r, the Laplace equation for the gravitational potential becomes:
 
 .. math::
 
-   \label{LaplaceEq}
+   \label{LaplaceEq2}
    \Delta^{2} U = -4\pi\gamma\sigma
 
 With :math:`\sigma` the density of the mass and where :math:`\gamma` is
