@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun May 10 18:24:14 2020
+Created on Mon May 11 16:23:04 2020
 
 @author: Benjamin
 """
 
 
-import reda as rd
