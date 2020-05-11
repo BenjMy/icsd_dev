@@ -237,7 +237,7 @@ Equation `[eq:ObjFctFull] <#eq:ObjFctFull>`__ can be rewritten as:
 .. math::
 
    \label{ObjFct2}
-   \widetilde{\mathbit{m}}=\ min\left\{{(Gm-d)}^TW_d(Gm-d)\ +\ \lambda{(m-m_0)}^{T}W_m(m-m_0)\right\}
+   \widetilde{m}=\ min\left\{{(Gm-d)}^TW_d(Gm-d)\ +\ \lambda{(m-m_0)}^{T}W_m(m-m_0)\right\}
 
 Where
 
@@ -328,16 +328,12 @@ synthetic test.
    icsd3d_SensApriori.obs='OBS_sens3d.txt'
    icsd3d_SensApriori.showResultsFini(method='Pearson')
 
-.. figure:: ./images/Pearson2d_nail2.png
-   :alt: Product moment correlation coefficient computed for a synthetic
-   case with a punctual injection point in a nail located at
-   [0.15,0.45].
-   :name: Pearson2d_nail2
+.. image:: ./images/Pearson2d_nail2.png
 
 .. image:: ./images/F1misfitM02d_nail2.png
-   :alt: F1 misfit coefficient as describes in `0.0.0.1 <#para_prior>`__
-   for a synthetic case with a punctual injection point in a nail
-   located at [0.15,0.45].
+
+.. image:: ./images/ICSD_2d_nail2.png
+
 
 Imaging methods derived from gravity methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
