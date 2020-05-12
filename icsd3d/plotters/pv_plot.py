@@ -10,8 +10,12 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
+from importers.read import *
 
-def plotCSD3d_pyvista(coords, path=None, filename_root='Solution.dat', **kwargs): # add kwards or *args for pyvista plot
+
+#%% Plot CSD in 3d using pyvista package
+
+def plotCSD3d_pv(coords, path=None, filename_root='Solution.dat', **kwargs): # add kwards or *args for pyvista plot
 
     if path is None:
         cwd = os.getcwd()
@@ -41,13 +45,13 @@ def plotCSD3d_pyvista(coords, path=None, filename_root='Solution.dat', **kwargs)
     poly = pv.PolyData(coord)
     pvfig = pv.Plotter(notebook=False,window_size=[600, 600])
     
-    # if self.mesh!=None:
-    #     print('plot mesh.vtk')
-    #     ModelVtk = pv.read(self.path2load + self.mesh)
-    #     cmap = plt.cm.get_cmap('viridis', 2)
-    #     pvfig.add_bounding_box()
-    #     pvfig.add_mesh(cmap=cmap,mesh=ModelVtk,scalars='rhomap', opacity=0.2)    # add a dataset to the scene
-    # 
+    
+    if kwargs.get('mesh') is not None:
+        ModelVtk = pv.read(path + kwargs.get('mesh'))
+        cmap = plt.cm.get_cmap('viridis', 2)
+        pvfig.add_bounding_box()
+        pvfig.add_mesh(cmap=cmap,mesh=ModelVtk,scalars='rhomap', opacity=0.2)    # add a dataset to the scene
+    
     pvfig.add_mesh(poly, point_size=15.0, scalars=data_2_plot[:,3], opacity=opacity, render_points_as_spheres=True,cmap='jet')
     print('interpolation spacing='+ str(spc))
     interpolated = grid.interpolate(poly, radius=spc*2)
@@ -62,43 +66,42 @@ def plotCSD3d_pyvista(coords, path=None, filename_root='Solution.dat', **kwargs)
     pvfig.show_axes()
     pvfig.add_scalar_bar('Normalized Current density',width=0.25,vertical=False,position_x=0.3)
 
-    # if self.plotElecs==True:
-    #     pvfig.add_points(self.pointsE)
-    #     # p.add_point_labels(pointsE,coordE[:RemLineNb,0].astype(int), point_size=15, font_size=35,
-    #     #     shape_opacity=0.01, margin=4.)
-    #     pvfig.add_point_labels(self.pointsE,self.coordE[:self.RemLineNb,0].astype(int), point_size=int(spc)-5, font_size=int(spc)-5,
-    #         shape_opacity=0.01, margin=4.)
-    # # set_focus(self.pointsE)
-    # # pvfig.set_focus(point=self.pointsE[0])
-    # # pvfig.set_scale(xscale=1, yscale=1, zscale=0.2, reset_camera=True)
+    if kwargs.get('plotElecs') is True:
+        RemLineNb, Injection, coordE, pointsE= load_geom(path) # geometry file containing electrodes position includinf remotes 
+
+        pvfig.add_points(pointsE)
+        pvfig.add_point_labels(pointsE,coordE[:RemLineNb,0].astype(int), point_size=int(spc)-5, font_size=int(spc)-5,
+            shape_opacity=0.01, margin=4.)
     pvfig.show(auto_close=True)  
 
+    knee = kwargs.get('knee')
+    wr = kwargs.get('wr')
+    if knee is True:
+        KneeWr = kwargs.get('KneeWr')
 
-    # if self.knee==True:
-    #    if self.wr==self.KneeWr:
-    #        # pvfig.screenshot('Pts_iCSD_knee'+ str(self.ObsName) + '.png')
-    #         pvfig.screenshot(self.path2save+ 'Pts_iCSD_knee_wr'+ self.obs +  str(self.KneeWr) + '.png')
-    #         if self.gif3d==True:
-    #             viewup = [0.5, 0.5, 1]
-    #             path = pvfig.generate_orbital_path(factor=2.0, shift=poly.length, viewup=viewup, n_points=36)
-    #             # p.open_gif(path2file + simName + "orbit.gif")
-    #             pvfig.open_movie(self.path2save +  self.obs + "orbit.gif", framerate=4)
-    #             pvfig.orbit_on_path(path, write_frames=True, viewup=[0, 0, 1])
-    # else:
-    #         pvfig.screenshot(self.path2save+  self.obs + 'Pts_iCSD_wr'+ str(self.wr) + '.png')
-    #         if self.gif3d==True:
-    #             viewup = [0.5, 0.5, 1]
-    #             path = pvfig.generate_orbital_path(factor=2.0, shift=poly.length, viewup=viewup, n_points=36)
-    #             # p.open_gif(path2file + simName + "orbit.gif")
-    #             pvfig.open_movie(self.path2save + self.obs +"orbit.gif", framerate=4)
-    #             pvfig.orbit_on_path(path, write_frames=True, viewup=[0, 0, 1])
+    # if kwargs.get('gif3d') is True:
+    gif3d = kwargs.get('gif3d')
+
+    if knee==True:
+        if wr==KneeWr:
+            # pvfig.screenshot('Pts_iCSD_knee'+ str(self.ObsName) + '.png')
+            pvfig.screenshot(path + 'Pts_iCSD_knee_wr'+  str(KneeWr) + '.png')
+            if gif3d==True:
+                viewup = [0.5, 0.5, 1]
+                path = pvfig.generate_orbital_path(factor=2.0, shift=poly.length, viewup=viewup, n_points=36)
+                # p.open_gif(path2file + simName + "orbit.gif")
+                pvfig.open_movie(path + "orbit.gif", framerate=4)
+                pvfig.orbit_on_path(path, write_frames=True, viewup=[0, 0, 1])
+        else:
+            pvfig.screenshot(path + 'Pts_iCSD_wr'+ str(wr) + '.png')
+            if gif3d==True:
+                viewup = [0.5, 0.5, 1]
+                path = pvfig.generate_orbital_path(factor=2.0, shift=poly.length, viewup=viewup, n_points=36)
+                # p.open_gif(path2file + simName + "orbit.gif")
+                pvfig.open_movie(path2save + "orbit.gif", framerate=4)
+                pvfig.orbit_on_path(path, write_frames=True, viewup=[0, 0, 1])
                 
-    # pvfig.close()
-    
- 
-    
-    
-
+    pvfig.close()
 
     # xyB4321 = np.loadtxt("digitized_B4321.dat",skiprows=0,delimiter=',')
     # x=xyB4321[:,0]

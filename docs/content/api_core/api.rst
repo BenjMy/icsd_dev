@@ -7,8 +7,42 @@ API reference: The ``icsd3d`` package
     :no-inherited-members:
 
 
-``icsd3d.gridder``: Grid data
+``icsd3d.inversion``: inversion scheme
+======================================
+
+.. automodule:: icsd3d.inversion
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: icsd3d.inversion
+
+.. autosummary::
+    :toctree: api/
+    :template: module.rst
+
+    priorM0
+    smoothing
+    solve
+
+``icsd3d.plotters``: plotters for results visualisation
 =======================================================
+
+.. automodule:: icsd3d.plotters
+    :no-members:
+    :no-inherited-members:
+
+.. currentmodule:: icsd3d.plotters
+
+.. autosummary::
+    :toctree: api/
+    :template: module.rst
+
+    mpl_plot
+    pv_plot
+
+
+``icsd3d.gridder``: Grid data
+=============================
 
 .. automodule:: icsd3d.gridder
     :no-members:

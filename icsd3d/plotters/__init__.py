@@ -16,3 +16,4 @@ libraries.
 
 
 from . import mpl_plot
+from . import pv_plot
