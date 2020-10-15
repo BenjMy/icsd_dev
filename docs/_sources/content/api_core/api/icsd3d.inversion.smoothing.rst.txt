@@ -1,0 +1,6 @@
+﻿icsd3d.inversion.smoothing
+==========================
+
+.. currentmodule:: icsd3d.inversion
+
+.. automodule:: smoothing

@@ -1,0 +1,352 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API reference: The icsd3d package &mdash; ICSD 0.1.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="icsd3d.inversion.priorM0" href="api/icsd3d.inversion.priorM0.html" />
+    <link rel="prev" title="Inversion of current source density apply to a roots imaging" href="../../auto_examples/run_nail.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ICSD
+          
+
+          
+            
+            <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">ICSD</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../started/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../started/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../started/install.html">Which Python?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../started/install.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../started/install.html#optionnal-third-party-packages">Optionnal Third party packages</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../doc/documentation.html">The Mise-à-la-masse method</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery of examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API reference: The <code class="docutils literal notranslate"><span class="pre">icsd3d</span></code> package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-icsd3d.inversion"><code class="docutils literal notranslate"><span class="pre">icsd3d.inversion</span></code>: inversion scheme</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#inversion-utilities-the-smoothing-is-inspired-from-the-fatiando-package-https-www-fatiando-org">Inversion utilities. The smoothing is inspired from The Fatiando package: https://www.fatiando.org/</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/icsd3d.inversion.priorM0.html">icsd3d.inversion.priorM0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/icsd3d.inversion.smoothing.html">icsd3d.inversion.smoothing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/icsd3d.inversion.solve.html">icsd3d.inversion.solve</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-icsd3d.plotters"><code class="docutils literal notranslate"><span class="pre">icsd3d.plotters</span></code>: plotters for results visualisation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/icsd3d.plotters.mpl_plot.html">icsd3d.plotters.mpl_plot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/icsd3d.plotters.pv_plot.html">icsd3d.plotters.pv_plot</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-icsd3d.gridder"><code class="docutils literal notranslate"><span class="pre">icsd3d.gridder</span></code>: Grid data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/icsd3d.gridder.mkgrid.html">icsd3d.gridder.mkgrid</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-icsd3d.importers"><code class="docutils literal notranslate"><span class="pre">icsd3d.importers</span></code>: wrappers to facilitate import of common ERT data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/icsd3d.importers.read.html">icsd3d.importers.read</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ICSD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>API reference: The <code class="docutils literal notranslate"><span class="pre">icsd3d</span></code> package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/content/api_core/api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-icsd3d.icsd3d_class_dev">
+<span id="api-reference-the-icsd3d-package"></span><h1>API reference: The <code class="docutils literal notranslate"><span class="pre">icsd3d</span></code> package<a class="headerlink" href="#module-icsd3d.icsd3d_class_dev" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-icsd3d.inversion">
+<span id="icsd3d-inversion-inversion-scheme"></span><h2><code class="docutils literal notranslate"><span class="pre">icsd3d.inversion</span></code>: inversion scheme<a class="headerlink" href="#module-icsd3d.inversion" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="inversion-utilities-the-smoothing-is-inspired-from-the-fatiando-package-https-www-fatiando-org">
+<h3>Inversion utilities. The smoothing is inspired from The Fatiando package: <a class="reference external" href="https://www.fatiando.org/">https://www.fatiando.org/</a><a class="headerlink" href="#inversion-utilities-the-smoothing-is-inspired-from-the-fatiando-package-https-www-fatiando-org" title="Permalink to this headline">¶</a></h3>
+</div>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">priorM0</span></code></p></td>
+<td><p>Created on Mon May 11 16:22:08 2020 &#64;author: Benjamin Estimation of initial model based on the physical assumption that a single source current can describe the pattern of the masse anomaly</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">smoothing</span></code></p></td>
+<td><p>Created on Mon May 11 17:29:01 2020 &#64;author: Benjamin</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">solve</span></code></p></td>
+<td><p>Created on Tue May 12 09:35:37 2020</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="module-icsd3d.plotters">
+<span id="icsd3d-plotters-plotters-for-results-visualisation"></span><h2><code class="docutils literal notranslate"><span class="pre">icsd3d.plotters</span></code>: plotters for results visualisation<a class="headerlink" href="#module-icsd3d.plotters" title="Permalink to this headline">¶</a></h2>
+<p>Plotting utilities.</p>
+<p>Wrappers to facilitate common plotting tasks using powerful third-party
+libraries.</p>
+<ul class="simple">
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">mpl</span></code>: 2D plotting using <a class="reference external" href="http://matplotlib.org/">matplotlib</a></p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">pv</span></code>: 3D plotting using <a class="reference external" href="https://www.pyvista.org/">Pyvista</a></p></li>
+</ul>
+<hr class="docutils" />
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mpl_plot</span></code></p></td>
+<td><p>Created on Mon May 11 14:44:26 2020</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pv_plot</span></code></p></td>
+<td><p>Created on Mon May 11 14:44:26 2020 &#64;author: Benjamin 3D plots using pyvista</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="module-icsd3d.gridder">
+<span id="icsd3d-gridder-grid-data"></span><h2><code class="docutils literal notranslate"><span class="pre">icsd3d.gridder</span></code>: Grid data<a class="headerlink" href="#module-icsd3d.gridder" title="Permalink to this headline">¶</a></h2>
+<p>Read utilities.</p>
+<p>Wrappers to facilitate import of common ERT data</p>
+<ul class="simple">
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">gimli</span></code></p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">resipy</span></code></p></li>
+</ul>
+<hr class="docutils" />
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/icsd3d.gridder.mkgrid.html#module-icsd3d.gridder.mkgrid" title="icsd3d.gridder.mkgrid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mkgrid</span></code></a></p></td>
+<td><p>Created on Mon May 11 15:58:36 2020</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="module-icsd3d.importers">
+<span id="icsd3d-importers-wrappers-to-facilitate-import-of-common-ert-data"></span><h2><code class="docutils literal notranslate"><span class="pre">icsd3d.importers</span></code>: wrappers to facilitate import of common ERT data<a class="headerlink" href="#module-icsd3d.importers" title="Permalink to this headline">¶</a></h2>
+<p>Read utilities.</p>
+<p>Wrappers to facilitate import of common ERT data</p>
+<ul class="simple">
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">gimli</span></code></p></li>
+<li><p><code class="xref py py-mod docutils literal notranslate"><span class="pre">resipy</span></code></p></li>
+</ul>
+<hr class="docutils" />
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/icsd3d.importers.read.html#module-icsd3d.importers.read" title="icsd3d.importers.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a></p></td>
+<td><p>Created on Mon May 11 15:18:31 2020</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api/icsd3d.inversion.priorM0.html" class="btn btn-neutral float-right" title="icsd3d.inversion.priorM0" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../../auto_examples/run_nail.html" class="btn btn-neutral float-left" title="Inversion of current source density apply to a roots imaging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Benjamin Mary
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

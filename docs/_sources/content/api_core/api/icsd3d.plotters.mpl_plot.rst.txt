@@ -1,0 +1,6 @@
+﻿icsd3d.plotters.mpl\_plot
+=========================
+
+.. currentmodule:: icsd3d.plotters
+
+.. automodule:: mpl_plot
