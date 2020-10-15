@@ -71,6 +71,5 @@ API reference: The ``icsd3d`` package
 
 .. autosummary::
     :toctree: api/
-    :template: module.rst
 
     read
