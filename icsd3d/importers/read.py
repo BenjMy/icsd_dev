@@ -66,6 +66,7 @@ def load_geom(path):
         # Read all lines in the file one by one
         for line in read_obj:
             # For each line, check if line contains the string
+            # print(line)
             line_number += 1
             if ('#Remote') in line:
                 # If yes, then add the line number & line as a tuple in the list
@@ -73,6 +74,8 @@ def load_geom(path):
             if ('#Injection') in line:
                 line_of_injection.append((line_number))
     
+    # print(line_of_injection)
+    # print(line_of_remotes)
     RemLineNb= int(line_of_remotes[0])-1
     Injection= int(line_of_injection[0])-1
     

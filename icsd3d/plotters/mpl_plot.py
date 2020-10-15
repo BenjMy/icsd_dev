@@ -14,7 +14,7 @@ from importers.read import *
 from gridder.mkgrid import mkGrid_XI_YI 
 
        
-def _fig_Interpolation_(coord, data, **kwargs):
+def _fig_Interpolation_(ax,coord, data, **kwargs):
     """ plot the interpolation of the VRTe current fractions """
     
     coord_x, coord_y = parseCoord(coord,dim='2d')
@@ -22,27 +22,27 @@ def _fig_Interpolation_(coord, data, **kwargs):
     points = np.column_stack((coord_x, coord_y))
     
     grid = griddata(points, data, (XI, YI), method = 'linear') # grid is a np array
-    plt.imshow(grid,
+    img = ax.imshow(grid,
                extent = (min (coord_x), max(coord_x), min(coord_y), max(coord_y)),
                aspect = 'auto', origin = 'lower', cmap= 'jet')
-    cbar = plt.colorbar()
+    cbar = plt.colorbar(img,ax=ax, orientation='vertical')
     
-    if kwargs.get('clim') is not None:
-        plt.clim(clim[0],clim[1])
+    # if kwargs.get('clim') is not None:
+    #     plt.clim(clim[0],clim[1])
     
-    if kwargs.get('lgd_label') is not None:
-        cbar.set_label(kwargs.get('lgd_label'), labelpad = 10)
-    else:
-        cbar.set_label('Fraction of Current Source', labelpad = 10)
+    # if kwargs.get('lgd_label') is not None:
+    #     cbar.set_label(kwargs.get('lgd_label'), labelpad = 10)
+    # else:
+    #     cbar.set_label('Fraction of Current Source', labelpad = 10)
 
-def _fig_RealSources_(sc):
+def _fig_RealSources_(ax,sc):
     """ add known point sources if present """
     if sc == None:
         return
     for s in sc:
         sx = float(s.split(',')[0])
         sy = float(s.split(',')[1])
-        plt.plot(sx, sy,'ow', markersize = 10, markeredgecolor = 'k')
+        ax.plot(sx, sy,'ow', markersize = 10, markeredgecolor = 'k')
 
 def _fig_ReturnElec_(retElec):
     """ plot the return electrode """
@@ -53,7 +53,7 @@ def _fig_ReturnElec_(retElec):
     retElecy = float(retElec.split(',')[1])
     plt.plot(retElecx, retElecy,'sw', markersize = 10)
 
-def _fig_VRTe_(coord,data_sol):
+def _fig_VRTe_(ax,coord,data_sol):
     """ plot the VRTe current franctions """
     coord_x, coord_y = parseCoord(coord,dim='2d')
     norm_z = (data_sol - min(data_sol)) / (max(data_sol) - min(data_sol))
@@ -61,19 +61,23 @@ def _fig_VRTe_(coord,data_sol):
     edgecolor_norm_z = grey_cm(norm_z)
     jet_cm = plt.cm.get_cmap('jet')
     facecolor_norm_z = jet_cm(norm_z)
-    plt.scatter(coord_x, coord_y, facecolor = facecolor_norm_z, edgecolor = edgecolor_norm_z, cmap = 'jet')
+    ax.scatter(coord_x, coord_y, facecolor = facecolor_norm_z, edgecolor = edgecolor_norm_z, cmap = 'jet')
 
             
-def _fig_Axis_Labels_(title):
-    plt.title(title)
-    plt.ylabel('y [m]',fontsize=12)
-    plt.xlabel('x [m]',fontsize=12)
-    axes = plt.gca()
+def _fig_Axis_Labels_(ax,title):
+    ax.set_title(title)
+    ax.set_ylabel('y [m]',fontsize=12)
+    ax.set_xlabel('x [m]',fontsize=12)
+    # axes = plt.gca()
     # axes.set_xlim([0,0.53])
     # axes.set_ylim([0,0.52])
-    plt.tick_params(axis='both', which='major')
+    ax.tick_params(axis='both', which='major')
     plt.tight_layout()
-    axes.set_aspect('equal')
+    ax.set_aspect('equal')
+    
+def _fig_ModelParameter_mi_(coord, mpi):
+    plt.plot(coord[mpi,0], coord[mpi,1],'sr', markersize = 10)
+    
     
 def parseCoord(coord,dim):
 
@@ -155,22 +159,27 @@ def plotFIT(b,b_w,xfun,path):
     plt.show()
 
     
-def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, **kwargs):
+def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, ax=None, **kwargs):
     """ Plot CSD in 2d, using matplotlib and scipy interpolation
     
     Parameters
     ------------
     self
     """
+      
     f = plt.figure('surface')
-    _fig_Interpolation_(coord,data_sol)
-    _fig_VRTe_(coord,data_sol)
-    _fig_RealSources_(sc)
+
+    if ax==None:
+        ax = plt.gca()
+        
+    _fig_Interpolation_(ax,coord,data_sol)
+    _fig_VRTe_(ax,coord,data_sol)
+    _fig_RealSources_(ax,sc)
     _fig_ReturnElec_(retElec)
     
     if kwargs.get('title_wr') is not None:
         title=r'$\lambda$=' + str(kwargs.get('title_wr') )
-        _fig_Axis_Labels_(title)
+        _fig_Axis_Labels_(ax,title)
 
     return f
 
@@ -178,7 +187,7 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, **kwa
         plotFIT(b,b_w,xfun,path)
 
             
-def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,title=None,pltRemotes=False,**kwargs):
+def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,ax=None,title=None,pltRemotes=False,**kwargs):
     """ plot scattered 3d current sources density for a given regularisation weight wr 
     (can be the knee location if pareto-curve mode is run)
     
@@ -189,9 +198,14 @@ def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,title=None,pltRemotes=Fals
     kwargs (to add) : 'sc' (plot source position (for a synthetic case experiment)
 
     """
+    # f = plt.figure('volume')
+
     coord_x, coord_y, coord_z = parseCoord(coord,dim='3d')
 
-    f = plt.figure('volume')
+    if ax==None:
+        print('no Axis')
+        # ax = plt.gca()
+        ax=f.gca(projection='3d')
 
     step=(max(coord_x)-min(coord_x))/10
 
@@ -202,13 +216,12 @@ def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,title=None,pltRemotes=Fals
     X,Y,Z=np.meshgrid(xlin,ylin,zlin)
     
     data_2_plot= data  
-    ax=f.gca(projection='3d')
     sc=ax.scatter(coord_x, coord_y, coord_z, c=data_2_plot, cmap ='coolwarm', s=data_2_plot*1e4,
               )
     # if self.clim is None:
     #     print('none clim')
     # sc.set_clim(self.clim)
-    cbar = plt.colorbar(sc)
+    cbar = plt.colorbar(sc,ax=ax)
     # self.labels()
     # cbar.set_label(self.physLabel)
     # ax.set_zlim([-10,0])
@@ -230,14 +243,17 @@ def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,title=None,pltRemotes=Fals
         title= 'Scattered current sources density, wr=' + str(wr) 
     else:
         title= title + ', wr=' + str(wr)
-    plt.legend()
-    plt.title(title)
+    # plt.legend()
+    ax.set_ylabel('y [m]',fontsize=12)
+    ax.set_xlabel('x [m]',fontsize=12)
+    ax.set_title(title)
     plt.savefig(path +  filename + '_icsd_scatter.png' , dpi=550,bbox_inches='tight',pad_inches = 0)
 
     if knee==True:
         if wr==KneeWr:
             plt.savefig(path+ filename + 'icsd_knee_scatter'+ str(KneeWr) + '.png',dpi=550,bbox_inches='tight',pad_inches = 0)
-    
+
+   
     plt.show()
     
     return f
@@ -246,11 +262,15 @@ def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,title=None,pltRemotes=Fals
 #%% Generic plot functions
 
 
-def scatter2d(coord, data, label, path, filename, pltRemotes=False, **kwargs):
+def scatter2d(coord, data, label, path, filename, pltRemotes=False, ax=None, **kwargs):
       
     coord_x, coord_y = parseCoord(coord,dim='2d')
 
     f = plt.figure('volume')
+    
+    if ax==None:
+        print('ax = None')
+        
     step=(max(coord_x)-min(coord_x))/10
     xlin=np.arange(min(coord_x),max(coord_x),step)
     ylin=np.arange(min(coord_y),max(coord_y),step)
@@ -273,27 +293,34 @@ def scatter2d(coord, data, label, path, filename, pltRemotes=False, **kwargs):
     return f
         
 
-def scatter3d(coord, data, label, path, filename, pltRemotes=False, **kwargs):
+def scatter3d(coord, data, label, path, filename, pltRemotes=False, ax=None, **kwargs):
       
     coord_x, coord_y, coord_z = parseCoord(coord,dim='3d')
 
     
+
     f = plt.figure('volume')
+    
+    if ax==None:
+        print('no Axis')
+        ax = plt.gca()
+    # ax=f.gca(projection='3d')
+        
+        
     step=(max(coord_x)-min(coord_x))/10
     xlin=np.arange(min(coord_x),max(coord_x),step)
     ylin=np.arange(min(coord_y),max(coord_y),step)
     zlin=np.arange(min(coord_z),max(coord_z),step)
     X,Y,Z=np.meshgrid(xlin,ylin,zlin)
-    ax=f.gca(projection='3d')
     sc=ax.scatter(coord_x, coord_y, coord_z, c=data, cmap ='coolwarm')
-    cbar = plt.colorbar(sc)
+    cbar = plt.colorbar(sc,ax=ax)
     cbar.set_label(label)      
     ax.set_ylabel('y [m]',fontsize=15)
     ax.set_xlabel('x [m]',fontsize=15)
     
     plotRemotes(path,dim='3d',pltRemotes=False) # plot remotes and injection position
 
-    plt.legend()
+    # plt.legend()
     # plt.title(title)
     plt.savefig(path+  filename + '_icsd_scatter.png' , dpi=550,bbox_inches='tight',pad_inches = 0)
     plt.show()
@@ -320,10 +347,13 @@ def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None, **kwargs)
     self
     """
     f = plt.figure('surface')
-    _fig_Interpolation_(coord,data_sol,lgd_label=physLabel)
+    # _fig_Interpolation_(coord,data_sol,lgd_label=physLabel)
     _fig_VRTe_(coord,data_sol)
     _fig_RealSources_(sc)
     _fig_ReturnElec_(retElec)
+
+    if kwargs.get('jac') is not None:
+        _fig_ModelParameter_mi_(coord,kwargs.get('jac'))
 
     if kwargs.get('title_wr') is not None:
         title=r'$\lambda$=' + str(title_wr)

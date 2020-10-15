@@ -62,7 +62,7 @@ class iCSD3d_Class():
         self.regMesh='strc' # strc or unstrc
         self.plotElecs=False 
         self.alphax0=1 # weight on model smallness relative to m0
-        self.inix0=None # or 'cst' if constant vector *0.1
+        self.inix0='cst' # None or 'cst' if constant vector *0.1
         self.methodM0='F1' # method to estimate intial physical model
         self.alphaSxy=False # weight on model smoothness in z-direction 
         self.alphaSx=1 # weight on model smoothness in x-direction
@@ -121,7 +121,6 @@ class iCSD3d_Class():
     ### mkdirs 
     def createdirs(self):
         self.path2load = self.dirName
-        print(self.path2load)
         self.path2save= self.path2load + 'figs'
         # self.path2save= self.dirName + 'fig/'
         # print(self.path2save)
@@ -172,6 +171,7 @@ class iCSD3d_Class():
         """
         run iCSD multiple times while changing the weights to explore the L-curve
         """           
+        self.icsd_init()
         self.pareto_weights = np.linspace(self.pareto_MinErr, self.pareto_MaxErr, self.pareto_nSteps)
         print('pareto weights are\n', self.pareto_weights)
 
@@ -203,7 +203,7 @@ class iCSD3d_Class():
                 plt.close(self.f)
 
                 self.ResidualAnalysis()
-
+                self.Misfit()
             
             self.DetectKneePt()
             self.wr=float(self.pareto_weights[self.IdPtkneew])
@@ -222,21 +222,25 @@ class iCSD3d_Class():
         Equivalent to several steps::
             self.prepare4iCSD()
             self.plotCSD()
-            self.RMSAnalysis()
+            self.Misfit()
             
         """
         self.icsd_init()
         self.prepare4iCSD()   
         if (self.x0_ini_guess == True or self.x0_prior == True):
             self.x = iCSD(self.x0_ini_guess,self.A_w,self.b_w,self.type,self.coord,self.path2load,x0=self.x0)
-            writeFIT(self.path2load,self.x0_prior,self.x.fun,self.b_w,self.b_s,self.x0,self.reg_A,saveall=False)
         else:
             self.x = iCSD(self.x0_ini_guess,self.A_w,self.b_w,self.type,self.coord,self.path2load)
 
         self.f = self.showResults()
-        self.RMSAnalysis()
+        # self.RMSAnalysis()
+        self.Misfit()
         self.f.savefig(self.path2save+'iCSD', dpi = 600)
+        plt.tight_layout()
         plt.show()
+        plt.close(self.f)
+        # self.ModelResolution()
+
         
 
         
@@ -255,6 +259,8 @@ class iCSD3d_Class():
              self.run_single()
         else:
              self.run_pareto()
+             
+        return self.x
        
         
     def _parseModelReg(self):
@@ -288,7 +294,7 @@ class iCSD3d_Class():
                 self.reg_A = regularize_A_UnstructuredMesh3d(self.coord,self.nVRTe,self.k)
             
                     
-        if self.alphaSxy==True:
+        if self.alphaSxy==True: # anisotropic smoothing
             self.reg_smallx0 = ponderate_smallnessX0(self.alphaSxy,self.alphax0,reg_Ax=self.reg_Ax)
             self.reg_A = sum_smallness_smoothness(self.alphaSxy,self.x0_prior,reg_smallx0=self.reg_smallx0, reg_Ax=self.reg_Ax, reg_Ay=self.reg_Ay)
         else:
@@ -331,12 +337,12 @@ class iCSD3d_Class():
         #     self.showEstimateM0()
         self.estimateM0(methodM0=self.methodM0)
             
-    def estimateM0(self,methodM0='F1',show=True):
+    def estimateM0(self,methodM0='F1',show=True, ax=None):
         self.icsd_init()
         self.parseM0(methodM0) # define the method to estimate M0
         self.physLabel=labels(methodM0) # lgd labeling for the plot
         if show == True:
-            self.showEstimateM0()
+            self.showEstimateM0(ax=ax)
         
     def parseM0(self,methodM0):
         """ Parse M0 parameters
@@ -347,12 +353,12 @@ class iCSD3d_Class():
             self.x0 = productmoment(self.A,self.b)
             
 
-    def showEstimateM0(self):
+    def showEstimateM0(self,ax=None):
         # fig, ax = plt.subplots()
         if self.type=='2d':
             f = plotContour2d(self.coord,self.x0,self.physLabel,path=self.path2load,retElec=None, sc=None)
         else:
-            f = scatter3d(self.coord, self.x0, self.physLabel, self.path2load, self.obs)
+            f = scatter3d(self.coord, self.x0, self.physLabel, self.path2load, self.obs, ax=ax)
         plt.tight_layout()
         plt.show()
         plt.close(f)
@@ -362,7 +368,7 @@ class iCSD3d_Class():
 #%% PLOT fcts     
 
 
-    def showResults(self, ax=None, clim=None ,cmap='viridis_r',
+    def showResults(self, ax=None, data=None, clim=None ,cmap='viridis_r',
                     plotElecs=False,sc=False,retElec=None,
                     mesh=None, gif3d=False, title=None, cut=False,**kwargs):
         """Show inverted model.
@@ -397,19 +403,21 @@ class iCSD3d_Class():
         self.mesh_over=mesh
         self.gif3d=gif3d
         self.title=title
+        print(ax)
+        if data is None:
+            data = self.x.x
        
-        # print(self.plotElecs)
         if self.type=='2d':
-            self.f = plotCSD2d(self.coord,self.x.x,self.b,self.b_w,self.x.fun,self.path2load,self.pareto,retElec=None, sc=None, title_wr=self.wr)
+            self.f = plotCSD2d(self.coord,data,self.b,self.b_w,self.x.fun,self.path2load,self.pareto,retElec=None, sc=None, ax=ax, title_wr=self.wr)
         else:
-            self.f = plotCSD3d(self.wr,self.coord,self.x.x,self.path2load,self.obs,self.knee,self.KneeWr,title=None,**kwargs)
+            self.f = plotCSD3d(self.wr,self.coord,data,self.path2load,self.obs,self.knee,self.KneeWr,ax=ax,title=None,**kwargs)
             if cut ==True:
                 plotCSD3d_pyvistaSlice()
             else:
                 plotCSD3d_pv(self.coord, path=self.path2load, filename_root='Solution.dat', 
                              knee = self.knee, wr = self.wr, KneeWr = self.KneeWr, 
                              mesh=self.mesh, plotElecs=plotElecs, gif3d = self.gif3d, **kwargs)
-        return self.f
+        return ax
         
 #%% POST inversion analysis        
 
@@ -426,6 +434,45 @@ class iCSD3d_Class():
         self.rms = np.sum(np.square(self.x.fun))/len(self.x.fun)
         print('RMS error='+ str(self.rms))
 
+
+    def Misfit(self):
+        """ 
+        
+        Parameters
+        ----------
+        
+        """   
+        residuals =  self.x.fun[0 : self.b.shape[0]] - self.b
+        val = np.linalg.norm(self.obs_w*residuals)
+
+        # val = np.sum(self.obs_w*(residuals**2))
+        
+        misfit = val*self.wr
+        # print(self.b_w[0 : self.b.shape[0]])
+        # print('RMS error='+ str(misfit))
+
+        return misfit
+
+
+    def ModelResolution(self,sol=None,coord=None, jacMi=None):
+
+        if sol is None:
+            sol = self.x
+
+        if coord is None:
+            coord = self.coord
+            
+        J = sol.jac[self.b.shape[0] + 1:,jacMi]  
+
+        # writeFIT(self.path2load,self.x0_prior,self.x.fun,self.b_w,self.b_s,self.x0,self.reg_A,J,saveall=False)
+
+        if self.type == '2d':
+            f = plotContour2d(coord,J,'Jac matrice',path=self.path2load,retElec=None, sc=None,jac=jacMi)
+        else:
+            f = scatter3d(coord,J,'Jac matrice', self.path2load, self.obs)
+        plt.tight_layout()
+        plt.show()
+        plt.close(f)
 
 #%% TO DO         
 

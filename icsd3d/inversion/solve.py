@@ -13,7 +13,8 @@ from exporters.save import Export_sol
 
 def iCSD(x0_ini_guess,A_w,b_w,dim,coord,path,**kwargs):
     """solve linear system, given weigted A matrix (VRTe, constrain, regul) and weigted b (observations)"""
-    if x0_ini_guess==False:
+        
+    if kwargs.get('x0') is None:
         # No initial guess
         x = lsq_linear(A_w, b_w, bounds = (0, 1))
         print('*' * 20)

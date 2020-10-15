@@ -168,7 +168,6 @@ class iCSD3d_Class():
         grid.origin = (min(coord_x), min(coord_y), min(coord_z)) # The bottom left corner of the data set
         grid.spacing = (spc, spc,spc) # These are the cell sizes along each axis
         
-
         coord= data_2_plot[:,:-1]
         pv.set_plot_theme('document')
         poly = pv.PolyData(coord)

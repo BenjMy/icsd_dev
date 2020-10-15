@@ -175,7 +175,7 @@ def regularize_A_x_y_z(coord):
     
     return reg_Ax, reg_Ay
 
-#%% Regularize
+#%% Initiate vectors to build regularisation matrice for A, b
 
 def regularize_b(reg_A):
     """initiate vector b with zeros, the length is determined by the number of regul rows in A"""
