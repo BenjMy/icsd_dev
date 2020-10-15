@@ -1,0 +1,6 @@
+﻿icsd3d.gridder.mkgrid
+=====================
+
+.. currentmodule:: icsd3d.gridder.mkgrid
+
+.. automodule:: icsd3d.gridder.mkgrid

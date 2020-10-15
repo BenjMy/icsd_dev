@@ -1,0 +1,6 @@
+﻿icsd3d.importers.read
+=====================
+
+.. currentmodule:: icsd3d.importers.read
+
+.. automodule:: icsd3d.importers.read

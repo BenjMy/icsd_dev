@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API documentation &mdash; ICSD 0.1.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ICSD
+          
+
+          
+            
+            <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">ICSD</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../started/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../started/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../started/install.html">Which Python?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../started/install.html#dependencies">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../started/install.html#optionnal-third-party-packages">Optionnal Third party packages</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../doc/documentation.html">The Mise-à-la-masse method</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Gallery of examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Gallery of examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API reference: The <code class="docutils literal notranslate"><span class="pre">icsd3d</span></code> package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ICSD</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>API documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/content/api_core/api_old.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-icsd3d.icsd3d_class">
+<span id="api-documentation"></span><h1>API documentation<a class="headerlink" href="#module-icsd3d.icsd3d_class" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class">
+<em class="property">class </em><code class="sig-prename descclassname">icsd3d.icsd3d_class.</code><code class="sig-name descname">iCSD3d_Class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dirName</span></em><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a icsd inversion object.</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#icsd3d.icsd3d_class.iCSD3d_Class.CreateSurvey" title="icsd3d.icsd3d_class.iCSD3d_Class.CreateSurvey"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CreateSurvey</span></code></a>()</p></td>
+<td><p>Data container using panda dataframe for survey paramaters such as geometry file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#icsd3d.icsd3d_class.iCSD3d_Class.CreateTimeLapseSurvey" title="icsd3d.icsd3d_class.iCSD3d_Class.CreateTimeLapseSurvey"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CreateTimeLapseSurvey</span></code></a>()</p></td>
+<td><p>Description here</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#icsd3d.icsd3d_class.iCSD3d_Class.Misfit" title="icsd3d.icsd3d_class.iCSD3d_Class.Misfit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Misfit</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">createdirs</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#icsd3d.icsd3d_class.iCSD3d_Class.icsd_init" title="icsd3d.icsd3d_class.iCSD3d_Class.icsd_init"><code class="xref py py-obj docutils literal notranslate"><span class="pre">icsd_init</span></code></a>()</p></td>
+<td><p>these functions are called only once, even for pareto, as they do not depend on the regularization weight</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#icsd3d.icsd3d_class.iCSD3d_Class.invert" title="icsd3d.icsd3d_class.iCSD3d_Class.invert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">invert</span></code></a>(**kwargs)</p></td>
+<td><p>Invert voltage to current densities.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#icsd3d.icsd3d_class.iCSD3d_Class.parseDataReg" title="icsd3d.icsd3d_class.iCSD3d_Class.parseDataReg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parseDataReg</span></code></a>()</p></td>
+<td><p>Parse regularisation parameters before inversion</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#icsd3d.icsd3d_class.iCSD3d_Class.parseM0" title="icsd3d.icsd3d_class.iCSD3d_Class.parseM0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parseM0</span></code></a>(methodM0)</p></td>
+<td><p>Parse M0 parameters</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#icsd3d.icsd3d_class.iCSD3d_Class.prepare4iCSD" title="icsd3d.icsd3d_class.iCSD3d_Class.prepare4iCSD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare4iCSD</span></code></a>()</p></td>
+<td><p>this function is called for each weight, keep them separated for pareto # 1 - Estimate M0 initial if smallness guided inversion or initial guess # 2-  Create vector with weights, the length is determined by the number of regul rows in A</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#icsd3d.icsd3d_class.iCSD3d_Class.run_pareto" title="icsd3d.icsd3d_class.iCSD3d_Class.run_pareto"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_pareto</span></code></a>()</p></td>
+<td><p>run iCSD multiple times while changing the weights to explore the L-curve</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#icsd3d.icsd3d_class.iCSD3d_Class.run_single" title="icsd3d.icsd3d_class.iCSD3d_Class.run_single"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_single</span></code></a>()</p></td>
+<td><p>Run a single inversion (unique regularisation weight) Equivalent to several steps::     self.prepare4iCSD()     self.plotCSD()     self.Misfit()</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#icsd3d.icsd3d_class.iCSD3d_Class.showResults" title="icsd3d.icsd3d_class.iCSD3d_Class.showResults"><code class="xref py py-obj docutils literal notranslate"><span class="pre">showResults</span></code></a>([ax, data, clim, cmap, …])</p></td>
+<td><p>Show inverted model.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 67%" />
+<col style="width: 33%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>DetectKneePt</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>ModelResolution</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>RMSAnalysis</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>ResidualAnalysis</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>estimateM0</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>showEstimateM0</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class.CreateSurvey">
+<code class="sig-name descname">CreateSurvey</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class.CreateSurvey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data container using panda dataframe for survey paramaters such as geometry file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class.CreateTimeLapseSurvey">
+<code class="sig-name descname">CreateTimeLapseSurvey</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class.CreateTimeLapseSurvey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Description here</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class.Misfit">
+<code class="sig-name descname">Misfit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class.Misfit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class.icsd_init">
+<code class="sig-name descname">icsd_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class.icsd_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>these functions are called only once, even for pareto,
+as they do not depend on the regularization weight</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class.invert">
+<code class="sig-name descname">invert</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class.invert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invert voltage to current densities.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class.parseDataReg">
+<code class="sig-name descname">parseDataReg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class.parseDataReg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse regularisation parameters before inversion</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class.parseM0">
+<code class="sig-name descname">parseM0</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">methodM0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class.parseM0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse M0 parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class.prepare4iCSD">
+<code class="sig-name descname">prepare4iCSD</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class.prepare4iCSD" title="Permalink to this definition">¶</a></dt>
+<dd><p>this function is called for each weight, keep them separated for pareto
+# 1 - Estimate M0 initial if smallness guided inversion or initial guess
+# 2-  Create vector with weights, the length is determined by the number of regul rows in A</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class.run_pareto">
+<code class="sig-name descname">run_pareto</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class.run_pareto" title="Permalink to this definition">¶</a></dt>
+<dd><p>run iCSD multiple times while changing the weights to explore the L-curve</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class.run_single">
+<code class="sig-name descname">run_single</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class.run_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a single inversion (unique regularisation weight)
+Equivalent to several steps:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">prepare4iCSD</span><span class="p">()</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">plotCSD</span><span class="p">()</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">Misfit</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="icsd3d.icsd3d_class.iCSD3d_Class.showResults">
+<code class="sig-name descname">showResults</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">data</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cmap</span><span class="o">=</span><span class="default_value">'viridis_r'</span></em>, <em class="sig-param"><span class="n">plotElecs</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sc</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">retElec</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mesh</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gif3d</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cut</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#icsd3d.icsd3d_class.iCSD3d_Class.showResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show inverted model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<em>Matplotlib.Axes</em><em>, </em><em>optional</em>) – If specified, the graph will be plotted against this axis.</p></li>
+<li><p><strong>clim</strong> (<em>array</em><em>, </em><em>optional</em>) – Minimum and Maximum value of the colorbar.</p></li>
+<li><p><strong>cmap</strong> (<em>str</em><em>, </em><em>optional</em>) – Name of the Matplotlib colormap to use.</p></li>
+<li><p><strong>plotElecs</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>True</cite> add to the ICSD plot measuring electrodes as points</p></li>
+<li><p><strong>sc</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <cite>True</cite> add to the ICSD plot remotes and injection electrodes as points</p></li>
+<li><p><strong>retElec</strong> (<em>array</em><em>, </em><em>optional</em>) – Coordinates of the return electrode, format = x1,y1’)
+If Not None add to the ICSD plot the return B electrode</p></li>
+<li><p><strong>mesh</strong> (<em>str</em><em>, </em><em>optional</em>) – Specify name of the vtk file
+If Not None add mesh3d.vtk to plot with the results of icsd (for 3d using pyvista)</p></li>
+<li><p><strong>gif3d</strong> (<em>bool</em><em>, </em><em>optional</em>) – <p>If <cite>True</cite> record a gif using orbital function of pyvista
+title :  str, optional</p>
+<blockquote>
+<div><p>Specify inversion titlename to be add to the plot</p>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Benjamin Mary
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

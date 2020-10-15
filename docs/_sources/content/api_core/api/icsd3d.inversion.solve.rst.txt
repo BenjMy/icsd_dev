@@ -1,0 +1,6 @@
+﻿icsd3d.inversion.solve
+======================
+
+.. currentmodule:: icsd3d.inversion
+
+.. automodule:: solve

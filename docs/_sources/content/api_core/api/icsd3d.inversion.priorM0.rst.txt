@@ -1,0 +1,6 @@
+﻿icsd3d.inversion.priorM0
+========================
+
+.. currentmodule:: icsd3d.inversion
+
+.. automodule:: priorM0
