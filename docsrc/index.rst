@@ -60,7 +60,7 @@ API documentation
 =================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: API
 
    content/api_core/api
