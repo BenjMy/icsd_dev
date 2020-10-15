@@ -347,9 +347,11 @@ def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None, **kwargs)
     self
     """
     f = plt.figure('surface')
+    ax = plt.gca()
+
     # _fig_Interpolation_(coord,data_sol,lgd_label=physLabel)
-    _fig_VRTe_(coord,data_sol)
-    _fig_RealSources_(sc)
+    _fig_VRTe_(ax,coord,data_sol)
+    _fig_RealSources_(ax,sc)
     _fig_ReturnElec_(retElec)
 
     if kwargs.get('jac') is not None:

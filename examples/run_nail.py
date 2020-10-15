@@ -3,6 +3,8 @@ Inversion of current source density apply to a roots imaging
 ------------------------------------------------------------
 """
 import os
+import matplotlib.pyplot as plt
+
 # import numpy as np
 
 # maindir='E:/Padova/Software/SourceInversion/icsd_dev/'
@@ -12,7 +14,7 @@ import os
 # Exemple cotton
 # -----------------------------------#
 # path2files="examples/Cotton_Soil/Nail1/"
-path2files="./examples/nail1/"
+path2files="./nail1/"
 
 # path2files = os.path.join(os.path.dirname('__file__'), '/Cotton_Soil/Nail1/')
 # cwd=os.getcwd()
@@ -59,10 +61,10 @@ icsd.estimateM0(methodM0='F1',show=True)
 # icsd.run_single()
 
 sol= icsd.invert()
-icsd.invert(pareto=True, regMesh='strc',x0_prior=True, pareto_MinErr=1, pareto_MaxErr=100)
+# icsd.invert(pareto=True, regMesh='strc',x0_prior=True, 
+#             pareto_MinErr=1, pareto_MaxErr=100)
 
 
-import matplotlib.pyplot as plt
  
 fig, ax = plt.subplots()
 ax.scatter([0.2,0.4],[0.1,0.3],color='r',marker='v')

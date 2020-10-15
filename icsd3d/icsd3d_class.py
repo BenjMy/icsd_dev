@@ -28,12 +28,8 @@ class iCSD3d_Class():
     
     Parameters
     ----------
-    coord_file : str, mandatory
-        coordinates of the VRTe for plotting
-    wr : float, optional
-        Weight regularization
-    wc : float, optional
     """
+    
     def __init__(self,dirName):
         self.dirName = dirName
         self.clim = []
@@ -226,19 +222,21 @@ class iCSD3d_Class():
             
         """
         self.icsd_init()
-        self.prepare4iCSD()   
+        self.prepare4iCSD()
         if (self.x0_ini_guess == True or self.x0_prior == True):
             self.x = iCSD(self.x0_ini_guess,self.A_w,self.b_w,self.type,self.coord,self.path2load,x0=self.x0)
         else:
             self.x = iCSD(self.x0_ini_guess,self.A_w,self.b_w,self.type,self.coord,self.path2load)
 
-        self.f = self.showResults()
+        ax, f = self.showResults()
         # self.RMSAnalysis()
         self.Misfit()
-        self.f.savefig(self.path2save+'iCSD', dpi = 600)
+        print(f)
+        print(self.path2save)
+        f.savefig(self.path2save+'iCSD', dpi = 600)
         plt.tight_layout()
         plt.show()
-        plt.close(self.f)
+        # plt.close(f)
         # self.ModelResolution()
 
         
@@ -403,21 +401,21 @@ class iCSD3d_Class():
         self.mesh_over=mesh
         self.gif3d=gif3d
         self.title=title
-        print(ax)
+        # print(ax)
         if data is None:
             data = self.x.x
        
         if self.type=='2d':
-            self.f = plotCSD2d(self.coord,data,self.b,self.b_w,self.x.fun,self.path2load,self.pareto,retElec=None, sc=None, ax=ax, title_wr=self.wr)
+            f = plotCSD2d(self.coord,data,self.b,self.b_w,self.x.fun,self.path2load,self.pareto,retElec=None, sc=None, ax=ax, title_wr=self.wr)
         else:
-            self.f = plotCSD3d(self.wr,self.coord,data,self.path2load,self.obs,self.knee,self.KneeWr,ax=ax,title=None,**kwargs)
+            f = plotCSD3d(self.wr,self.coord,data,self.path2load,self.obs,self.knee,self.KneeWr,ax=ax,title=None,**kwargs)
             if cut ==True:
                 plotCSD3d_pyvistaSlice()
             else:
                 plotCSD3d_pv(self.coord, path=self.path2load, filename_root='Solution.dat', 
                              knee = self.knee, wr = self.wr, KneeWr = self.KneeWr, 
                              mesh=self.mesh, plotElecs=plotElecs, gif3d = self.gif3d, **kwargs)
-        return ax
+        return ax, f
         
 #%% POST inversion analysis        
 
