@@ -5,8 +5,15 @@
 
 Computation times
 =================
+<<<<<<< HEAD
 **00:08.467** total execution time for **auto_examples** files:
 
 +-------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_auto_examples_run_nail.py` (``run_nail.py``) | 00:08.467 | 0.0 MB |
+=======
+**00:08.298** total execution time for **auto_examples** files:
+
++-------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_run_nail.py` (``run_nail.py``) | 00:08.298 | 0.0 MB |
+>>>>>>> b29b9511b906000d7db3da0e13123cf54cb6a4e0
 +-------------------------------------------------------------+-----------+--------+

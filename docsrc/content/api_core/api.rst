@@ -6,6 +6,12 @@ API reference: The ``icsd3d`` package
     :no-members:
     :no-inherited-members:
 
+.. currentmodule:: icsd3d.icsd3d_class_dev
+
+.. autosummary::
+    :toctree: api/
+    :template: module.rst
+
 
 ``icsd3d.inversion``: inversion scheme
 ======================================

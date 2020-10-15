@@ -151,7 +151,11 @@ Inversion of current source density apply to a roots imaging
 
 .. rst-class:: sphx-glr-timing
 
+<<<<<<< HEAD
    **Total running time of the script:** ( 0 minutes  8.467 seconds)
+=======
+   **Total running time of the script:** ( 0 minutes  8.298 seconds)
+>>>>>>> b29b9511b906000d7db3da0e13123cf54cb6a4e0
 
 
 .. _sphx_glr_download_auto_examples_run_nail.py:
