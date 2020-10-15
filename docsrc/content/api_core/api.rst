@@ -2,7 +2,7 @@
 API reference: The ``icsd3d`` package
 =======================================
 
-.. automodule:: icsd3d.icsd3d_class
+.. automodule:: icsd3d.icsd3d_class_dev
     :no-members:
     :no-inherited-members:
 
