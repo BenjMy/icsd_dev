@@ -10,7 +10,6 @@ API reference: The ``icsd3d`` package
 
 .. autosummary::
     :toctree: api/
-    :template: module.rst
 
 
 ``icsd3d.inversion``: inversion scheme
@@ -24,7 +23,6 @@ API reference: The ``icsd3d`` package
 
 .. autosummary::
     :toctree: api/
-    :template: module.rst
 
     priorM0
     smoothing
@@ -41,7 +39,6 @@ API reference: The ``icsd3d`` package
 
 .. autosummary::
     :toctree: api/
-    :template: module.rst
 
     mpl_plot
     pv_plot
@@ -58,7 +55,6 @@ API reference: The ``icsd3d`` package
 
 .. autosummary::
     :toctree: api/
-    :template: module.rst
 
     mkgrid
 
