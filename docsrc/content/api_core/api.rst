@@ -19,7 +19,7 @@ API reference: The ``icsd3d`` package
 
 .. currentmodule:: icsd3d.inversion
 
-.. autosummary::
+.. automodule::
 
     priorM0
     smoothing
