@@ -12,6 +12,9 @@ API reference: The ``icsd3d`` package
 =============================
 
 .. automodule:: icsd3d.mkgrid
+   :members:
+   :show-inheritance:
+   :inherited-members:
 
 
 
