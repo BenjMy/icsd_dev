@@ -684,7 +684,9 @@ class iCSD3d_Class():
             self.W_s_b = W
 
     #%% APPLY WEIGHTS 
-
+    """
+    APPLY WEIGHTS 
+    """
     def weight_A(self):
         """Apply the weights to A"""
         if self.x0_prior==True:
@@ -700,7 +702,9 @@ class iCSD3d_Class():
             self.b_w = np.matmul(self.b_s,  self.W_s)
     
     #%% PREPARE FOR ICSD
-
+    """
+    PREPARE FOR ICSD
+    """
     def prepare4iCSD(self):
         """ this function is called for each weight, keep them separated for pareto"""
         # create regularization part of the weight matrix
@@ -715,6 +719,9 @@ class iCSD3d_Class():
         self.weight_b()
 
     #%% LSQ 
+    """
+    LSQ 
+    """
 
     def iCSD(self):
         """solve linear system, given A matrix (VRTe, constrain, regul) and b (observations)"""

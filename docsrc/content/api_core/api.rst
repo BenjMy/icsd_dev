@@ -8,6 +8,12 @@ API reference: The ``icsd3d`` package
    :inherited-members:
 
 
+``icsd3d.gridder``: Grid data
+=============================
+
+.. automodule:: icsd3d.mkgrid
+
+
 
 ``icsd3d.inversion``: inversion scheme
 ======================================
