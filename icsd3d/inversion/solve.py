@@ -12,8 +12,26 @@ from exporters.save import Export_sol
 #%% Solve linear system Ax=b
 
 def iCSD(x0_ini_guess,A_w,b_w,dim,coord,path,**kwargs):
-    """solve linear system, given weigted A matrix (VRTe, constrain, regul) and weigted b (observations)"""
-        
+    """
+    Solve linear system, given weigted A matrix (VRTe, constrain, regul) and weigted b (observations).
+
+    Parameters
+    ----------
+    * x0_ini_guess : 1D-arrays
+        Initial guess
+    * A_w : 1D-arrays
+        Kernel of green functions
+    * b_w : 1D-array
+        Weigted observations
+    * dim : int
+        Survey dimension i.e 2d or 3d
+    * coord : 1D-arrays
+        Coordinates of the virtual sources
+    Returns
+    -------
+    x : 1D-arrays
+        Solution
+    """       
     if kwargs.get('x0') is None:
         # No initial guess
         x = lsq_linear(A_w, b_w, bounds = (0, 1))

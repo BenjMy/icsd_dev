@@ -10,9 +10,6 @@ import numpy as np
 from scipy.stats import pearsonr
 
 
-#%%
-
-
 ### Individual Misfit  
 def normF1(A,b):
     """compute the norm between observation data and individual green functions"""
