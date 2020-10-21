@@ -21,6 +21,13 @@ from scipy.sparse import diags
 import sys
 from numpy import linalg as LA
 
+from plotters.mpl_plot import plotCSD3d, plotCSD2d, scatter3d, scatter2d, plotContour2d, plotPareto, labels
+from plotters.pv_plot import plotCSD3d_pv
+from inversion.smoothing import *
+from inversion.priorM0 import *
+from inversion.solve import *
+from importers.read import *
+from exporters.save import * 
 from gridder.mkgrid import mkGrid_XI_YI 
 
 class iCSD3d_Class():
