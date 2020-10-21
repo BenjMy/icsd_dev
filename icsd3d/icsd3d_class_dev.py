@@ -654,7 +654,7 @@ class iCSD3d_Class():
             self.reg_w_0_b = np.ones(self.reg_A.shape[0]) * self.x0F1_sum * self.wr
             self.reg_w_0_A = np.ones(self.reg_A.shape[0])* self.wr
             
-    ### VERTICAL STACK EQUATIONS
+    #%% VERTICAL STACK EQUATIONS
     def stack_A(self):
         """Stack A (green fcts), constrainsts and regularisation"""
         print('shape A=' + str(np.shape(self.A)))
@@ -683,7 +683,7 @@ class iCSD3d_Class():
             np.fill_diagonal(W, wb)
             self.W_s_b = W
 
-    ### APPLY WEIGHTS 
+    #%% APPLY WEIGHTS 
 
     def weight_A(self):
         """Apply the weights to A"""
@@ -699,7 +699,7 @@ class iCSD3d_Class():
         else:
             self.b_w = np.matmul(self.b_s,  self.W_s)
     
-    ### PREPARE FOR ICSD
+    #%% PREPARE FOR ICSD
 
     def prepare4iCSD(self):
         """ this function is called for each weight, keep them separated for pareto"""
@@ -714,7 +714,7 @@ class iCSD3d_Class():
         self.weight_A()
         self.weight_b()
 
-    ### LSQ 
+    #%% LSQ 
 
     def iCSD(self):
         """solve linear system, given A matrix (VRTe, constrain, regul) and b (observations)"""
