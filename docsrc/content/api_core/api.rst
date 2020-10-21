@@ -28,8 +28,6 @@ API reference: The ``icsd3d`` package
 
 .. automodule:: icsd3d.plotters
    :members:
-   :show-inheritance:
-   :inherited-members:
 
 
 ``icsd3d.gridder``: Grid data
