@@ -17,6 +17,14 @@ API reference: The ``icsd3d`` package
    :show-inheritance:
    :inherited-members:
 
+.. currentmodule:: icsd3d.inversion
+
+.. autosummary::
+
+    priorM0
+    smoothing
+    solve
+
 
 ``icsd3d.plotters``: plotters for results visualisation
 =======================================================

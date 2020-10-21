@@ -54,7 +54,8 @@ extensions = [
     #'nbsphinx', # to include jupyter notebook as sphinx doc page
     'sphinx_gallery.gen_gallery', # to generate the gallery
     #'sphinx_nbexamples', # needs pandoc (apt-get install pandoc)
-    'sphinx.ext.autosectionlabel'
+    'sphinx.ext.autosectionlabel',
+    'sphinx.ext.viewcode'
 ]
 
 
