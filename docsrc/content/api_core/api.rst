@@ -43,10 +43,12 @@ API reference: The ``icsd3d`` package
 =============================
 
 .. automodule:: icsd3d.gridder
-   :members:
-   :show-inheritance:
-   :inherited-members:
 
+.. currentmodule:: icsd3d.gridder
+
+.. automodule::
+
+    mkgrid
 
 
 ``icsd3d.importers``: wrappers to facilitate import of common ERT data
