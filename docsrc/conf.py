@@ -16,14 +16,14 @@ import datetime
 # sys.path.append(os.path.relpath('../icsd3d'))
 # sys.path.insert(0, os.path.abspath('../icsd3d'))
 
-sys.path.insert(0, os.path.abspath("..icsd3d/"))
-sys.path.insert(0, os.path.abspath("..icsd3d/gridder/"))
-sys.path.insert(0, os.path.abspath("..icsd3d/exporters/"))
-sys.path.insert(0, os.path.abspath("..icsd3d/importers/"))
-sys.path.insert(0, os.path.abspath("..icsd3d/inversion/"))
-sys.path.insert(0, os.path.abspath("..icsd3d/plotters/"))
+sys.path.insert(0, os.path.abspath("../icsd3d/"))
+sys.path.insert(0, os.path.abspath("../icsd3d/gridder/"))
+sys.path.insert(0, os.path.abspath("../icsd3d/exporters/"))
+sys.path.insert(0, os.path.abspath("../icsd3d/importers/"))
+sys.path.insert(0, os.path.abspath("../icsd3d/inversion/"))
+sys.path.insert(0, os.path.abspath("../icsd3d/plotters/"))
 
-# sys.path.append(os.path.pardir)
+sys.path.append(os.path.pardir)
 
 
 # import sys
