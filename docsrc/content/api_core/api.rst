@@ -13,9 +13,6 @@ API reference: The ``icsd3d`` package
 ======================================
 
 .. automodule:: icsd3d.inversion
-   :members:
-   :show-inheritance:
-   :inherited-members:
 
 .. currentmodule:: icsd3d.inversion
 

@@ -1034,7 +1034,7 @@ class iCSD3d_Class():
 
 #%% DEFINE SURVEY container for observations and simulations     
 
-    def CreateSurvey(self):
+    def createSurvey(self):
         """Data container for survey paramaters such as geometry file
         
         Parameters
@@ -1043,14 +1043,28 @@ class iCSD3d_Class():
         """
 
 
-    def CreateTimeLapseSurvey(self):
-        """Description here
+    def createTimeLapseSurvey(self,fnames):
+        """Import multiple surveys.
         
         Parameters
         ----------
-
+        fnames : list of str
+            List of file to be parsed or directory where the files are.
         """
-        
+        if isinstance(fnames, list): # it's a list of filename
+            if len(fnames) < 2:
+                raise ValueError('at least two files needed for timelapse inversion')
+        else: # it's a directory and we import all the files inside
+            if os.path.isdir(fnames):
+                fnames = [os.path.join(fnames, f) for f in np.sort(os.listdir(fnames)) if f[0] != '.']
+                # this filter out hidden file as well
+            else:
+                raise ValueError('dirname should be a directory path or a list of filenames')
+        if self.projection is not None:
+            targetProjection = self.projection
+        for fname in fnames:
+            self.createSurvey(fname, targetProjection=targetProjection)
+
 
 #%% INITIAL MODEL          
 
