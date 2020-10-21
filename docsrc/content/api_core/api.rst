@@ -4,31 +4,19 @@ API reference: The ``icsd3d`` package
 
 .. automodule:: icsd3d.icsd3d_class_dev
    :members:
-   :show-inheritance:
-   :inherited-members:
-
-
-``icsd3d.gridder``: Grid data
-=============================
-
-.. automodule:: icsd3d.mkgrid
-   :members:
-   :show-inheritance:
-   :inherited-members:
 
 
 ``icsd3d.inversion``: inversion scheme
 ======================================
 
-.. automodule:: icsd3d.inversion
+.. automodule:: inversion.priorM0
+   :members:
 
-.. currentmodule:: icsd3d.inversion
+.. automodule:: inversion.smoothing
+   :members:
 
-.. automodule::
-
-    inversion.priorM0
-    inversion.smoothing
-    inversion.solve
+.. automodule:: inversion.solve
+   :members:
 
 
 ``icsd3d.plotters``: plotters for results visualisation
@@ -44,13 +32,11 @@ API reference: The ``icsd3d`` package
 =============================
 
 .. automodule:: gridder.mkgrid
-    :no-members:
+   :members:
 
 
 ``icsd3d.importers``: wrappers to facilitate import of common ERT data
 ======================================================================
 
-.. automodule:: icsd3d.importers
+.. automodule:: importers.read
    :members:
-   :show-inheritance:
-   :inherited-members:

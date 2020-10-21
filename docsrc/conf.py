@@ -16,7 +16,7 @@ import datetime
 # sys.path.append(os.path.relpath('../icsd3d'))
 # sys.path.insert(0, os.path.abspath('../icsd3d'))
 
-sys.path.insert(0, os.path.abspath("../icsd3d/"))
+sys.path.insert(0, os.path.abspath("../icsd3d"))
 sys.path.insert(0, os.path.abspath("../icsd3d/gridder/"))
 sys.path.insert(0, os.path.abspath("../icsd3d/exporters/"))
 sys.path.insert(0, os.path.abspath("../icsd3d/importers/"))
