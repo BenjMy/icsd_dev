@@ -17,7 +17,6 @@ API reference: The ``icsd3d`` package
    :inherited-members:
 
 
-
 ``icsd3d.inversion``: inversion scheme
 ======================================
 
@@ -27,30 +26,25 @@ API reference: The ``icsd3d`` package
 
 .. automodule::
 
-    priorM0
-    smoothing
-    solve
+    inversion.priorM0
+    inversion.smoothing
+    inversion.solve
 
 
 ``icsd3d.plotters``: plotters for results visualisation
 =======================================================
 
-.. automodule:: icsd3d.plotters
+.. automodule:: plotters.mpl_plot
    :members:
 
+.. automodule:: plotters.pv_plot
+   :members:
 
 ``icsd3d.gridder``: Grid data
 =============================
 
-.. automodule:: icsd3d.gridder
+.. automodule:: gridder.mkgrid
     :no-members:
-    :no-inherited-members:
-
-.. currentmodule:: icsd3d.gridder
-
-.. autosummary::
-
-    gridder/mkgrid
 
 
 ``icsd3d.importers``: wrappers to facilitate import of common ERT data
