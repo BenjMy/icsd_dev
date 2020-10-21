@@ -43,21 +43,6 @@ API reference: The ``icsd3d`` package
 =============================
 
 .. automodule:: icsd3d.gridder
-
-.. currentmodule:: icsd3d.gridder
-
-.. automodule::icsd3d.gridder
-   :members:
-   :show-inheritance:
-   :inherited-members:
-
-   gridder/mkgrid
-
-
-``icsd3d.gridder``: Grid data test 1
-====================================
-
-.. automodule:: icsd3d.gridder
     :no-members:
     :no-inherited-members:
 

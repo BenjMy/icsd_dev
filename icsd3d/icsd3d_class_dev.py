@@ -21,6 +21,7 @@ from scipy.sparse import diags
 import sys
 from numpy import linalg as LA
 
+from gridder.mkgrid import mkGrid_XI_YI 
 
 class iCSD3d_Class():
     
