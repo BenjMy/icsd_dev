@@ -9,12 +9,19 @@ API reference: The ``icsd3d`` package
 ``icsd3d.inversion``: inversion scheme
 ======================================
 
+Prior model
+"""""""""""
+
 .. automodule:: inversion.priorM0
    :members:
 
+Smoothing
+"""""""""
 .. automodule:: inversion.smoothing
    :members:
 
+Solver
+""""""
 .. automodule:: inversion.solve
    :members:
 
