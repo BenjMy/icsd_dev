@@ -2,48 +2,38 @@
 API reference: The ``icsd3d`` package
 =======================================
 
-.. toctree::
-   :maxdepth: 3
-
 .. automodule:: icsd3d.icsd3d_class_dev
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
 
 
 ``icsd3d.inversion``: inversion scheme
 ======================================
 
 .. automodule:: icsd3d.inversion
+   :members:
+   :show-inheritance:
+   :inherited-members:
 
-.. currentmodule:: icsd3d.inversion
-
-.. autosummary::
-
-    priorM0
-    smoothing
-    solve
 
 ``icsd3d.plotters``: plotters for results visualisation
 =======================================================
 
 .. automodule:: icsd3d.plotters
-
-.. currentmodule:: icsd3d.plotters
-
-.. autosummary::
-
-    mpl_plot
-    pv_plot
+   :members:
+   :show-inheritance:
+   :inherited-members:
 
 
 ``icsd3d.gridder``: Grid data
 =============================
 
 .. automodule:: icsd3d.gridder
-
-.. currentmodule:: icsd3d.gridder
-
-.. autosummary::
-
-    mkgrid
+   :members:
+   :show-inheritance:
+   :inherited-members:
 
 
 
@@ -51,9 +41,6 @@ API reference: The ``icsd3d`` package
 ======================================================================
 
 .. automodule:: icsd3d.importers
-
-.. currentmodule:: icsd3d.importers
-
-.. autosummary::
-
-    read
+   :members:
+   :show-inheritance:
+   :inherited-members:
