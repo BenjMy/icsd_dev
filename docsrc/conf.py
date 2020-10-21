@@ -13,15 +13,15 @@ import datetime
 #
 # sys.path.append(os.path.relpath('../src/icsd3d'))
 # sys.path.insert(0, os.path.abspath('../src/icsd3d'))
-sys.path.append(os.path.relpath('../icsd3d'))
-sys.path.insert(0, os.path.abspath('../icsd3d'))
+# sys.path.append(os.path.relpath('../icsd3d'))
+# sys.path.insert(0, os.path.abspath('../icsd3d'))
 
 sys.path.append(os.path.relpath('../icsd3d/gridder'))
 sys.path.insert(0, os.path.abspath('../icsd3d/gridder'))
 
 
-sys.path.append(os.path.relpath('../icsd3d/inversion'))
-sys.path.insert(0, os.path.abspath('../icsd3d/inversion'))
+# sys.path.append(os.path.relpath('../icsd3d/inversion'))
+# sys.path.insert(0, os.path.abspath('../icsd3d/inversion'))
 
 
 sys.path.append(os.path.pardir)
@@ -54,8 +54,8 @@ sys.path.append(os.path.pardir)
 
 #sys.path.append(os.path.abspath('..{}'.format(os.path.sep)))
 from icsd3d.icsd3d_class import iCSD3d_Class
-from icsd3d.gridder.mkgrid import *
-from icsd3d.inversion.priorM0 import *
+# from icsd3d.gridder.mkgrid import *
+# from icsd3d.inversion.priorM0 import *
 
 
 # -- Project information -----------------------------------------------------
