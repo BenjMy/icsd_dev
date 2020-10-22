@@ -51,9 +51,9 @@ icsd.obs_err='sqrt' # choose between constant weight and w = 1/sqrt(abs(obs))
 icsd.wr=1 #weight regularization
 icsd.alphaSxy=True
 icsd.x0_prior=True
-icsd.x0_ini_guess=True # initial guess
+icsd.x0_ini_guess=False # initial guess
 icsd.icsd_init()
-# icsd.plotElecs=True
+# icsd.plotElecs=False
 
 m0 = icsd.estimateM0(method_m0='F1',show=True)
 

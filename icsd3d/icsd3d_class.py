@@ -33,6 +33,11 @@ class iCSD3d_Class():
     """
     
     def __init__(self,dirName):
+        
+        self.df = None # main dataframe
+        self.surveys = []
+
+
         # input files directory
         self.dirName = dirName
         
@@ -40,7 +45,7 @@ class iCSD3d_Class():
         self.type='2d' # or '3d'
         self.sim='VRTeSim.txt'
         self.obs='ObsData.txt'
-        self.coord_file='VRTeCoord.txt'
+        self.coord_file='VRTeCoord.txt' # coordinates of the virtual sources
         
         # inversion default parameters
         self.wr=25 #weight regularization
@@ -84,7 +89,12 @@ class iCSD3d_Class():
         self.mesh=None # mesh3d .vtk to plot with the results of icsd
 
         # IMPLEMENT obs_err based on reciprocal analysis i.e. estimated standard deviation of the data errors;                         % estimated standard deviation of the traveltime data errors
-        
+
+        # processing outputs [TO write]
+        # self.models = []
+        # self.rmses = []
+
+
 
     def icsd_init(self):
         """ these functions are called only once, even for pareto,
@@ -229,6 +239,10 @@ class iCSD3d_Class():
         """ Parse data regularisation parameters before inversion
         """    
 
+    def _parseSolver(self):
+        """ Parse solver used during inversion
+        """    
+        
     def run_single(self):
         """Run a single inversion (unique regularisation weight)
         Equivalent to several steps::
@@ -387,15 +401,44 @@ class iCSD3d_Class():
         ----------
 
         """
+        survey = iCSD3d_Class()
+    
+        # set attribute according to the first survey
+        if len(self.surveys) == 0:
+            self.icsd_init()
+            self.surveys.append(survey)
+        else: # check we have the same configuration than other survey
+            check = [a == b for a,b, in zip(self.nVRTe, survey.nVRTe)]
+            if all(check) is True:
+                self.surveys.append(survey)
+
 
 
     def CreateTimeLapseSurvey(self):
-        """Description here
+        """Import multiple surveys.
         
         Parameters
         ----------
-
+        fnames : list of str
+            List of file to be parsed or directory where the files are.
+        targetProjection : str, optional
+            If specified, a conversion from NMEA string in 'Latitude' and 'Longitude'
+            columns will be performed according to EPSG code: e.g. 'EPSG:27700'.
         """
+        if isinstance(fnames, list): # it's a list of filename
+            if len(fnames) < 2:
+                raise ValueError('at least two files needed for timelapse inversion')
+        else: # it's a directory and we import all the files inside
+            if os.path.isdir(fnames):
+                fnames = [os.path.join(fnames, f) for f in np.sort(os.listdir(fnames)) if f[0] != '.']
+                # this filter out hidden file as well
+            else:
+                raise ValueError('dirname should be a directory path or a list of filenames')
+        if self.projection is not None:
+            targetProjection = self.projection
+        for fname in fnames:
+            self.createSurvey(fname, targetProjection=targetProjection)
+
 
     def _add_to_container(self, df):
         """Add a given DataFrame to the container"""
@@ -551,7 +594,7 @@ class iCSD3d_Class():
         return misfit
 
 
-    def ModelResolution(self,sol=None,coord=None, jacMi=None):
+    def modelResolution(self,sol=None,coord=None, jacMi=None):
 
         if sol is None:
             sol = self.x

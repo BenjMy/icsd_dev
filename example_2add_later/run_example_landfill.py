@@ -35,7 +35,7 @@ icsd3d_landfill.obs="OAno_synt.txt" # or ONoAno_synt / OAno_synt / Obs_real
 icsd3d_landfill.coord_file="VRTeCoord.txt"
 
 # icsd3d_landfill.estimateM0(methodM0='Pearson',show=True)
-# icsd3d_landfill.invert(plotElecs=True,mesh='mesh3d_rhomap.vtk')
+icsd3d_landfill.invert(plotElecs=True,mesh='mesh3d_rhomap.vtk')
 
 
 # Unconstrainsted current source densities inversion

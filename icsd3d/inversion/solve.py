@@ -7,7 +7,7 @@ Created on Tue May 12 09:35:37 2020
 import numpy as np
 from scipy.optimize import lsq_linear, least_squares
 
-from exporters.save import Export_sol
+from exporters.save import export_sol
 
 #%% Solve linear system Ax=b
 
@@ -32,21 +32,32 @@ def iCSD(x0_ini_guess,A_w,b_w,dim,coord,path,**kwargs):
     x : 1D-arrays
         Solution
     """       
+    
+    # check if we have initial model
+    # check time-lapse constrain
+    # n = self.surveys[0].df.shape[0]
+    # for s in self.surveys[1:]:
+    #     if s.df.shape[0] != n:
+    #         raise ValueError('For time-lapse constrain (gamma > 0), all surveys need to have the same length.')
+    #         gamma = 0
+
+
+
     if kwargs.get('x0') is None:
-        # No initial guess
+        # No initial guess use lsq_linear solver
         x = lsq_linear(A_w, b_w, bounds = (0, 1))
         print('*' * 20)
         print('CURRENT Sum=' + str(np.sum(x.x)))
         # TO IMPLEMENT RETURN JAC Matrice to evaluate MALM sensitivity
     else:
-        # Initial guess x0
+        # Initial guess x0 use least_squares solver
         a = A_w 
         b = b_w
         def func(x, a, b):
             return (b - np.dot(a, x))
         x = least_squares(func, x0=kwargs.get('x0'), bounds = (0, 1), args=(a, b)) # Add initial guess
         print('CURRENT Sum=' + str(np.sum(x.x)))
-    Export_sol(coord, x.x, dim,path,filename_root='Solution.dat')
+    export_sol(coord, x.x, dim,path,filename_root='Solution.dat')
     
     return x
 

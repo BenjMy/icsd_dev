@@ -10,7 +10,7 @@ import os
 
 #%% SAVE FCTS          
 
-def Export_sol( coord, vec_sol, dim,path=None,filename_root='Solution.dat'):
+def export_sol( coord, vec_sol, dim,path=None,filename_root='Solution.dat'):
     """Export solution x
     
     Parameters
