@@ -6,7 +6,7 @@ Inversion of current source density apply to a landfill leakage
 import os
 import numpy as np
 
-maindir='E:/Padova/Software/SourceInversion/icsd_dev/'
+maindir='E:/Padova/Software/SourceInversion/branch_icsd_dev/'
 os.chdir(maindir)
 
 
@@ -40,14 +40,15 @@ icsd3d_landfill.coord_file="VRTeCoord.txt"
 
 # Unconstrainsted current source densities inversion
 icsd3d_landfill.invert(wr=1,x0_prior=False)
- 
+
+icsd3d_landfill.invert()
 # Estimate initial model
-icsd3d_landfill.estimateM0(methodM0='F1', show=True)
+icsd3d_landfill.estimateM0(methodM0='Pearson', show=True)
 
 # Constrainsted current source densities inversion
 icsd3d_landfill.invert(regMesh='unstrc',wr=100,x0_prior=True)
 
-icsd3d_landfill.invert(x0_prior=False,)
+icsd3d_landfill.invert(x0_prior=False)
 
 # Pareto curve analysis
 icsd3d_landfill.invert(x0_prior=False, 

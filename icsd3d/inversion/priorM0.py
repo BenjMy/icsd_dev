@@ -11,7 +11,7 @@ from scipy.stats import pearsonr
 
 
 ### Individual Misfit  
-def normF1(A,b):
+def _normF1(A,b):
     """compute the norm between observation data and individual green functions"""
     F1=[]
     for i in range(np.shape(A)[1]):
@@ -22,21 +22,19 @@ def normF1(A,b):
     
     return norm_F1
 
-def misfit_2_initialX0(A,b,iniM0):
+def misfitF1_2_initialX0(A,b):
     
-    norm_F1 = normF1(A,b)
+    norm_F1 = _normF1(A,b)
     
-    """Transform the misfit to an initial solution M0"""
+    """Transform the misfit F1 to an initial solution M0"""
     x0F1=1./((norm_F1+1)*(norm_F1+1)) # Inverse misfit using a 1/x^2 transformation
     x0F1_sum= x0F1/sum(x0F1) # normalize such as sum equal to 1
-    if iniM0=='cst':
-        x0F1_sum=np.ones(x0F1_sum.shape)*0.1
     M0=x0F1_sum
     
     return norm_F1, M0
 
 
-def productmoment(A,b):
+def product_moment(A,b):
     """ Compute the product moment correlation after Binley et al. 1999
     .. math:: 
 

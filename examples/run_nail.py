@@ -53,14 +53,14 @@ icsd.alphaSxy=True
 icsd.x0_prior=True
 icsd.x0_ini_guess=True # initial guess
 icsd.icsd_init()
+# icsd.plotElecs=True
 
-
-icsd.estimateM0(methodM0='F1',show=True)
+m0 = icsd.estimateM0(method_m0='F1',show=True)
 
 # icsd.clim=[0,0.1]
 # icsd.run_single()
 
-sol= icsd.invert()
+sol= icsd.invert(x0_prior=False,wr=1e3)
 # icsd.invert(pareto=True, regMesh='strc',x0_prior=True, 
 #             pareto_MinErr=1, pareto_MaxErr=100)
 
@@ -77,13 +77,13 @@ icsd.showResults()
 
 # icsd.ModelResolution(jacMi=305)
 
-# # run pareto
-# icsd.pareto_MinErr=0.001
-# icsd.pareto_MaxErr=1
-# icsd.pareto_nSteps=3
+# run pareto
+icsd.pareto_MinErr=0.01
+icsd.pareto_MaxErr=10
+icsd.pareto_nSteps=10
 
-# icsd.knee=True
-# icsd.run_pareto()
+icsd.knee=False
+icsd.run_pareto()
 
 
 

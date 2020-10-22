@@ -109,7 +109,7 @@ def plotRemotes(path,dim,pltRemotes=False):
 #%% Specific plot functions for ICSD outputs
 
 def plotPareto(wr,pareto_list_FitRes,pareto_list_RegRes,IdPtkneew,path):
-    p, ax = plt.subplots()
+    p, ax = plt.subplots('L-curve')
     # ax.annotate('Wr=' + str(int(wr)), xy=(float(np.asarray(pareto_list_FitRes)[IdPtkneew]), 
     #                                  float(np.asarray(pareto_list_RegRes)[IdPtkneew])), 
     #                               xytext=(float(np.asarray(pareto_list_FitRes)[IdPtkneew])+max(pareto_list_FitRes)/3, 
@@ -137,8 +137,8 @@ def plot_knee_icsd(wr,kn):
     """
     KneeWr=wr
     kn.plot_knee_normalized()
-    plt.show(kn)
-    run_single()
+    # plt.show(kn)
+    # run_single()
 
 
 def plotFIT(b,b_w,xfun,path):
@@ -166,10 +166,9 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, ax=No
     ------------
     self
     """
-      
-    f = plt.figure('surface')
 
     if ax==None:
+        f = plt.figure('CSD 2d')
         ax = plt.gca()
         
     _fig_Interpolation_(ax,coord,data_sol)
@@ -181,7 +180,7 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, ax=No
         title=r'$\lambda$=' + str(kwargs.get('title_wr') )
         _fig_Axis_Labels_(ax,title)
 
-    return f
+    return f, ax
 
     if not pareto:
         plotFIT(b,b_w,xfun,path)
@@ -198,13 +197,13 @@ def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,ax=None,title=None,pltRemo
     kwargs (to add) : 'sc' (plot source position (for a synthetic case experiment)
 
     """
-    # f = plt.figure('volume')
 
     coord_x, coord_y, coord_z = parseCoord(coord,dim='3d')
 
     if ax==None:
         print('no Axis')
         # ax = plt.gca()
+        f = plt.figure('volume')
         ax=f.gca(projection='3d')
 
     step=(max(coord_x)-min(coord_x))/10
@@ -346,13 +345,15 @@ def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None, **kwargs)
     ------------
     self
     """
-    f = plt.figure('surface')
+    f = plt.figure('2d')
     ax = plt.gca()
 
     # _fig_Interpolation_(coord,data_sol,lgd_label=physLabel)
     _fig_VRTe_(ax,coord,data_sol)
     _fig_RealSources_(ax,sc)
     _fig_ReturnElec_(retElec)
+    ax.set_xlabel('x [m]')
+    ax.set_ylabel('y [m]')
 
     if kwargs.get('jac') is not None:
         _fig_ModelParameter_mi_(coord,kwargs.get('jac'))
