@@ -63,6 +63,10 @@ class iCSD3d(object):
         # self.iTimeLapse = False # to enable timelapse inversion [Not implemented yet]
         self.TL=False # Time lapse inversion (see slides VIU Venice to implement)
 
+        # tdip option
+        self.TDIP_flag=False # import tdip data
+
+
         # mesh type
         self.regMesh='strc' # strc or unstrc
         
@@ -117,12 +121,15 @@ class iCSD3d(object):
         else:
             self.coord_x, self.coord_y, self.coord_z, self.coord = load_coord(self.path2load, self.coord_file, self.type)
 
+        if TDIP==False:
+            # load observations resistances b
+            self.b = load_obs(self.path2load, self.obs)
+            # load simulated resistances A (i.e. Green function)
+            self.A = load_sim(self.path2load, self.sim)
+        else:
+            self.b = survey.
+            self.A = survey.
 
-        # load observations resistances b
-        self.b = load_obs(self.path2load, self.obs)
-        
-        # load simulated resistances A (i.e. Green function)
-        self.A = load_sim(self.path2load, self.sim)
         
         # load observations electrode coordinates
         if self.plotElecs==True:
@@ -489,6 +496,27 @@ class iCSD3d(object):
 
         return self.surveys
 
+
+    def createTDIPSurvey(self,fname_obs):
+        """create TDIP survey and return a survey object.
+        
+        Parameters
+        ----------
+        fname : *.bin file containing TDIP infos
+        """
+        # read TDIP file
+        tdip_obs = loadTDIPSurvey(self.dirName + fname)
+        tdip_sim = loadTDIPSurvey(self.dirName + fname) # *.data (pygimli format)
+
+        self.TDIP_flag = True # activate tdip flag
+        self.dataTDIP = tdip.data
+        self.Vs = tdip.MA
+        self.gates =  tdip.t
+        survey = iCSD3d(dirName=self.dirName)
+        survey.icsd_init() 
+        
+        return tdip_obs, tdip_sim
+    
 
     # def _add_to_container(self, df):
     #     """Add a given DataFrame to the container"""

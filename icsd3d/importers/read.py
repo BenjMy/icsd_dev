@@ -8,6 +8,8 @@ Created on Mon May 11 15:18:31 2020
 import numpy as np
 import os 
 
+import pybert as pb
+
 #%% LOAD from ICSD3d format: .txt file tab separated         
 
 def load_coord(path, filename, dim):
@@ -101,3 +103,13 @@ def DataImport(SimFile=None,ObsFile=None):
         print('pygimli format import')
     if fileExt=='*.data':
         print('resipy format import') 
+        
+def loadTDIPSurvey(fname):
+
+    tdip = pb.TDIPdata(fname)
+    tdip.data['a']
+    tdip.MA
+    tdip.t
+    
+    return tdip
+
