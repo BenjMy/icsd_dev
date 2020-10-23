@@ -1,6 +1,5 @@
 import os
 
-
 import numpy as np
 from scipy.optimize import lsq_linear, least_squares
 
@@ -25,7 +24,7 @@ from importers.read import *
 from exporters.save import * 
 from gridder.mkgrid import mkGrid_XI_YI 
 
-class iCSD3d_Class():
+class iCSD3d(object):
     
     
     """ 
@@ -34,8 +33,8 @@ class iCSD3d_Class():
     
     def __init__(self,dirName):
         
-        self.df = None # main dataframe
         self.surveys = []
+        self.df = None # main dataframe containing resistance values (TDIP data in progress)
 
 
         # input files directory
@@ -55,12 +54,15 @@ class iCSD3d_Class():
         self.pareto_MaxErr=1
         self.pareto_nSteps=10
         self.k=4  # For each point, find the k closest current sources
-        self.TL=False # Time lapse inversion (see slides VIU Venice to implement)
         self.x0_prior=False #  relative smallness regularization as a prior criterion for the inversion; i.e the algorithm minimizes ||m−m0||2
         self.x0_ini_guess=False # initial guess
         self.knee=False # L-curve knee automatic detection
         self.KneeWr=[]
         
+            # time lapse option
+        # self.iTimeLapse = False # to enable timelapse inversion [Not implemented yet]
+        self.TL=False # Time lapse inversion (see slides VIU Venice to implement)
+
         # mesh type
         self.regMesh='strc' # strc or unstrc
         
@@ -93,13 +95,20 @@ class iCSD3d_Class():
         # processing outputs [TO write]
         # self.models = []
         # self.rmses = []
+        # print(len(self.surveys))
 
+        if self.surveys:
+            print('Existing survey')
+        else:
+            print('Create a new survey')
 
 
     def icsd_init(self):
         """ these functions are called only once, even for pareto,
         as they do not depend on the regularization weight"""
-        # create directories
+        # create directories          
+            
+        print('init')
         self.createdirs()
         
         # load virtual sources coordinates
@@ -167,11 +176,19 @@ class iCSD3d_Class():
     def prepare4iCSD(self):
         """ this function is called for each weight, keep them separated for pareto
         # 1 - Estimate M0 initial if smallness guided inversion or initial guess 
-        # 2-  Create vector with weights, the length is determined by the number of regul rows in A
+        # 2-  Create vector with weights-->
+        (data weigth, constrainsts weight and regularisation weigth)
 
         """
         # create regularization part of the weight matrix
-               
+        # for i, survey in enumerate(self.surveys):
+        #     print('prepare4iCSD')
+        #     print(i, survey)
+        #     print('survey.x0_ini_guess')
+        #     print(survey.x0_ini_guess)
+        #     print('survey.reg_A')
+        #     print(survey.reg_A)
+
         if (self.x0_ini_guess==True or self.x0_prior==True):
             self._estimateM0_()
             
@@ -243,7 +260,16 @@ class iCSD3d_Class():
         """ Parse solver used during inversion
         """    
         
-    def run_single(self):
+    def run_single_TL(self):
+        """Run a time-lapse inversion (unique regularisation weight)
+        Equivalent to several steps::
+            self.prepare4iCSD()
+            self.plotCSD()
+            self.misfit()
+            
+        """
+        
+    def run_single(self,index=0):
         """Run a single inversion (unique regularisation weight)
         Equivalent to several steps::
             self.prepare4iCSD()
@@ -254,16 +280,25 @@ class iCSD3d_Class():
         self.icsd_init()
         self.prepare4iCSD()
         if (self.x0_ini_guess == True or self.x0_prior == True):
-            self.x = iCSD(self.x0_ini_guess,self.A_w,self.b_w,self.type,self.coord,self.path2load,x0=self.x0)
+            self.x = iCSD(self.x0_ini_guess,
+                          self.A_w,self.b_w,
+                          self.type,
+                          self.coord,
+                          self.path2load,
+                          x0=self.x0)
         else:
-            self.x = iCSD(self.x0_ini_guess,self.A_w,self.b_w,self.type,self.coord,self.path2load)
+            self.x = iCSD(self.x0_ini_guess,
+                          self.A_w,self.b_w,
+                          self.type,
+                          self.coord,
+                          self.path2load)
 
-        ax, f = self.showResults()
+        ax, f = self.showResults(index=index)
         # self.RMSAnalysis()
         self.misfit()
-        print(f)
-        print(self.path2save)
-        f.savefig(self.path2save+'iCSD', dpi = 600)
+        # print(f)
+        # print(self.path2save)
+        # f.savefig(self.path2save+'iCSD', dpi = 600)
         plt.tight_layout()
         plt.show()
         
@@ -382,11 +417,19 @@ class iCSD3d_Class():
             print("{0} = {1}".format(k, v))
          
         if self.pareto==False:
-             self.run_single()
+            if len(self.surveys)<2:
+                self.run_single()
+                return self.x
+
+            else:
+                if self.TL==True: # flag for time-lapse inversion
+                    self.run_single_TL()
+                else:
+                    for i, survey in enumerate(self.surveys):
+                        survey.run_single(index=i)               
         else:
              self.run_pareto()
              
-        return self.x
        
         
 
@@ -394,54 +437,61 @@ class iCSD3d_Class():
 #%% DEFINE SURVEY container for observations and simulations     
 
         
-    def CreateSurvey(self):
-        """Data container using panda dataframe for survey paramaters such as geometry file
+    def createSurvey(self,fname_obs,fname_sim):
+        """ Create an instance of iCSD3d and return
+        a survey object.
         
         Parameters
         ----------
-
+        fname_obs : list of str
+            File to be parsed.
+        fname_sim : list of str
+            File to be parsed.
         """
-        survey = iCSD3d_Class()
-    
         # set attribute according to the first survey
         if len(self.surveys) == 0:
-            self.icsd_init()
-            self.surveys.append(survey)
+            survey = iCSD3d(dirName=self.dirName)
+            survey.obs=fname_obs
+            survey.sim=fname_sim
+            survey.icsd_init()
+            self.surveys.append(survey)          
         else: # check we have the same configuration than other survey
-            check = [a == b for a,b, in zip(self.nVRTe, survey.nVRTe)]
-            if all(check) is True:
-                self.surveys.append(survey)
+            survey = iCSD3d(dirName=self.dirName)
+            survey.obs=fname_obs
+            survey.sim=fname_sim
+            survey.icsd_init()
+            # check = [a == b for a,b, in zip(self.nVRTe, self.surveys[len(surveys-1)].nVRTe)]
+            # if all(check) is True:
+            self.surveys.append(survey)
 
-
-
-    def CreateTimeLapseSurvey(self):
-        """Import multiple surveys.
+    def createTimeLapseSurvey(self,fnames_obs, fnames_sim):
+        """Import multiple surveys and return
+        a survey object.
         
         Parameters
         ----------
-        fnames : list of str
+        fnames_obs : list of str
             List of file to be parsed or directory where the files are.
-        targetProjection : str, optional
-            If specified, a conversion from NMEA string in 'Latitude' and 'Longitude'
-            columns will be performed according to EPSG code: e.g. 'EPSG:27700'.
         """
-        if isinstance(fnames, list): # it's a list of filename
-            if len(fnames) < 2:
+        self.surveys = []
+        if isinstance(fnames_obs, list): # it's a list of filename
+            if len(fnames_obs) < 2:
                 raise ValueError('at least two files needed for timelapse inversion')
         else: # it's a directory and we import all the files inside
-            if os.path.isdir(fnames):
-                fnames = [os.path.join(fnames, f) for f in np.sort(os.listdir(fnames)) if f[0] != '.']
+            if os.path.isdir(fnames_obs):
+                fnames_obs = [os.path.join(fnames_obs, f) for f in np.sort(os.listdir(fnames_obs)) if f[0] != '.']
                 # this filter out hidden file as well
             else:
                 raise ValueError('dirname should be a directory path or a list of filenames')
-        if self.projection is not None:
-            targetProjection = self.projection
-        for fname in fnames:
-            self.createSurvey(fname, targetProjection=targetProjection)
+        for fnames_obs,fnames_sim  in zip(fnames_obs,fnames_sim):
+            self.createSurvey(fnames_obs,fnames_sim)
+            print(fnames_obs)
+
+        return self.surveys
 
 
-    def _add_to_container(self, df):
-        """Add a given DataFrame to the container"""
+    # def _add_to_container(self, df):
+    #     """Add a given DataFrame to the container"""
             
         
 
@@ -457,16 +507,17 @@ class iCSD3d_Class():
     def _parseM0_(self,method_m0):
         """ Parse M0 parameters
         """
-        if self.method_m0 is not None:
-            if method_m0=='F1': 
-                self.norm_F1, self.x0 = misfitF1_2_initialX0(self.A,self.b)
-            elif method_m0=='Pearson': 
-                self.x0 = product_moment(self.A,self.b)
-        elif self.inix0 is not None:
-            if self.inix0=='cst':
-                self.x0=np.ones(self.b.shape)*0.1
+        for i, survey in enumerate(self.surveys):
+            if method_m0 is not None:
+                if method_m0=='F1': 
+                    self.surveys[i].norm_F1, self.surveys[i].x0 = misfitF1_2_initialX0(survey.A,survey.b)
+                elif method_m0=='Pearson': 
+                    self.surveys[i].x0 = product_moment(survey.A,survey.b)
+            elif self.inix0 is not None:
+                if survey.inix0=='cst':
+                    self.surveys[i].x0=np.ones(survey.b.shape)*0.1
                 
-        return self.x0
+        return self.surveys[i].x0
             
     def estimateM0(self,method_m0='F1',show=True, ax=None):
         """Estimate initial M0 model for constrainst inversion
@@ -482,21 +533,31 @@ class iCSD3d_Class():
         Returns:
     
         """
-        self.icsd_init()
-        m0 = self._parseM0_(method_m0) # define the method to estimate M0
-        self.physLabel=labels(method_m0) # lgd labeling for the plot
-        if show == True:
-            self.showEstimateM0(ax=ax)
+        for i, survey in enumerate(self.surveys):
+            m0 = self._parseM0_(method_m0) # define the method to estimate M0
+            self.surveys[i].physLabel=labels(method_m0) # lgd labeling for the plot
+            if show == True:
+                self.showEstimateM0(index=i,ax=ax)
             
         return m0
         
+    def showEstimateM0(self,index=0,ax=None):
+        """Show initial model m0 estimation.
+        
+        Parameters
+        ----------
+        index : int, optional
+            Index of the survey to plot.
+        ax : Matplotlib.Axes, optional
+            If specified, the graph will be plotted against this axis.
+        """
 
-            
-
-    def showEstimateM0(self,ax=None):
         # fig, ax = plt.subplots()
         if self.type=='2d':
-            f = plotContour2d(self.coord,self.x0,self.physLabel,path=self.path2load,retElec=None, sc=None)
+            f = plotContour2d(self.surveys[index].coord,self.surveys[index].x0,
+                              self.surveys[index].physLabel,
+                              path=self.surveys[index].path2load,
+                              retElec=None, sc=None,index=index)
         else:
             f = scatter3d(self.coord, self.x0, self.physLabel, self.path2load, self.obs, ax=ax)
         plt.tight_layout()
@@ -543,20 +604,35 @@ class iCSD3d_Class():
         self.mesh_over=mesh # plot mesh over
         self.gif3d=gif3d # animated
         self.title=title # plot title
+        
+        index=0
+        for key, value in kwargs.items():
+            if key == 'index':
+                index = value
+ 
+                
         # print(ax)
         if data is None:
             data = self.x.x
        
         if self.type=='2d':
-            f = plotCSD2d(self.coord,data,self.b,self.b_w,self.x.fun,self.path2load,self.pareto,retElec=None, sc=None, ax=ax, title_wr=self.wr)
+            f = plotCSD2d(self.coord,data,self.b,self.b_w,self.x.fun,
+                          self.path2load,self.pareto,
+                          retElec=None, sc=None, 
+                          ax=ax, title_wr=self.wr, index=index)
         else:
-            f = plotCSD3d(self.wr,self.coord,data,self.path2load,self.obs,self.knee,self.KneeWr,ax=ax,title=None,**kwargs)
+            f = plotCSD3d(self.wr,self.coord,data,
+                          self.path2load,self.obs,self.knee,
+                          self.KneeWr,ax=ax,title=None,**kwargs)
             if cut ==True:
                 plotCSD3d_pyvistaSlice()
             else:
-                plotCSD3d_pv(self.coord, path=self.path2load, filename_root='Solution.dat', 
-                             knee = self.knee, wr = self.wr, KneeWr = self.KneeWr, 
-                             mesh=self.mesh, plotElecs=plotElecs, gif3d = self.gif3d, **kwargs)
+                plotCSD3d_pv(self.coord, path=self.path2load, 
+                             filename_root='Solution.dat', 
+                             knee = self.knee, wr = self.wr, 
+                             KneeWr = self.KneeWr, 
+                             mesh=self.mesh, plotElecs=plotElecs, 
+                             gif3d = self.gif3d, **kwargs)
         return ax, f
         
 #%% POST inversion analysis        

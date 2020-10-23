@@ -54,7 +54,7 @@ def _fig_ReturnElec_(retElec):
     plt.plot(retElecx, retElecy,'sw', markersize = 10)
 
 def _fig_VRTe_(ax,coord,data_sol):
-    """ plot the VRTe current franctions """
+    """ plot the VRTe current fractions """
     coord_x, coord_y = parseCoord(coord,dim='2d')
     norm_z = (data_sol - min(data_sol)) / (max(data_sol) - min(data_sol))
     grey_cm = plt.cm.get_cmap('Greys')
@@ -167,10 +167,19 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, ax=No
     self
     """
 
+    
     if ax==None:
-        f = plt.figure('CSD 2d')
+        # f = plt.figure('CSD 2d')
+        # ax = plt.gca()
+
+        fig_name = 'CSD 2d'
+        if kwargs.get('index') is not None:
+            fig_name = 'CSD 2d T' + str(kwargs.get('index'))
+        
+        f = plt.figure(fig_name)
         ax = plt.gca()
         
+    
     _fig_Interpolation_(ax,coord,data_sol)
     _fig_VRTe_(ax,coord,data_sol)
     _fig_RealSources_(ax,sc)
@@ -345,9 +354,12 @@ def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None, **kwargs)
     ------------
     self
     """
-    f = plt.figure('2d')
+    fig_name = '2d scatter'
+    if kwargs.get('index') is not None:
+        fig_name = '2d scatter T' + str(kwargs.get('index'))
+    
+    f = plt.figure(fig_name)
     ax = plt.gca()
-
     # _fig_Interpolation_(coord,data_sol,lgd_label=physLabel)
     _fig_VRTe_(ax,coord,data_sol)
     _fig_RealSources_(ax,sc)

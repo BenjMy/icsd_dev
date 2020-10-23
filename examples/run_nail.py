@@ -37,7 +37,7 @@ path2files="./nail1/"
 
 # -----------------------------------#
 # apply here a smallness contrainst to the regularisation
-from icsd3d_class import iCSD3d_Class as i3d
+from icsd3d_class import iCSD3d as i3d
 from plotters import mpl_plot
 
 # mpl_plot.showObs2d(path2files)
@@ -53,9 +53,11 @@ icsd.alphaSxy=True
 icsd.x0_prior=True
 icsd.x0_ini_guess=False # initial guess
 icsd.icsd_init()
+
+# icsd.createSurvey()
 # icsd.plotElecs=False
 
-m0 = icsd.estimateM0(method_m0='F1',show=True)
+# m0 = icsd.estimateM0(method_m0='F1',show=True)
 
 # icsd.clim=[0,0.1]
 # icsd.run_single()
