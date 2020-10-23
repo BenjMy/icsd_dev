@@ -126,9 +126,9 @@ class iCSD3d(object):
             self.b = load_obs(self.path2load, self.obs)
             # load simulated resistances A (i.e. Green function)
             self.A = load_sim(self.path2load, self.sim)
-        else:
-            self.b = survey.
-            self.A = survey.
+        # else:
+        #     self.b = survey.
+        #     self.A = survey.
 
         
         # load observations electrode coordinates
@@ -219,7 +219,8 @@ class iCSD3d(object):
             self.b_w = weight_b(self.x0_prior,self.b_s,W_s=self.W_s)  
 
     def _parseModelReg(self):
-        """ Parse regularisation parameters before inversion
+        """ Parse regularisation smoothing and 
+        prior constrainst parameters before inversion
         """
         
         # 2D CASE -----------------------------------------
@@ -286,6 +287,8 @@ class iCSD3d(object):
         """
         self.icsd_init()
         self.prepare4iCSD()
+        
+        # constrainsted inversion
         if (self.x0_ini_guess == True or self.x0_prior == True):
             self.x = iCSD(self.x0_ini_guess,
                           self.A_w,self.b_w,
@@ -293,6 +296,8 @@ class iCSD3d(object):
                           self.coord,
                           self.path2load,
                           x0=self.x0)
+            
+        # UNconstrainsted inversion
         else:
             self.x = iCSD(self.x0_ini_guess,
                           self.A_w,self.b_w,
