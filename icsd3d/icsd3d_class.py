@@ -121,7 +121,7 @@ class iCSD3d(object):
         else:
             self.coord_x, self.coord_y, self.coord_z, self.coord = load_coord(self.path2load, self.coord_file, self.type)
 
-        if TDIP==False:
+        if self.TDIP_flag==False:
             # load observations resistances b
             self.b = load_obs(self.path2load, self.obs)
             # load simulated resistances A (i.e. Green function)
