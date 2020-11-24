@@ -105,7 +105,8 @@ class iCSD3d(object):
             print('Existing survey')
         else:
             print('Create a new survey')
-
+            #self.createSurvey(self.obs,self.sim)
+            
 
     def icsd_init(self):
         """ these functions are called only once, even for pareto,
@@ -233,8 +234,8 @@ class iCSD3d(object):
                         raise ValueError('#### dimensions of matrices do not agree - change regularisation types')
                     else:
                         self.reg_A = regularize_A(self.coord,self.nVRTe)
-            # else: # 3d mesh
-            #     self.reg_A = regularize_A_UnstructuredMesh3d(self.coord,self.nVRTe,self.k)
+            else: # 3d mesh
+                 self.reg_A = regularize_A_UnstructuredMesh3d(self.coord,self.nVRTe,self.k)
         
         
         # 3D CASE -----------------------------------------
@@ -277,7 +278,7 @@ class iCSD3d(object):
             
         """
         
-    def run_single(self,index=0):
+    def run_single(self,index=0,showfig=False):
         """Run a single inversion (unique regularisation weight)
         Equivalent to several steps::
             self.prepare4iCSD()
@@ -304,16 +305,16 @@ class iCSD3d(object):
                           self.type,
                           self.coord,
                           self.path2load)
-
-        ax, f = self.showResults(index=index)
-        # self.RMSAnalysis()
-        self.misfit()
-        # print(f)
-        # print(self.path2save)
-        # f.savefig(self.path2save+'iCSD', dpi = 600)
-        plt.tight_layout()
-        plt.show()
-        
+        if showfig == True:
+            ax, f = self.showResults(index=index)
+            # self.RMSAnalysis()
+            self.misfit()
+            # print(f)
+            # print(self.path2save)
+            # f.savefig(self.path2save+'iCSD', dpi = 600)
+            plt.tight_layout()
+            plt.show()
+            plt.close(self.f)
         # add result to container
         # _add_to_container(self.x)
         
@@ -545,11 +546,12 @@ class iCSD3d(object):
                 if method_m0=='F1': 
                     self.surveys[i].norm_F1, self.surveys[i].x0 = misfitF1_2_initialX0(survey.A,survey.b)
                 elif method_m0=='Pearson': 
+                    print(survey.A)
                     self.surveys[i].x0 = product_moment(survey.A,survey.b)
             elif self.inix0 is not None:
                 if survey.inix0=='cst':
                     self.surveys[i].x0=np.ones(survey.b.shape)*0.1
-                
+        self.x0 = np.copy(self.surveys[i].x0)
         return self.surveys[i].x0
             
     def estimateM0(self,method_m0='F1',show=True, ax=None):
@@ -566,6 +568,8 @@ class iCSD3d(object):
         Returns:
     
         """
+        print('survey info')
+        print(self.surveys)
         for i, survey in enumerate(self.surveys):
             m0 = self._parseM0_(method_m0) # define the method to estimate M0
             self.surveys[i].physLabel=labels(method_m0) # lgd labeling for the plot
@@ -649,9 +653,9 @@ class iCSD3d(object):
             data = self.x.x
        
         if self.type=='2d':
-            f = plotCSD2d(self.coord,data,self.b,self.b_w,self.x.fun,
+            f, ax = plotCSD2d(self.coord,data,self.b,self.b_w,self.x.fun,
                           self.path2load,self.pareto,
-                          retElec=None, sc=None, 
+                          retElec=None, sc=None,
                           ax=ax, title_wr=self.wr, index=index)
         else:
             f = plotCSD3d(self.wr,self.coord,data,

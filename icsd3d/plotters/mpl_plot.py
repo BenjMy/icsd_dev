@@ -109,7 +109,7 @@ def plotRemotes(path,dim,pltRemotes=False):
 #%% Specific plot functions for ICSD outputs
 
 def plotPareto(wr,pareto_list_FitRes,pareto_list_RegRes,IdPtkneew,path):
-    p, ax = plt.subplots('L-curve')
+    p, ax = plt.subplots() #'L-curve'
     # ax.annotate('Wr=' + str(int(wr)), xy=(float(np.asarray(pareto_list_FitRes)[IdPtkneew]), 
     #                                  float(np.asarray(pareto_list_RegRes)[IdPtkneew])), 
     #                               xytext=(float(np.asarray(pareto_list_FitRes)[IdPtkneew])+max(pareto_list_FitRes)/3, 
@@ -167,18 +167,17 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, ax=No
     self
     """
 
-    
-    if ax==None:
-        # f = plt.figure('CSD 2d')
-        # ax = plt.gca()
 
-        fig_name = 'CSD 2d'
+    if ax==None:
         if kwargs.get('index') is not None:
             fig_name = 'CSD 2d T' + str(kwargs.get('index'))
         
-        f = plt.figure(fig_name)
+        f = plt.figure('CSD 2d')
         ax = plt.gca()
-        
+    else:
+        f = plt.gcf()
+
+
     
     _fig_Interpolation_(ax,coord,data_sol)
     _fig_VRTe_(ax,coord,data_sol)
@@ -360,7 +359,7 @@ def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None, **kwargs)
     
     f = plt.figure(fig_name)
     ax = plt.gca()
-    # _fig_Interpolation_(coord,data_sol,lgd_label=physLabel)
+    _fig_Interpolation_(ax,coord,data_sol,lgd_label=physLabel)
     _fig_VRTe_(ax,coord,data_sol)
     _fig_RealSources_(ax,sc)
     _fig_ReturnElec_(retElec)
@@ -385,6 +384,8 @@ def showObs2d(path, **kwargs):
     self
     """
     filename='ObsData.txt'
+    f = plt.figure('ObsData')
+    ax = plt.gca()
     
     if kwargs.get('filename') is not None:
         filename = kwargs.get('filename')
@@ -395,7 +396,7 @@ def showObs2d(path, **kwargs):
 
     data_obs = load_obs(path,filename)
     f = plt.figure('surface')
-    _fig_Interpolation_(pointsE,data_obs,lgd_label='U/I')
+    _fig_Interpolation_(ax,pointsE,data_obs,lgd_label='U/I')
     _fig_VRTe_(pointsE,data_obs)
     _fig_RealSources_(sc=None)
     _fig_ReturnElec_(retElec=None)

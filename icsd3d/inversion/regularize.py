@@ -56,7 +56,8 @@ def regularize_A(coord,nVRTe):
     return reg_A
         
 def regularize_A_x_y(coord,alphaSx,alphaSy):
-    """create and append rows for spatial regularization to A, second derivative is applied in both direction x and y
+    """create and append rows for spatial regularization to A, 
+    second derivative is applied in both direction x and y
     math:: Dx = ?? Dy=
     We used a ponderate diagonal matrix with coeffcient (1,-2, 1)
     """
@@ -107,7 +108,41 @@ def regularize_A_3d(nVRTe,coord):
     
     return reg_A
         
+def regularize_A_UnstructuredMesh2d(coord,nVRTe,k_neighbors=2): 
+    """model smoothing consisting in creating and appending rows for spatial regularization to A. 
+    Adapted for unstructured mesh since it uses the k_neighbors method, default k=2. Also working on regular grid 2d"""
+    reg = []
+    for VRTEnb in range(nVRTe):
+        dist =  np.linalg.norm(coord[VRTEnb]-coord, axis=1)
+        closest = np.argsort(dist)
+        k = k_neighbors  # For each point, find the k closest current sources
+        Ind = closest[1:k+1]
+        row = np.zeros(nVRTe) # add a line to the regularisation A with k non-null coefficients
+        knorm = dist[closest[1:k+1]]/dist[closest[1:k+1]].sum(axis=0,keepdims=1)
+        row[Ind]= -knorm
+        row[VRTEnb]= 1 # = one for the actual current source
+        reg.append(row)
+        test=[1]
+        mask = np.in1d(test, VRTEnb)
+        if mask.any()==True: 
+            print('nll')
+            # self.fc = plt.figure('TEST regularisation')
+            # ax = self.fc.add_subplot(111, projection='3d')
+            # ax.scatter(self.coord[VRTEnb,0], self.coord[VRTEnb,1], self.coord[VRTEnb,2], linewidths=12,
+            #            facecolor = 'green', edgecolor = 'green')
+            # ax.scatter(self.coord[Ind,0], self.coord[Ind,1], self.coord[Ind,2], linewidths=12,
+            #            facecolor = 'red', edgecolor = 'red')
+            # ax.set_xlim([min(self.coord_x),max(self.coord_x)])
+            # ax.set_ylim([min(self.coord_y),max(self.coord_y)])
+            # ax.set_zlim([min(self.coord_z),max(self.coord_z)])
+            # self.fc.savefig(self.path2save+ 'TEST regularisation', dpi = 600)
+            # #plt.show()
+            # #plt.close()
+        reg_A = np.array(reg)
         
+    return reg_A
+
+
 def regularize_A_UnstructuredMesh3d(coord,nVRTe,k_neighbors=4): 
     """model smoothing consisting in creating and appending rows for spatial regularization to A. 
     Adapted for unstructured mesh since it uses the k_neighbors method, default k=4. Also working on regular grid 2d"""

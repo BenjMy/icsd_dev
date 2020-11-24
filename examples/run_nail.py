@@ -54,10 +54,11 @@ icsd.x0_prior=True
 icsd.x0_ini_guess=False # initial guess
 icsd.icsd_init()
 
-# icsd.createSurvey()
+icsd.createSurvey(fname_obs='ObsData.txt',fname_sim='VRTeSim.txt')
 # icsd.plotElecs=False
 
-# m0 = icsd.estimateM0(method_m0='F1',show=True)
+m0 = icsd.estimateM0(method_m0='F1',show=True)
+m0 = icsd.estimateM0(method_m0='Pearson',show=True)
 
 # icsd.clim=[0,0.1]
 # icsd.run_single()
