@@ -25,7 +25,9 @@ def _fig_Interpolation_(ax,coord, data, **kwargs):
     img = ax.imshow(grid,
                extent = (min (coord_x), max(coord_x), min(coord_y), max(coord_y)),
                aspect = 'auto', origin = 'lower', cmap= 'jet')
-    cbar = plt.colorbar(img,ax=ax, orientation='vertical')
+    cbar = plt.colorbar(img,ax=ax, 
+                        orientation='vertical',
+                        shrink=0.6)
     
     # if kwargs.get('clim') is not None:
     #     plt.clim(clim[0],clim[1])
@@ -159,7 +161,8 @@ def plotFIT(b,b_w,xfun,path):
     plt.show()
 
     
-def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, ax=None, **kwargs):
+def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, 
+              ax=None, **kwargs):
     """ Plot CSD in 2d, using matplotlib and scipy interpolation
     
     Parameters
@@ -273,10 +276,11 @@ def scatter2d(coord, data, label, path, filename, pltRemotes=False, ax=None, **k
       
     coord_x, coord_y = parseCoord(coord,dim='2d')
 
-    f = plt.figure('volume')
+    #f = plt.figure('volume')
     
     if ax==None:
-        print('ax = None')
+       f = plt.figure('volume')
+       print('ax = None')
         
     step=(max(coord_x)-min(coord_x))/10
     xlin=np.arange(min(coord_x),max(coord_x),step)
@@ -297,7 +301,7 @@ def scatter2d(coord, data, label, path, filename, pltRemotes=False, ax=None, **k
     plt.savefig(path+  filename + '_icsd_scatter.png' , dpi=550,bbox_inches='tight',pad_inches = 0)
     plt.show()
     
-    return f
+    return ax
         
 
 def scatter3d(coord, data, label, path, filename, pltRemotes=False, ax=None, **kwargs):
@@ -346,7 +350,7 @@ def labels(method):
     return physLabel
             
             
-def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None, **kwargs):
+def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None,ax=None, **kwargs):
     """ Plot contour in 2d, using matplotlib and scipy interpolation
     
     Parameters
@@ -357,14 +361,19 @@ def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None, **kwargs)
     if kwargs.get('index') is not None:
         fig_name = '2d scatter T' + str(kwargs.get('index'))
     
-    f = plt.figure(fig_name)
-    ax = plt.gca()
+    if ax==None:
+        print('no Axis')
+        f = plt.figure(fig_name)
+        ax = plt.gca()
+
     _fig_Interpolation_(ax,coord,data_sol,lgd_label=physLabel)
     _fig_VRTe_(ax,coord,data_sol)
     _fig_RealSources_(ax,sc)
     _fig_ReturnElec_(retElec)
     ax.set_xlabel('x [m]')
     ax.set_ylabel('y [m]')
+    ax.set_ylabel('y [m]')
+    ax.set_aspect('equal', adjustable='box')
 
     if kwargs.get('jac') is not None:
         _fig_ModelParameter_mi_(coord,kwargs.get('jac'))
@@ -373,7 +382,7 @@ def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None, **kwargs)
         title=r'$\lambda$=' + str(title_wr)
         _fig_Axis_Labels_(title)
 
-    return f
+    return ax
 
 
 def showObs2d(path, **kwargs):

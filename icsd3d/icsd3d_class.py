@@ -24,6 +24,9 @@ from importers.read import *
 from exporters.save import * 
 from gridder.mkgrid import mkGrid_XI_YI 
 
+from copy import deepcopy
+
+
 class iCSD3d(object):
     
     
@@ -73,7 +76,7 @@ class iCSD3d(object):
         # Initial model
         self.alphax0=1 # weight on model smallness relative to m0
         self.inix0='cst' #  intial physical model: None or 'cst' if constant vector *0.1 
-        self.method_m0=None # method to estimate intial physical model (F1= misfit from a single current source OR ProductMoment method)
+        self.method_m0='F1' # method to estimate intial physical model (F1= misfit from a single current source OR ProductMoment method)
 
         # spatial regularization
         self.alphaSxy=False # weight on model smoothness in z-direction 
@@ -100,33 +103,43 @@ class iCSD3d(object):
         # self.models = []
         # self.rmses = []
         # print(len(self.surveys))
-
         if self.surveys:
             print('Existing survey')
         else:
             print('Create a new survey')
-            #self.createSurvey(self.obs,self.sim)
-            
+            survey = deepcopy(self)
+            self.surveys.append(survey)
 
-    def icsd_init(self):
+            
+    def icsd_init(self,survey):
         """ these functions are called only once, even for pareto,
         as they do not depend on the regularization weight"""
         # create directories          
             
         print('init')
-        self.createdirs()
+        self.createdirs(survey)
         
         # load virtual sources coordinates
         if self.type == '2d':
-            self.coord_x, self.coord_y, self.coord = load_coord(self.path2load, self.coord_file, self.type)
+            self.coord_x, self.coord_y, survey.coord = load_coord(survey.path2load, self.coord_file, self.type)
         else:
-            self.coord_x, self.coord_y, self.coord_z, self.coord = load_coord(self.path2load, self.coord_file, self.type)
+            self.coord_x, self.coord_y, self.coord_z, survey.coord = load_coord(self.surveys[0], self.coord_file, self.type)
 
-        if self.TDIP_flag==False:
+        
+        #if len(self.surveys)==1:
+        #    print('single file')
             # load observations resistances b
-            self.b = load_obs(self.path2load, self.obs)
-            # load simulated resistances A (i.e. Green function)
-            self.A = load_sim(self.path2load, self.sim)
+        survey.b = load_obs(survey.path2load, survey.obs)
+        # load simulated resistances A (i.e. Green function)
+        self.A = load_sim(survey.path2load, survey.sim)
+            
+            
+        #if self.TDIP_flag==True:
+        #    # load observations resistances b
+        #    #self.b = load_obs(self.path2load, self.obs)
+        #    self.b = load_obs(self.path2load, self.surveys.obs)
+        #    # load simulated resistances A (i.e. Green function)
+        #    self.A = load_sim(self.path2load, self.sim)
         # else:
         #     self.b = survey.
         #     self.A = survey.
@@ -134,40 +147,40 @@ class iCSD3d(object):
         
         # load observations electrode coordinates
         if self.plotElecs==True:
-            self.RemLineNb, self.Injection, self.coordE, self.pointsE= load_geom(self.path2load) # geometry file containing electrodes position includinf remotes 
+            survey.RemLineNb, survey.Injection, survey.coordE, survey.pointsE= load_geom(self.path2load) # geometry file containing electrodes position includinf remotes 
         
         # check vector sizes
-        self.nVRTe = check_nVRTe(self.A,self.b,self.coord)
+        survey.nVRTe = check_nVRTe(self.A,survey.b,survey.coord)
         
         
         # reshape A vector into matrix A of nVRTE collumns
-        self.A = reshape_A(self.A,self.nVRTe)
+        survey.A = reshape_A(self.A,survey.nVRTe)
         
         # define mode to weights the data (const, sqrt or reciprocal)     
-        self.obs_w= obs_w_f(self.obs_err,self.b,self.errRmin,sd_rec=None)
+        survey.obs_w= obs_w_f(self.obs_err,survey.b,self.errRmin,sd_rec=None)
         
         # constrain (curent conservation)
-        self.con_A = con_A_f(self.A)
-        self.con_b = con_b_f(self.b)
-        self.con_w = con_w_f(self.wc)
+        survey.con_A = con_A_f(survey.A)
+        survey.con_b = con_b_f(survey.b)
+        survey.con_w = con_w_f(self.wc)
         
         # make grid mesh (??)
         # self.XI, self.YI= mkGrid_XI_YI(self.coord_x,self.coord_y)
         
         # append spatial regularization (add lines to the matrice)
-        self._parseModelReg()
+        survey.reg_A = self._parseModelReg(survey)
         # self.parseDataReg()
-        self.reg_b= regularize_b(self.reg_A)
+        survey.reg_b = regularize_b(self.reg_A)
         
         # stack data, constrain, and regularization 
-        self.A_s = stack_A(self.A, self.con_A, self.reg_A)
-        self.b_s = stack_b(self.b, self.con_b, self.reg_b)
+        survey.A_s = stack_A(survey.A, survey.con_A, survey.reg_A)
+        survey.b_s = stack_b(survey.b, survey.con_b, survey.reg_b)
         
         
     ### mkdirs 
-    def createdirs(self):
-        self.path2load = self.dirName
-        self.path2save= self.path2load + 'figs'
+    def createdirs(self,survey):
+        survey.path2load = self.dirName
+        survey.path2save= survey.path2load + 'figs'
         # self.path2save= self.dirName + 'fig/'
         # print(self.path2save)
         # cwd = os.getcwd()
@@ -202,24 +215,39 @@ class iCSD3d(object):
             
         
         if self.x0_prior==True: # if relative smallness 
-            self.reg_w_0_b, self.reg_w_0_A = regularize_w(self.reg_A,self.wr,self.x0_prior,x0=self.x0)
+            self.reg_w_0_b, self.reg_w_0_A = regularize_w(self.surveys[0].reg_A,
+                                                          self.wr,
+                                                          self.x0_prior,
+                                                          x0=self.x0)
             
             # stack weight matrix
-            self.W_s_A, self.W_s_b = stack_w(self.obs_w, self.con_w, self.x0_prior, reg_w_0_A=self.reg_w_0_A, reg_w_0_b=self.reg_w_0_b)
-
+            self.W_s_A, self.W_s_b = stack_w(self.surveys[0].obs_w, 
+                                             self.surveys[0].con_w, 
+                                             self.x0_prior, 
+                                             reg_w_0_A=self.reg_w_0_A, 
+                                             reg_w_0_b=self.reg_w_0_b)
 
             # apply weight to A and b (data weigth, constrainsts weight and regularisation weigth)
-            self.A_w = weight_A(self.x0_prior,self.A_s,W_s_A=self.W_s_A)
-            self.b_w = weight_b(self.x0_prior,self.b_s,W_s_b=self.W_s_b)
+            self.A_w = weight_A(self.x0_prior,self.surveys[0].A_s,W_s_A=self.W_s_A)
+            self.b_w = weight_b(self.x0_prior,self.surveys[0].b_s,W_s_b=self.W_s_b)
 
         else:
-            self.reg_w = regularize_w(self.reg_A,self.wr,self.x0_prior)
+            self.reg_w = regularize_w(self.surveys[0].reg_A,
+                                      self.wr,
+                                      self.x0_prior)
             
-            self.W_s = stack_w(self.obs_w, self.con_w, self.x0_prior, reg_w=self.reg_w)
-            self.A_w = weight_A(self.x0_prior,self.A_s,W_s=self.W_s)
-            self.b_w = weight_b(self.x0_prior,self.b_s,W_s=self.W_s)  
+            self.W_s = stack_w(self.surveys[0].obs_w, 
+                               self.surveys[0].con_w, 
+                               self.x0_prior, 
+                               reg_w=self.reg_w)
+            self.A_w = weight_A(self.x0_prior,
+                                self.surveys[0].A_s,
+                                W_s=self.W_s)
+            self.b_w = weight_b(self.x0_prior,
+                                self.surveys[0].b_s,
+                                W_s=self.W_s)  
 
-    def _parseModelReg(self):
+    def _parseModelReg(self,survey):
         """ Parse regularisation smoothing and 
         prior constrainst parameters before inversion
         """
@@ -228,14 +256,16 @@ class iCSD3d(object):
         if self.type=='2d': 
             if self.regMesh=='strc': # structured (grid) mesh of virtual sources
                 if self.alphaSxy==True: # spatial smoothing with coeff  alphaSx and alphaSy
-                    self.reg_Ax, self.reg_Ay = regularize_A_x_y(self.coord,self.alphaSx,self.alphaSy)    
+                    self.reg_Ax, self.reg_Ay = regularize_A_x_y(self.surveys[0].coord,self.alphaSx,self.alphaSy)    
                 else:
                     if self.x0_prior==True:
                         raise ValueError('#### dimensions of matrices do not agree - change regularisation types')
                     else:
-                        self.reg_A = regularize_A(self.coord,self.nVRTe)
+                        self.reg_A = regularize_A(survey.coord,
+                                                  survey.nVRTe)
             else: # 3d mesh
-                 self.reg_A = regularize_A_UnstructuredMesh3d(self.coord,self.nVRTe,self.k)
+                 self.reg_A = regularize_A_UnstructuredMesh3d(self.surveys[0].coord,
+                                                              self.nVRTe,self.k)
         
         
         # 3D CASE -----------------------------------------
@@ -245,10 +275,12 @@ class iCSD3d(object):
                     # self.regularize_A_x_y_z()
                     raise ValueError('### Not yet ready to work with m0 and 3d grid mesh, regularize_A_x_y_z need to be tested')
                 else:
-                     self.reg_A = regularize_A_3d(self.nVRTe,self.coord) # working for structured mesh
+                     self.reg_A = regularize_A_3d(self.nVRTe,
+                                                  self.surveys[0].coord) # working for structured mesh
             
             elif self.regMesh=='unstrc':
-                self.reg_A = regularize_A_UnstructuredMesh3d(self.coord,self.nVRTe,self.k)
+                self.reg_A = regularize_A_UnstructuredMesh3d(self.surveys[0].coord,
+                                                             self.nVRTe,self.k)
             
                     
         if self.alphaSxy==True: # anisotropic smoothing
@@ -286,7 +318,9 @@ class iCSD3d(object):
             self.misfit()
             
         """
-        self.icsd_init()
+        if not hasattr(self.surveys[0], 'A'):
+            self.icsd_init(self.surveys[0])
+            
         self.prepare4iCSD()
         
         # constrainsted inversion
@@ -294,8 +328,8 @@ class iCSD3d(object):
             self.x = iCSD(self.x0_ini_guess,
                           self.A_w,self.b_w,
                           self.type,
-                          self.coord,
-                          self.path2load,
+                          self.surveys[0].coord,
+                          self.surveys[0].path2load,
                           x0=self.x0)
             
         # UNconstrainsted inversion
@@ -303,8 +337,8 @@ class iCSD3d(object):
             self.x = iCSD(self.x0_ini_guess,
                           self.A_w,self.b_w,
                           self.type,
-                          self.coord,
-                          self.path2load)
+                          self.surveys[0].coord,
+                          self.surveys[0].path2load)
         if showfig == True:
             ax, f = self.showResults(index=index)
             # self.RMSAnalysis()
@@ -324,8 +358,8 @@ class iCSD3d(object):
     def run_pareto(self):
         """
         run iCSD multiple times while changing the weights to explore the L-curve
-        """           
-        self.icsd_init()
+        """ 
+        #self.icsd_init(self.surveys[0])
         self.pareto_weights = np.linspace(self.pareto_MinErr, self.pareto_MaxErr, self.pareto_nSteps)
         print('pareto weights are\n', self.pareto_weights)
 
@@ -333,7 +367,7 @@ class iCSD3d(object):
         self.pareto_list_RegRes = []
         
         
-        with PdfPages(self.path2save+ self.obs +'iCSD_pareto.pdf') as pdf:
+        with PdfPages(self.surveys[0].path2save+ self.obs +'iCSD_pareto.pdf') as pdf:
             
             # LOOP ON REG WEIGHTS
             for self.wr in self.pareto_weights:              
@@ -350,14 +384,16 @@ class iCSD3d(object):
                 else:
                     self.x = iCSD(self.x0_ini_guess,
                                   self.A_w,self.b_w,
-                                  self.type,self.coord,
-                                  self.path2load)
+                                  self.type,self.surveys[0].coord,
+                                  self.surveys[0].path2load)
 
                 # PLOT ICSD
                 if self.type=="2d":
-                    self.f, _ = plotCSD2d(self.coord,self.x.x,self.b,self.b_w,
+                    self.f, _ = plotCSD2d(self.surveys[0].coord,self.x.x,
+                                          self.surveys[0].b,
+                                          self.b_w,
                                        self.x.fun,
-                                       self.path2load,
+                                       self.surveys[0].path2load,
                                        self.pareto,
                                        retElec=None, sc=None, 
                                        title_wr=self.wr)
@@ -382,7 +418,11 @@ class iCSD3d(object):
             print('Knee detected for wr=' + str(self.wr))
             
             # Plot the L-curve
-            self.p, self.ax= plotPareto(self.wr,self.pareto_list_FitRes,self.pareto_list_RegRes,self.IdPtkneew, self.path2save)
+            self.p, self.ax= plotPareto(self.wr,
+                                        self.pareto_list_FitRes,
+                                        self.pareto_list_RegRes,
+                                        self.IdPtkneew, 
+                                        self.surveys[0].path2save)
             pdf.savefig(self.p)
             # plt.close(self.p)
 
@@ -450,7 +490,7 @@ class iCSD3d(object):
 #%% DEFINE SURVEY container for observations and simulations     
 
         
-    def createSurvey(self,fname_obs,fname_sim):
+    def createSurvey(self,fname_obs,fname_sim,append=False):
         """ Create an instance of iCSD3d and return
         a survey object.
         
@@ -463,19 +503,27 @@ class iCSD3d(object):
         """
         # set attribute according to the first survey
         if len(self.surveys) == 0:
+            print('no existing survey')
             survey = iCSD3d(dirName=self.dirName)
             survey.obs=fname_obs
             survey.sim=fname_sim
-            survey.icsd_init()
+            survey.icsd_init(survey)
             self.surveys.append(survey)          
         else: # check we have the same configuration than other survey
-            survey = iCSD3d(dirName=self.dirName)
-            survey.obs=fname_obs
-            survey.sim=fname_sim
-            survey.icsd_init()
-            # check = [a == b for a,b, in zip(self.nVRTe, self.surveys[len(surveys-1)].nVRTe)]
-            # if all(check) is True:
-            self.surveys.append(survey)
+            if append: 
+                print('append new survey')
+                survey = iCSD3d(dirName=self.dirName)
+                survey.obs=fname_obs
+                survey.sim=fname_sim
+                survey.icsd_init(survey)
+                # check = [a == b for a,b, in zip(self.nVRTe, self.surveys[len(surveys-1)].nVRTe)]
+                # if all(check) is True:
+                self.surveys.append(survey)
+            else:
+                self.surveys[0].obs=fname_obs
+                self.surveys[0].sim=fname_sim
+                self.surveys[0].icsd_init(self.surveys[0])
+        return self.surveys
 
     def createTimeLapseSurvey(self,fnames_obs, fnames_sim):
         """Import multiple surveys and return
@@ -541,7 +589,7 @@ class iCSD3d(object):
     def _parseM0_(self,method_m0):
         """ Parse M0 parameters
         """
-        for i, survey in enumerate(self.surveys):
+        for i, survey in enumerate(self.surveys):           
             if method_m0 is not None:
                 if method_m0=='F1': 
                     self.surveys[i].norm_F1, self.surveys[i].x0 = misfitF1_2_initialX0(survey.A,survey.b)
@@ -571,8 +619,8 @@ class iCSD3d(object):
         print('survey info')
         print(self.surveys)
         for i, survey in enumerate(self.surveys):
-            m0 = self._parseM0_(method_m0) # define the method to estimate M0
-            self.surveys[i].physLabel=labels(method_m0) # lgd labeling for the plot
+            m0 = self._parseM0_(self.method_m0) # define the method to estimate M0
+            self.surveys[i].physLabel=labels(self.method_m0) # lgd labeling for the plot
             if show == True:
                 self.showEstimateM0(index=i,ax=ax)
             
@@ -594,7 +642,8 @@ class iCSD3d(object):
             f = plotContour2d(self.surveys[index].coord,self.surveys[index].x0,
                               self.surveys[index].physLabel,
                               path=self.surveys[index].path2load,
-                              retElec=None, sc=None,index=index)
+                              retElec=None, sc=None,index=index,
+                              ax=ax)
         else:
             f = scatter3d(self.coord, self.x0, self.physLabel, self.path2load, self.obs, ax=ax)
         plt.tight_layout()
@@ -653,10 +702,15 @@ class iCSD3d(object):
             data = self.x.x
        
         if self.type=='2d':
-            f, ax = plotCSD2d(self.coord,data,self.b,self.b_w,self.x.fun,
-                          self.path2load,self.pareto,
-                          retElec=None, sc=None,
-                          ax=ax, title_wr=self.wr, index=index)
+            f, ax = plotCSD2d(self.surveys[0].coord,
+                              data,
+                              self.surveys[0].b,
+                              self.b_w,
+                              self.x.fun,
+                              self.surveys[0].path2load,
+                              self.pareto,
+                              retElec=None, sc=None,
+                              ax=ax, title_wr=self.wr, index=index)
         else:
             f = plotCSD3d(self.wr,self.coord,data,
                           self.path2load,self.obs,self.knee,
@@ -675,9 +729,9 @@ class iCSD3d(object):
 #%% POST inversion analysis        
 
     def residualAnalysis(self):
-        fitting_res = self.x.fun[0 : self.b.shape[0]]
+        fitting_res = self.x.fun[0 : self.surveys[0].b.shape[0]]
         # constrain_res = self.x.fun[self.b.shape[0] + 1] / self.wc
-        regularization_res = self.x.fun[self.b.shape[0] + 2 :] / self.wr # constrain not included in the reg function
+        regularization_res = self.x.fun[self.surveys[0].b.shape[0] + 2 :] / self.wr # constrain not included in the reg function
         self.reg_sum = np.sum(np.square(regularization_res))
         self.fit_sum = np.sum(np.square(fitting_res))
         self.pareto_list_FitRes.append(self.fit_sum)
@@ -695,8 +749,8 @@ class iCSD3d(object):
         ----------
         
         """   
-        residuals =  self.x.fun[0 : self.b.shape[0]] - self.b
-        val = np.linalg.norm(self.obs_w*residuals)
+        residuals =  self.x.fun[0 : self.surveys[0].b.shape[0]] - self.surveys[0].b
+        val = np.linalg.norm(self.surveys[0].obs_w*residuals)
 
         # val = np.sum(self.obs_w*(residuals**2))
         

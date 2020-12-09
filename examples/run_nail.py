@@ -52,7 +52,7 @@ icsd.wr=1 #weight regularization
 icsd.alphaSxy=True
 icsd.x0_prior=True
 icsd.x0_ini_guess=False # initial guess
-icsd.icsd_init()
+#icsd.icsd_init()
 
 icsd.createSurvey(fname_obs='ObsData.txt',fname_sim='VRTeSim.txt')
 # icsd.plotElecs=False
@@ -63,7 +63,7 @@ m0 = icsd.estimateM0(method_m0='Pearson',show=True)
 # icsd.clim=[0,0.1]
 # icsd.run_single()
 
-sol= icsd.invert(x0_prior=False,wr=1e3)
+sol= icsd.invert(x0_prior=False,wr=1)
 # icsd.invert(pareto=True, regMesh='strc',x0_prior=True, 
 #             pareto_MinErr=1, pareto_MaxErr=100)
 

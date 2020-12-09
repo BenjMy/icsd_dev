@@ -19,17 +19,13 @@ icsd.wr=1 #weight regularization
 icsd.alphaSxy=False
 icsd.x0_prior=False
 icsd.x0_ini_guess=False # initial guess
-icsd.icsd_init()
 
 icsd.createSurvey(fname_obs='ObsData.txt',fname_sim='VRTeSim.txt')
 # icsd.plotElecs=False
 
-m0 = icsd.estimateM0(method_m0='F1',show=True)
 m0 = icsd.estimateM0(method_m0='Pearson',show=True)
-
 # icsd.clim=[0,0.1]
 # icsd.run_single()
-
 
 sol= icsd.invert(x0_prior=False,wr=1)
 
@@ -38,11 +34,15 @@ fig, ax = plt.subplots()
 icsd.showResults(ax=ax)
 plt.show()
 
-icsd.invert(pareto=True, regMesh='strc',x0_prior=False, 
-            pareto_MinErr=0.01, pareto_MaxErr=100)
+#icsd.invert(pareto=True, regMesh='strc',x0_prior=False, 
+#            pareto_MinErr=0.01, pareto_MaxErr=100)
 
-
-sol= icsd.invert(pareto=False,x0_prior=True,wr=33.3)
+icsd=i3d(dirName=path2files)   
+#icsd.createSurvey()
+sol= icsd.invert(pareto=False,
+                 alphaSxy= False, 
+                 x0_ini_guess=False, 
+                 x0_prior=False,wr=33.3)
 icsd.showResults()
 
 # icsd.ModelResolution(jacMi=305)
