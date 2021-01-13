@@ -31,6 +31,9 @@ sim_fnames = list(['SMALMtimeReg0.txt',
 
 surveys = icsd3d_Salt.createTimeLapseSurvey(obs_fnames,sim_fnames)
 
+surveys[0].obs
+surveys[1].obs
+
 # m0 = icsd3d_Salt.estimateM0(method_m0='F1',show=True)
 icsd3d_Salt.TL = True
 icsd3d_Salt.invert(x0_prior=False,wr=1e3)

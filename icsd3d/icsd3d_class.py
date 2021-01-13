@@ -545,7 +545,7 @@ class iCSD3d(object):
             else:
                 raise ValueError('dirname should be a directory path or a list of filenames')
         for fnames_obs,fnames_sim  in zip(fnames_obs,fnames_sim):
-            self.createSurvey(fnames_obs,fnames_sim)
+            self.createSurvey(fnames_obs,fnames_sim,append=True)
             print(fnames_obs)
 
         return self.surveys
