@@ -9,6 +9,7 @@ import numpy as np
 import os 
 
 import pybert as pb
+from pybert import tdip
 
 #%% LOAD from ICSD3d format: .txt file tab separated         
 
@@ -37,14 +38,17 @@ def load_obs(path, filename):
     b = np.loadtxt(path+ filename)
     return b
 
-def load_sim(path, filename):
+def load_sim(path, data_sim):
     """ load the simulated green functions file
     
     Parameters
     ----------
 
     """
-    A = np.loadtxt(path+ filename)
+    if isinstance(data_sim, str):
+        A = np.loadtxt(path+ data_sim)
+    else:
+        A = data_sim
     print('*'*36)
     return A
 

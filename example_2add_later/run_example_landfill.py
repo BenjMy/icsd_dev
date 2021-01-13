@@ -14,7 +14,7 @@ os.chdir(maindir)
 # Exemple with a 3d landfill geometry --> ARTICLE comp. Geosciences ?
 # -----------------------------------#
 # a delineaer 
-from icsd3d_class import iCSD3d_Class as i3d
+from icsd3d_class import iCSD3d as i3d
 from plotters import mpl_plot
 
 # No_hole Ano1_bh_lambda_1

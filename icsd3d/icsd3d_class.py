@@ -126,23 +126,23 @@ class iCSD3d(object):
             self.coord_x, self.coord_y, self.coord_z, survey.coord = load_coord(self.surveys[0], self.coord_file, self.type)
 
         
-        #if len(self.surveys)==1:
-        #    print('single file')
+
+            
+            
+        if self.TDIP_flag==True:
             # load observations resistances b
-        survey.b = load_obs(survey.path2load, survey.obs)
-        # load simulated resistances A (i.e. Green function)
-        self.A = load_sim(survey.path2load, survey.sim)
-            
-            
-        #if self.TDIP_flag==True:
-        #    # load observations resistances b
-        #    #self.b = load_obs(self.path2load, self.obs)
-        #    self.b = load_obs(self.path2load, self.surveys.obs)
-        #    # load simulated resistances A (i.e. Green function)
-        #    self.A = load_sim(self.path2load, self.sim)
-        # else:
-        #     self.b = survey.
-        #     self.A = survey.
+            #self.b = load_obs(self.path2load, self.obs)
+            # load simulated resistances A (i.e. Green function)
+            self.A = load_sim(survey.path2load, survey.sim)          
+            survey.b = survey.b[0:37]
+            print('icsd_init TDIP survey')
+        else:
+            #if len(self.surveys)==1:
+            #    print('single file')
+                # load observations resistances b
+            survey.b = load_obs(survey.path2load, survey.obs)
+            # load simulated resistances A (i.e. Green function)
+            self.A = load_sim(survey.path2load, survey.sim)
 
         
         # load observations electrode coordinates
@@ -172,9 +172,15 @@ class iCSD3d(object):
         # self.parseDataReg()
         survey.reg_b = regularize_b(self.reg_A)
         
-        # stack data, constrain, and regularization 
-        survey.A_s = stack_A(survey.A, survey.con_A, survey.reg_A)
-        survey.b_s = stack_b(survey.b, survey.con_b, survey.reg_b)
+
+        if self.TDIP_flag==False:
+            # stack data, constrain, and regularization 
+            survey.A_s = stack_A(survey.A, survey.con_A, survey.reg_A)
+            survey.b_s = stack_b(survey.b, survey.con_b, survey.reg_b)
+        else:
+            # stack data, constrain, and regularization 
+            survey.A_s = stack_A(survey.A, survey.con_A, survey.reg_A)
+            survey.b_s = stack_b(survey.b[:,1], survey.con_b, survey.reg_b)
         
         
     ### mkdirs 
@@ -551,7 +557,7 @@ class iCSD3d(object):
         return self.surveys
 
 
-    def createTDIPSurvey(self,fname_obs):
+    def createTDIPSurvey(self,fname_obs,fname_sim):
         """create TDIP survey and return a survey object.
         
         Parameters
@@ -559,13 +565,30 @@ class iCSD3d(object):
         fname : *.bin file containing TDIP infos
         """
         # read TDIP file
-        tdip_obs = loadTDIPSurvey(self.dirName + fname)
-        tdip_sim = loadTDIPSurvey(self.dirName + fname) # *.data (pygimli format)
+        tdip_obs = loadTDIPSurvey(self.dirName + fname_obs) # *.data (pygimli format)
+        tdip_sim = load_sim(self.dirName, fname_sim) #
 
-        self.TDIP_flag = True # activate tdip flag
-        self.dataTDIP = tdip.data
-        self.Vs = tdip.MA
-        self.gates =  tdip.t
+        self.dataTDIP = tdip_obs.data
+        self.Vs = tdip_obs.MA.transpose()
+        self.gates =  tdip_obs.t
+
+        # if len(self.surveys) == 0:
+        survey = iCSD3d(dirName=self.dirName)
+        survey.TDIP_flag = True # activate tdip flag
+        print(survey.TDIP_flag)
+        survey.b=self.Vs
+        print(np.shape(survey.b))
+        self.A=tdip_sim
+        survey.icsd_init(survey)
+        self.surveys.append(survey)          
+
+        return self.surveys
+    
+    
+        for fnames_obs,fnames_sim  in zip(fnames_obs,fnames_sim):
+            self.createSurvey(fnames_obs,fnames_sim,append=True)
+            print(fnames_obs)
+            
         survey = iCSD3d(dirName=self.dirName)
         survey.icsd_init() 
         

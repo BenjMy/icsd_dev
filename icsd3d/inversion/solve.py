@@ -67,8 +67,12 @@ def check_nVRTe(A,b,coord):
     if A.shape[0] / b.shape[0] ==  coord.shape[0]:
         nVRTe = coord.shape[0]
     else:
-        raise ValueError('### dimensions of the files do not agree')
-        
+        print('A:' + str(A.shape[0]) + '\n'
+                         + 'b:' +  str(b.shape[0]) + '\n'
+                         + 'coord:' +  str(coord.shape[0]))
+        raise ValueError('### dimensions of the files do not agree' 
+                         )
+
     return nVRTe
 
 def reshape_A(A,nVRTe):

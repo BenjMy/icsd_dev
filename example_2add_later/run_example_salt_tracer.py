@@ -13,7 +13,7 @@ os.chdir(maindir)
 # Example time-lapse salt tracer
 # show the importance of an anisotropic spatial regularisation
 # -----------------------------------#
-from icsd3d_class import iCSD3d_Class as i3d
+from icsd3d_class import iCSD3d as i3d
 import pyvista as pv
 
 tstep=1
@@ -39,7 +39,7 @@ icsd3d_Salt.alphaSx=1 # x-smooth
 icsd3d_Salt.alphaSy=1 # y-smooth
 # icsd3d_TL_RWU.mesh='Figures/ERTmodel_reg_'+str(tstep)+'.vtk'      
 
-icsd3d_Salt.icsd_init() 
+#icsd3d_Salt.icsd_init() 
 # icsd3d_Salt.run_single()
 
 icsd3d_Salt.pareto_MinErr=0.1
