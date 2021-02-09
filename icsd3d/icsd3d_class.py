@@ -62,6 +62,7 @@ class iCSD3d(object):
         self.knee=False # L-curve knee automatic detection
         self.KneeWr=[]
         
+        self.logTrans=False
             # time lapse option
         # self.iTimeLapse = False # to enable timelapse inversion [Not implemented yet]
         self.TL=False # Time lapse inversion (see slides VIU Venice to implement)
@@ -105,10 +106,11 @@ class iCSD3d(object):
         # print(len(self.surveys))
         if self.surveys:
             print('Existing survey')
-        else:
-            print('Create a new survey')
-            survey = deepcopy(self)
-            self.surveys.append(survey)
+        # else:
+        #     print('Create a new survey')
+        #     print(self.logTrans)
+        #     survey = deepcopy(self)
+        #     self.surveys.append(survey)
 
             
     def icsd_init(self,survey):
@@ -116,7 +118,7 @@ class iCSD3d(object):
         as they do not depend on the regularization weight"""
         # create directories          
             
-        print('init')
+        print('initiation ICSD')
         self.createdirs(survey)
         
         # load virtual sources coordinates
@@ -125,9 +127,6 @@ class iCSD3d(object):
         else:
             self.coord_x, self.coord_y, self.coord_z, survey.coord = load_coord(self.surveys[0], self.coord_file, self.type)
 
-        
-
-            
             
         if self.TDIP_flag==True:
             # load observations resistances b
@@ -135,7 +134,7 @@ class iCSD3d(object):
             # load simulated resistances A (i.e. Green function)
             self.A = load_sim(survey.path2load, survey.sim)          
             survey.b = survey.b[0:37]
-            print('icsd_init TDIP survey')
+            print('icsd_init TDIP survey- reshape *.bin to fit with sim')
         else:
             #if len(self.surveys)==1:
             #    print('single file')
@@ -144,7 +143,16 @@ class iCSD3d(object):
             # load simulated resistances A (i.e. Green function)
             self.A = load_sim(survey.path2load, survey.sim)
 
-        
+        print('log transformation: ' + str(survey.logTrans))
+        #Log transformation before inversion
+        if survey.logTrans==True:
+            print('log transformation')
+            print(survey.b[0])
+            survey.b = np.log(survey.b) 
+            self.A  = np.log(self.A) 
+            print(survey.b[0])
+
+           
         # load observations electrode coordinates
         if self.plotElecs==True:
             survey.RemLineNb, survey.Injection, survey.coordE, survey.pointsE= load_geom(self.path2load) # geometry file containing electrodes position includinf remotes 
@@ -173,14 +181,14 @@ class iCSD3d(object):
         survey.reg_b = regularize_b(self.reg_A)
         
 
-        if self.TDIP_flag==False:
-            # stack data, constrain, and regularization 
-            survey.A_s = stack_A(survey.A, survey.con_A, survey.reg_A)
-            survey.b_s = stack_b(survey.b, survey.con_b, survey.reg_b)
-        else:
-            # stack data, constrain, and regularization 
-            survey.A_s = stack_A(survey.A, survey.con_A, survey.reg_A)
-            survey.b_s = stack_b(survey.b[:,1], survey.con_b, survey.reg_b)
+        # if self.TDIP_flag==False:
+        # stack data, constrain, and regularization 
+        survey.A_s = stack_A(survey.A, survey.con_A, survey.reg_A)
+        survey.b_s = stack_b(survey.b, survey.con_b, survey.reg_b)
+        # else:
+        #     # stack data, constrain, and regularization 
+        #     survey.A_s = stack_A(survey.A, survey.con_A, survey.reg_A)
+        #     survey.b_s = stack_b(survey.b[:,1], survey.con_b, survey.reg_b)
         
         
     ### mkdirs 
@@ -510,11 +518,12 @@ class iCSD3d(object):
         # set attribute according to the first survey
         if len(self.surveys) == 0:
             print('no existing survey')
-            survey = iCSD3d(dirName=self.dirName)
+            # survey = iCSD3d(dirName=self.dirName)
+            survey = deepcopy(self)
             survey.obs=fname_obs
             survey.sim=fname_sim
             survey.icsd_init(survey)
-            self.surveys.append(survey)          
+            self.surveys.append(survey)       
         else: # check we have the same configuration than other survey
             if append: 
                 print('append new survey')
@@ -526,9 +535,12 @@ class iCSD3d(object):
                 # if all(check) is True:
                 self.surveys.append(survey)
             else:
-                self.surveys[0].obs=fname_obs
-                self.surveys[0].sim=fname_sim
-                self.surveys[0].icsd_init(self.surveys[0])
+                print('Replace existing survey')
+                survey = deepcopy(self)
+                survey.obs=fname_obs
+                survey.sim=fname_sim
+                survey.icsd_init(survey)
+                self.surveys[0]=survey       
         return self.surveys
 
     def createTimeLapseSurvey(self,fnames_obs, fnames_sim):
@@ -573,26 +585,23 @@ class iCSD3d(object):
         self.gates =  tdip_obs.t
 
         # if len(self.surveys) == 0:
-        survey = iCSD3d(dirName=self.dirName)
-        survey.TDIP_flag = True # activate tdip flag
-        print(survey.TDIP_flag)
-        survey.b=self.Vs
-        print(np.shape(survey.b))
-        self.A=tdip_sim
-        survey.icsd_init(survey)
-        self.surveys.append(survey)          
 
-        return self.surveys
-    
-    
-        for fnames_obs,fnames_sim  in zip(fnames_obs,fnames_sim):
-            self.createSurvey(fnames_obs,fnames_sim,append=True)
-            print(fnames_obs)
-            
-        survey = iCSD3d(dirName=self.dirName)
-        survey.icsd_init() 
         
-        return tdip_obs, tdip_sim
+        # For now, transform each gates to several surveys as it is done for timelapse icsd
+        self.surveys = []
+        for i  in range(self.Vs.shape[1]):
+            survey = iCSD3d(dirName=self.dirName)
+            survey.TDIP_flag = True # activate tdip flag
+            print(survey)
+            survey.b=self.Vs[:,i]
+            self.A=tdip_sim
+            survey.icsd_init(survey)
+            self.surveys.append(survey)     
+            
+        # survey = iCSD3d(dirName=self.dirName)
+        # survey.icsd_init() 
+        
+        return self.surveys
     
 
     # def _add_to_container(self, df):
@@ -617,7 +626,6 @@ class iCSD3d(object):
                 if method_m0=='F1': 
                     self.surveys[i].norm_F1, self.surveys[i].x0 = misfitF1_2_initialX0(survey.A,survey.b)
                 elif method_m0=='Pearson': 
-                    print(survey.A)
                     self.surveys[i].x0 = product_moment(survey.A,survey.b)
             elif self.inix0 is not None:
                 if survey.inix0=='cst':
@@ -626,7 +634,7 @@ class iCSD3d(object):
         return self.surveys[i].x0
             
     def estimateM0(self,method_m0='F1',show=True, ax=None):
-        """Estimate initial M0 model for constrainst inversion
+        """Estimate initial M0 model for constrainsted inversion
         
         Parameters
         ----------
@@ -639,11 +647,9 @@ class iCSD3d(object):
         Returns:
     
         """
-        print('survey info')
-        print(self.surveys)
         for i, survey in enumerate(self.surveys):
-            m0 = self._parseM0_(self.method_m0) # define the method to estimate M0
-            self.surveys[i].physLabel=labels(self.method_m0) # lgd labeling for the plot
+            m0 = self._parseM0_(method_m0) # define the method to estimate M0
+            self.surveys[i].physLabel=labels(method_m0) # lgd labeling for the plot
             if show == True:
                 self.showEstimateM0(index=i,ax=ax)
             
@@ -673,6 +679,22 @@ class iCSD3d(object):
         plt.show()
         # plt.close(f)
 
+    def showCurrentStreamlines(self,index=0,ax=None):
+        """Show Current Streamlines.
+        
+        Parameters
+        ----------
+        index : int, optional
+            Index of the survey to plot.
+        ax : Matplotlib.Axes, optional
+            If specified, the graph will be plotted against this axis.
+        """
+
+        # fig, ax = plt.subplots()
+        if self.type=='2d':
+            f = current_streamlines(path)
+        else:
+            print('not yet implemented in 3d')
    
 
 #%% PLOT fcts     

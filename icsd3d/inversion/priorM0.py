@@ -15,19 +15,26 @@ def _normF1(A,b):
     """compute the norm between observation data and individual green functions"""
     F1=[]
     for i in range(np.shape(A)[1]):
-        F1i = LA.norm((b-A[:,i]))
+        F1i = LA.norm((b-A[:,i]))# norm between observation and simulated current source i
         F1.append(F1i)
-    norm_F1 = (F1 - min(F1)) / (max(F1) - min(F1)) 
+        
     # normalise such as the sum is equal to 1 for current conservation
+    norm_F1 = (F1 - min(F1)) / (max(F1) - min(F1)) 
     
     return norm_F1
 
 def misfitF1_2_initialX0(A,b):
-    
+    """Transform the misfit F1 (punctual source inversion) to an initial solution M0  
+    using a 1/x^2 transformation"""
+
+    # if b.shape[1]>1:
+    #     print('b contains several collumns check TDIP flag')
+        
     norm_F1 = _normF1(A,b)
-    
-    """Transform the misfit F1 to an initial solution M0"""
-    x0F1=1./((norm_F1+1)*(norm_F1+1)) # Inverse misfit using a 1/x^2 transformation
+    # df = pd.DataFrame(data, columns = ['First Column Name','Second Column Name',...])
+
+    # x0F1=1./((norm_F1+1)*(norm_F1+1)) # Inverse misfit using a 1/x^2 transformation
+    x0F1=1./((norm_F1+1)) # Inverse misfit using a 1/x^2 transformation
     x0F1_sum= x0F1/sum(x0F1) # normalize such as sum equal to 1
     M0=x0F1_sum
     

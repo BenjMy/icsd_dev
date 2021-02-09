@@ -27,12 +27,13 @@ from importers.read import *
 # tdip_sim = load_sim(self.dirName + fname_sim) # *.data (pygimli format)
         
 icsd_TDIP = i3d(dirName=path2files)   
-testTDIP = icsd_TDIP.createTDIPSurvey(fname_obs, # Observation TDIP file
+surveys = icsd_TDIP.createTDIPSurvey(fname_obs, # Observation TDIP file
                            fname_sim) #Simulation primary voltages only
-m0 = icsd_TDIP.estimateM0(method_m0='F1',show=True)
+
+# m0 = icsd_TDIP.estimateM0(method_m0='F1',show=True)
 
 
-testTDIP[0].TDIP_flag
-testTDIP[0].dirName
-testTDIP[0].regMesh
-testTDIP[0].A
+# testTDIP[0].TDIP_flag
+# testTDIP[0].dirName
+# testTDIP[0].regMesh
+# testTDIP[0].A

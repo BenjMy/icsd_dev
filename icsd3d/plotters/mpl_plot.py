@@ -32,10 +32,10 @@ def _fig_Interpolation_(ax,coord, data, **kwargs):
     # if kwargs.get('clim') is not None:
     #     plt.clim(clim[0],clim[1])
     
-    # if kwargs.get('lgd_label') is not None:
-    #     cbar.set_label(kwargs.get('lgd_label'), labelpad = 10)
-    # else:
-    #     cbar.set_label('Fraction of Current Source', labelpad = 10)
+    if kwargs.get('lgd_label') is not None:
+        cbar.set_label(kwargs.get('lgd_label'), labelpad = 10)
+    else:
+        cbar.set_label('Fraction of Current Source', labelpad = 10)
 
 def _fig_RealSources_(ax,sc):
     """ add known point sources if present """
@@ -414,3 +414,88 @@ def showObs2d(path, **kwargs):
     plt.close(f)
 
     return f
+
+def current_streamlines(path, Res=1, mesh=None, **kwargs):
+    """
+    Current streamlines
+    -------
+    Only suitable for MALM with fix potential electrodes.
+    Correction of resistivity Res
+
+    """
+    filename='ObsData.txt'
+    f = plt.figure('ObsData')
+    ax = plt.gca()
+    
+    if kwargs.get('filename') is not None:
+        filename = kwargs.get('filename')
+        
+    RemLineNb, Injection, coordE, pointsE= load_geom(path) # geometry file containing electrodes position includinf remotes 
+    # print(path)
+    # print(path)
+
+    data_obs = load_obs(path,filename)
+    
+    xn = 30
+    yn = 30
+
+    xx = np.linspace(min(coordE[:,1]), max(coordE[:,1]),xn)
+    yy = np.linspace(min(coordE[:,2]), max(coordE[:,2]),yn)
+
+    xx, yy = np.meshgrid(xx, yy)
+    points = np.transpose(np.vstack((coordE[:,1], coordE[:,2])))
+    u_interp = interpolate.griddata(points,
+                                    data_obs,
+                                    (xx, yy), 
+                                    method='cubic')
+    uu = np.reshape(u_interp,[xn*yn])
+    data = uu/Res
+
+    if mesh is None:
+        mesh = pg.createGrid(x=np.linspace(min(coordE[:,1]), max(coordE[:,1]),xn),
+                 y=np.linspace(min(coordE[:,2]), max(coordE[:,2]),yn))
+
+    if kwargs.get('vmin'):
+       vmin = kwargs.get('vmin')
+    else: 
+       vmin = min(Obs)
+       
+    if kwargs.get('vmax'):
+       vmax = kwargs.get('vmax')
+    else: 
+       vmax = max(Obs)
+
+    if kwargs.get('ax'):
+        ax = kwargs.get('ax')
+    else:
+        fig, ax = plt.subplots()
+        
+    sc=ax.scatter(coordE[:,1], coordE[:,2], c=Obs, 
+                  cmap ='coolwarm',s=5e2, vmin=vmin, vmax=vmax) # norm=matplotlib.colors.Normalize()
+    cbar = plt.colorbar(sc,ax=ax)
+    cbar.set_label('V')   
+    ax.set_ylabel('y [m]',fontsize=15)
+    ax.set_xlabel('x [m]',fontsize=15)
+    
+    # if len(kwargs.get('sensors'))>0:
+    #     sensors = kwargs.get('sensors')
+    #     ax.scatter(sensors[:,0],sensors[:,1],color='k',marker='.',label='pot. elec')
+    #     for i in range(len(sensors[:,0])):
+    #            ax.annotate(str(i+1), (sensors[i,0],sensors[i,1]))   
+    #     if kwargs.get('A'):
+    #         A = kwargs.get('A')
+    #         ax.scatter(sensors[A,0],sensors[A,1],color='r',marker='v',label='A. elec')
+    #     if kwargs.get('B'):
+    #         B = kwargs.get('B')
+    #         ax.scatter(sensors[B,0],sensors[B,1],color='b',marker='v',label='B. elec')
+    #     if kwargs.get('Nfix'):
+    #         Nfix = kwargs.get('Nfix')
+    #         ax.scatter(sensors[Nfix,0],sensors[Nfix,1],color='g',marker='v',label='Nfix. elec')
+
+    # if kwargs.get('gridCoarse'):
+    #     gridCoarse = pg.createGrid(x=np.linspace(min(sensors[:,0]), max(sensors[:,0]),xn/2),
+    #                      y=np.linspace(min(sensors[:,1]), max(sensors[:,1]),yn/2))
+    
+    drawStreams(ax, mesh, -pg.solver.grad(mesh, data),
+                 color='green', quiver=True, linewidth=3.0)
+        
