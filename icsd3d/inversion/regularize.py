@@ -28,8 +28,10 @@ def nx_ny_nz(coord):
 #%% 2d
 
 def regularize_A(coord,nVRTe):
-    """create and append rows for to A, for spatial regularization (simple model smoothing). 
-    Working only on 2d regular meshes"""
+    """create and append rows for to A, 
+    for spatial regularization (simple model smoothing). 
+    Working only on 2d regular meshes
+    """
     reg = []
     vrte = range(1, nVRTe + 1)
     
@@ -83,7 +85,9 @@ def regularize_A_x_y(coord,alphaSx,alphaSy):
     
 #%% 3d
 def regularize_A_3d(nVRTe,coord):
-    """model smoothing consisting in creating and appending rows for spatial regularization to A"""
+    """model smoothing consisting in creating and 
+    appending rows for spatial regularization to A
+    """
     nx,ny,nz= nx_ny_nz(coord)
     reg = []
     vrte = range(1, nVRTe + 1)
@@ -270,7 +274,9 @@ def sum_smallness_smoothness(alphaSxy,x0_prior,**kwargs):
     ------------
     self
     """
-    # Test all the 4 possible cases i.e. with/without smallness regularisation (x0_prior), with/without anisotropic smoothing (alphaSxy)
+    # Test all the 4 possible cases i.e. 
+    # with/without smallness regularisation (x0_prior)
+    # with/without anisotropic smoothing (alphaSxy)
     # sum all contributions
     if (alphaSxy==True and x0_prior==False):
         # sum reg Ax, reg Ay

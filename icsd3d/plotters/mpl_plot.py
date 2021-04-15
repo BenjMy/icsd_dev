@@ -29,8 +29,8 @@ def _fig_Interpolation_(ax,coord, data, **kwargs):
                         orientation='vertical',
                         shrink=0.6)
     
-    # if kwargs.get('clim') is not None:
-    #     plt.clim(clim[0],clim[1])
+    if kwargs.get('clim') is not None:
+        plt.clim(clim[0],clim[1])
     
     if kwargs.get('lgd_label') is not None:
         cbar.set_label(kwargs.get('lgd_label'), labelpad = 10)
@@ -46,7 +46,7 @@ def _fig_RealSources_(ax,sc):
         sy = float(s.split(',')[1])
         ax.plot(sx, sy,'ow', markersize = 10, markeredgecolor = 'k')
 
-def _fig_ReturnElec_(retElec):
+def _fig_ReturnElec_(ax,retElec):
     """ plot the return electrode """
     if retElec == None:
         return
@@ -170,10 +170,12 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None,
     self
     """
 
-
+    if kwargs.get('index') is not None:
+        fig_name = 'CSD 2d T' + str(kwargs.get('index'))
+    else:
+        fig_name = 'CSD 2d'
+            
     if ax==None:
-        if kwargs.get('index') is not None:
-            fig_name = 'CSD 2d T' + str(kwargs.get('index'))
         
         f = plt.figure('CSD 2d')
         ax = plt.gca()
@@ -185,10 +187,13 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None,
     _fig_Interpolation_(ax,coord,data_sol)
     _fig_VRTe_(ax,coord,data_sol)
     _fig_RealSources_(ax,sc)
-    _fig_ReturnElec_(retElec)
+    _fig_ReturnElec_(ax,retElec)
     
     if kwargs.get('title_wr') is not None:
-        title=r'$\lambda$=' + str(kwargs.get('title_wr') )
+        if kwargs.get('index') is not None:
+            title=fig_name + r'  $\lambda$=' + str(kwargs.get('title_wr') )
+        else:
+            title=r'$\lambda$=' + str(kwargs.get('title_wr') )
         _fig_Axis_Labels_(ax,title)
 
     return f, ax
@@ -266,7 +271,7 @@ def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,ax=None,title=None,pltRemo
    
     plt.show()
     
-    return f
+    return ax
        
         
 #%% Generic plot functions
@@ -350,30 +355,37 @@ def labels(method):
     return physLabel
             
             
-def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None,ax=None, **kwargs):
+def plotContour2d(coord,data_sol,physLabel,path,retElec=None, 
+                  sc=None,ax=None, 
+                  **kwargs):
     """ Plot contour in 2d, using matplotlib and scipy interpolation
     
     Parameters
     ------------
     self
     """
-    fig_name = '2d scatter'
-    if kwargs.get('index') is not None:
-        fig_name = '2d scatter T' + str(kwargs.get('index'))
     
+    if kwargs.get('fig_name') is not None:
+        fig_name = kwargs.get('fig_name')
+    else:
+        fig_name = '2d'
+    
+    if kwargs.get('index') is not None:
+        fig_name += '  T' + str(kwargs.get('index'))
+        # print(fig_name)
+
     if ax==None:
-        print('no Axis')
         f = plt.figure(fig_name)
         ax = plt.gca()
 
     _fig_Interpolation_(ax,coord,data_sol,lgd_label=physLabel)
     _fig_VRTe_(ax,coord,data_sol)
     _fig_RealSources_(ax,sc)
-    _fig_ReturnElec_(retElec)
-    ax.set_xlabel('x [m]')
-    ax.set_ylabel('y [m]')
-    ax.set_ylabel('y [m]')
-    ax.set_aspect('equal', adjustable='box')
+    #_fig_ReturnElec_(ax,retElec)
+    # ax.set_xlabel('x [m]')
+    # ax.set_ylabel('y [m]')
+    # ax.set_aspect('equal', adjustable='box')
+    _fig_Axis_Labels_(ax,title=fig_name)
 
     if kwargs.get('jac') is not None:
         _fig_ModelParameter_mi_(coord,kwargs.get('jac'))
@@ -385,35 +397,38 @@ def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None,ax=None, *
     return ax
 
 
-def showObs2d(path, **kwargs):
-    """ Plot contour in 2d, using matplotlib and scipy interpolation. Required surface and borehole electrode to make the 2d interpolation possible
-    
+def showObs2d(path, ax=None, **kwargs):
+    """ Plot contour in 2d, using matplotlib and scipy interpolation. 
+    Required surface and borehole electrode to make the 2d interpolation possible
     Parameters
     ------------
     self
     """
     filename='ObsData.txt'
-    f = plt.figure('ObsData')
-    ax = plt.gca()
+    
+    if ax==None:
+        f = plt.figure('ObsData')
+        ax = plt.gca()
     
     if kwargs.get('filename') is not None:
         filename = kwargs.get('filename')
+    
+    if kwargs.get('index') is not None:
+        index = kwargs.get('index')
+    else: 
+        index = 0
         
+    
     RemLineNb, Injection, coordE, pointsE= load_geom(path) # geometry file containing electrodes position includinf remotes 
-    # print(path)
-    # print(path)
-
-    data_obs = load_obs(path,filename)
-    f = plt.figure('surface')
+    data_obs = load_obs(path,filename,index)
+    
     _fig_Interpolation_(ax,pointsE,data_obs,lgd_label='U/I')
-    _fig_VRTe_(pointsE,data_obs)
-    _fig_RealSources_(sc=None)
-    _fig_ReturnElec_(retElec=None)
-    _fig_Axis_Labels_(title='Observations')
-    plt.show(f)
-    plt.close(f)
+    _fig_VRTe_(ax,pointsE,data_obs)
+    # _fig_RealSources_(ax,sc=None)
+    # _fig_ReturnElec_(ax,retElec=None)
+    _fig_Axis_Labels_(ax,title='Obs T=' + str(index))
 
-    return f
+    return ax
 
 def current_streamlines(path, Res=1, mesh=None, **kwargs):
     """

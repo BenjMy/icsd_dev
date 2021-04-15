@@ -10,6 +10,7 @@ import os
 
 import pybert as pb
 from pybert import tdip
+import pygimli as pg
 
 #%% LOAD from ICSD3d format: .txt file tab separated         
 
@@ -28,17 +29,30 @@ def load_coord(path, filename, dim):
         coord_x, coord_y, coord_z = coord[:, 0], coord[:, 1], coord[:, 2]
         return coord_x, coord_y, coord_z, coord
 
-def load_obs(path, filename):
+def load_obs(path, filename,index=None):
     """ load the observations file (normalised voltages)
     
     Parameters
     ----------
 
-    """
-    b = np.loadtxt(path+ filename)
+    """       
+    if filename.endswith('.data'): #TDIP data importer
+        bfile = pg.load(filename)
+        # b = (bfile['m'+str(index)]).array()
+        # # print(str(index)+str(b[0]))
+        import matplotlib.pyplot as plt 
+        # fig, ax = plt.subplots()
+        # ax.plot(b)
+        b = (bfile['m'+str(index)]/bfile['k']).array()
+        fig, ax = plt.subplots()
+        ax.plot(b)
+
+    else:
+        b = np.loadtxt(path+ filename)
+                
     return b
 
-def load_sim(path, data_sim):
+def load_sim(path, data_sim, knorm=True):
     """ load the simulated green functions file
     
     Parameters
@@ -46,10 +60,36 @@ def load_sim(path, data_sim):
 
     """
     if isinstance(data_sim, str):
-        A = np.loadtxt(path+ data_sim)
+        if '.data' in data_sim:
+            tdip_data_sim = pg.load(path + data_sim)
+            A = []
+            i=0
+            if knorm == True:
+                while True:
+                    try: 
+                      A.append(((tdip_data_sim['m'+str(i)])/tdip_data_sim['k']).array())
+                      i += 1
+                      # print(i)
+                    except:
+                     break
+            else:
+                while True:
+                    try: 
+                      A.append((tdip_data_sim['m'+str(i)]).array())
+                      i += 1
+                    except:
+                     break
+                 
+            A = np.vstack(A) 
+            A = np.transpose(A) 
+            
+        else:
+            A = np.loadtxt(path+ data_sim)
     else:
         A = data_sim
+    print(np.shape(A))
     print('*'*36)
+    
     return A
 
 def load_geom(path):
@@ -108,12 +148,27 @@ def DataImport(SimFile=None,ObsFile=None):
     if fileExt=='*.data':
         print('resipy format import') 
         
-def loadTDIPSurvey(fname):
+def loadTDIPSurvey(fname,knorm=True):
 
-    tdip = pb.TDIPdata(fname)
-    tdip.data['a']
-    tdip.MA
-    tdip.t
+    tdip_data = pg.load(fname)
+    i=0 
+    Vs = []
+    if knorm == True:
+        while True:
+            try: 
+              Vs.append(((tdip_data['m'+str(i)])/tdip_data['k']).array())
+              i += 1
+            except:
+             break
+    else:
+        while True:
+            try: 
+              Vs.append((tdip_data['m'+str(i)]).array())
+              i += 1
+            except:
+             break
+    #tdip_data.MA
+    #tdip_data.t
     
-    return tdip
+    return Vs
 

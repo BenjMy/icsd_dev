@@ -57,7 +57,7 @@ def iCSD(x0_ini_guess,A_w,b_w,dim,coord,path,**kwargs):
             return (b - np.dot(a, x))
         x = least_squares(func, x0=kwargs.get('x0'), bounds = (0, 1), args=(a, b)) # Add initial guess
         print('CURRENT Sum=' + str(np.sum(x.x)))
-    export_sol(coord, x.x, dim,path,filename_root='Solution.dat')
+    #export_sol(coord, x.x, dim,path,filename_root='Solution.dat')
     
     return x
 

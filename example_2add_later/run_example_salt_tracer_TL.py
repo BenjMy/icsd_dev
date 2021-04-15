@@ -5,8 +5,8 @@ Inversion of current source density apply to a salt tracer
 import os
 import numpy as np
 
-maindir='E:/Padova/Software/SourceInversion/branch_icsd_dev/'
-os.chdir(maindir)
+# maindir='E:/Padova/Software/SourceInversion/branch_icsd_dev/'
+# os.chdir(maindir)
 
 
 # -----------------------------------#
@@ -16,11 +16,12 @@ os.chdir(maindir)
 from icsd3d_class import iCSD3d as i3d
 import pyvista as pv
 
-path2files='example_2add_later/Salt_tracer/all/'
+path2files='./Salt_tracer/all/'
 
  # tstepmax = 5
 # obs_fnames = [for i in range(tstepmax)]
-icsd3d_Salt = i3d(dirName=path2files)
+icsdTL_Salt = i3d(dirName=path2files)
+icsdTL_Salt.logTrans = False
 
 obs_fnames = list(['OMALMtimeReg0_synt.txt',
                    'OMALMtimeReg1_synt.txt',
@@ -29,15 +30,17 @@ sim_fnames = list(['SMALMtimeReg0.txt',
                    'SMALMtimeReg1.txt',
                    'SMALMtimeReg2.txt'])
 
-surveys = icsd3d_Salt.createTimeLapseSurvey(obs_fnames,sim_fnames)
+surveys = icsdTL_Salt.createTimeLapseSurvey(obs_fnames,sim_fnames)
 
-surveys[0].obs
-surveys[1].obs
 
 # m0 = icsd3d_Salt.estimateM0(method_m0='F1',show=True)
-icsd3d_Salt.TL = True
-icsd3d_Salt.invert(x0_prior=False,wr=1e3)
+icsdTL_Salt.TL = True
+icsdTL_Salt.invert(wr=1)
 
-# icsd3d_Salt.invert(x0_prior=False,wr=1e3,TL=True)
+fig, axs = plt.subplots(3, 1, sharex='all', sharey='all',figsize=(20,5))
+for i, j in  enumerate(range(3)):
+    icsdTL_Salt.showResults(ax=axs[i],index=j)
+# plt.savefig(icsdPath+'icsd_Vs.png', dpi=400)
+
 
 
