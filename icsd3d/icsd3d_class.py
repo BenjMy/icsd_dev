@@ -101,17 +101,13 @@ class iCSD3d(object):
 
         # IMPLEMENT obs_err based on reciprocal analysis i.e. estimated standard deviation of the data errors;                         % estimated standard deviation of the traveltime data errors
 
-        # processing outputs [TO write]
+        # processing outputs [To write]
         # self.models = []
         # self.rmses = []
-        # print(len(self.surveys))
+        
         if self.surveys:
             print('Existing survey')
-        # else:
-        #     print('Create a new survey')
-        #     print(self.logTrans)
-        #     survey = deepcopy(self)
-        #     self.surveys.append(survey)
+
 
             
     def icsd_init(self,survey):
@@ -130,7 +126,6 @@ class iCSD3d(object):
 
             
         if self.TDIP_flag==False:
-            print('no flag')
             # load observations resistances b
             survey.b = load_obs(survey.path2load, survey.obs)
             # load simulated resistances A (i.e. Green function)
@@ -142,9 +137,7 @@ class iCSD3d(object):
             # check the min
             TranslateMIN= np.min(np.array([min(survey.b),min(survey.A)])) 
             survey.b = np.log(survey.b + 1 - TranslateMIN) # translate, then transform */
-            #survey.b = np.log(survey.b + 1 - min(survey.b)) # translate, then transform */
             survey.A = np.log(survey.A+ 1 - TranslateMIN) # translate, then transform */
-            #self.A = np.log(self.A+ 1 - min(self.A)) # translate, then transform */
 
            
         # load observations electrode coordinates
@@ -162,28 +155,20 @@ class iCSD3d(object):
         # define mode to weights the data (const, sqrt or reciprocal)     
         survey.obs_w= obs_w_f(self.obs_err,survey.b,self.errRmin,sd_rec=None)
         
-        # constrain (curent conservation)
+        # set constrain (curent conservation)
         survey.con_A = con_A_f(survey.A)
         survey.con_b = con_b_f(survey.b)
         survey.con_w = con_w_f(self.wc)
         
-        # make grid mesh (??)
-        # self.XI, self.YI= mkGrid_XI_YI(self.coord_x,self.coord_y)
-        
+       
         # append spatial regularization (add lines to the matrice)
         survey.reg_A = self._parseModelReg(survey)
-        # self.parseDataReg()
         survey.reg_b = regularize_b(self.reg_A)
         
-
-        # if self.TDIP_flag==False:
         # stack data, constrain, and regularization 
         survey.A_s = stack_A(survey.A, survey.con_A, survey.reg_A)
         survey.b_s = stack_b(survey.b, survey.con_b, survey.reg_b)
-        # else:
-        #     # stack data, constrain, and regularization 
-        #     survey.A_s = stack_A(survey.A, survey.con_A, survey.reg_A)
-        #     survey.b_s = stack_b(survey.b[:,1], survey.con_b, survey.reg_b)
+
         
         
     ### mkdirs 
@@ -214,6 +199,7 @@ class iCSD3d(object):
             self._estimateM0_()
             
         
+        # Create vector with weight (data weigth, constrainsts weight and regularisation weigth)
         if self.x0_prior==True: # if relative smallness 
             self.reg_w_0_b, self.reg_w_0_A = regularize_w(self.surveys[index].reg_A,
                                                           self.wr,
@@ -292,23 +278,6 @@ class iCSD3d(object):
             
         return self.reg_A
                 
-                
-    def _parseDataReg(self):
-        """ Parse data regularisation parameters before inversion
-        """    
-
-    def _parseSolver(self):
-        """ Parse solver used during inversion
-        """    
-        
-    def run_single_TL(self):
-        """Run a time-lapse inversion (unique regularisation weight)
-        Equivalent to several steps::
-            self.prepare4iCSD()
-            self.plotCSD()
-            self.misfit()
-            
-        """
         
     def run_single(self,index=0,showfig=False):
         """Run a single inversion (unique regularisation weight)
@@ -342,14 +311,11 @@ class iCSD3d(object):
                           self.surveys[index].path2load)
         
         self.surveys[index].solution=self.x
-        print(self.surveys[index].solution)
             
         if showfig == True:
             ax, f = self.showResults(index=index)
             # self.RMSAnalysis()
             self.misfit()
-            # print(f)
-            # print(self.path2save)
             # f.savefig(self.path2save+'iCSD', dpi = 600)
             plt.tight_layout()
             plt.show()
@@ -488,11 +454,16 @@ class iCSD3d(object):
                         raise ValueError('weigted TL inversion not yet implemented')
                         # self.run_single_TL()
                 else: #TDIP survey
+                    # if kwargs['index']:
+                    #     self.run_single(index=kwargs['index'])     
+                    # else:
                     for i, survey in enumerate(self.surveys):
                         self.run_single(index=i)     
 
         else:
              self.run_pareto()
+            
+        return self.surveys
              
        
         
@@ -547,6 +518,7 @@ class iCSD3d(object):
                 self.surveys[0]=survey       
         return self.surveys
 
+
     def createTimeLapseSurvey(self,fnames_obs, fnames_sim):
         """Import multiple surveys and return
         a surveys object.
@@ -572,33 +544,45 @@ class iCSD3d(object):
         return self.surveys
 
 
-    def createTDIPSurvey(self,fname_obs,fname_sim):
+    def createTDIPSurvey(self,fname_obs,fname_sim,**kwargs):
         """create TDIP survey and return a survey object.
         
         Parameters
         ----------
         fname : *.bin file containing TDIP infos
         """
+        
+        Vp_norm = True #Apply K geometric factor
+        for key, value in kwargs.items():
+            if key == 'knorm':
+                Vp_norm = value
+                
         print("createTDIPSurvey")
         # read TDIP file
         # normalisation of all Vs by K factor
-        tdip_obs = loadTDIPSurvey(self.dirName + fname_obs,knorm=True) # *.data (pygimli format)
-        tdip_sim = load_sim(self.dirName, fname_sim) #
+        self.Vs, A = loadTDIPSurvey(self.dirName + fname_obs,  self.dirName + fname_sim, 
+                                            Vp_norm=Vp_norm) # *.data (pygimli format)
+        # tdip_sim = load_sim(self.dirName, fname_sim) #
         
-        self.Vs = np.vstack(tdip_obs) 
-        self.Vs = np.transpose(self.Vs) 
+        # self.Vs = np.vstack(tdip_obs) 
+        # self.Vs = np.transpose(self.Vs) 
         
      
         # For now, transform each gates to several surveys as it is done for timelapse icsd
         self.surveys = []
+        print('relaxing CC constrainst for time domain IP')
         for i  in range(self.Vs.shape[1]):
             # survey = iCSD3d(dirName=self.dirName)
+            if i>0:
+                self.wc = 1e-5 # relaxing CC constrainst for time domain IP
+                # self.errRmin=1e2
             survey = copy(self)
+            print(survey.wc)
 
-            if tdip_sim.ndim>1:
-                survey.A=tdip_sim[:,i]
+            if A.ndim>1:
+                survey.A=A[:,i]
             else:
-                survey.A=tdip_sim
+                survey.A=A
             survey.TDIP_flag = True # activate tdip flag
             survey.b=self.Vs[:,i]
             survey.icsd_init(survey)
@@ -608,28 +592,6 @@ class iCSD3d(object):
         
 
 #%% INITIAL MODEL          
-    def _estimateM0_(self,show=True):
-        # self.icsd_init()
-        # self.parseM0(self.method_m0) # define the method to estimate M0
-        # self.physLabel=labels(self.method_m0) # lgd labeling for the plot
-        # if show == True:
-        #     self.showEstimateM0()
-        self.estimateM0(method_m0=self.method_m0)
-
-    def _parseM0_(self,method_m0):
-        """ Parse M0 parameters
-        """
-        for i, survey in enumerate(self.surveys):           
-            if method_m0 is not None:
-                if method_m0=='F1':                     
-                    self.surveys[i].norm_F1, self.surveys[i].x0 = misfitF1_2_initialX0(survey.A,survey.b)
-                elif method_m0=='Pearson': 
-                    self.surveys[i].x0 = product_moment(survey.A,survey.b)
-            elif self.inix0 is not None:
-                if survey.inix0=='cst':
-                    self.surveys[i].x0=np.ones(survey.b.shape)*0.1
-        self.x0 = np.copy(self.surveys[i].x0)
-        return self.surveys[i].x0
             
     def estimateM0(self,method_m0='F1',show=True, ax=None):
         """Estimate initial M0 model for constrainsted inversion
@@ -646,13 +608,37 @@ class iCSD3d(object):
     
         """
         for i, survey in enumerate(self.surveys):
-            m0 = self._parseM0_(method_m0) # define the method to estimate M0
+            print(i)
+            m0 = self._parseM0_(method_m0, index=i) # define the method to estimate M0
             self.surveys[i].physLabel=labels(method_m0) # lgd labeling for the plot
             if show == True:
                 self.showEstimateM0(index=i,ax=ax)
             
         return m0
-        
+
+    def _estimateM0_(self,show=True):
+        self.estimateM0(method_m0=self.method_m0)
+
+    def _parseM0_(self,method_m0, index=0):
+        """ Parse M0 parameters
+        """
+        # for i, survey in enumerate(self.surveys): 
+        #     print(i)
+        survey = self.surveys[index]
+        # print(survey.b[0])
+        if method_m0 is not None:
+            if method_m0=='F1':                     
+                self.surveys[index].norm_F1, self.surveys[index].x0 = misfitF1_2_initialX0(survey.A,survey.b)
+            elif method_m0=='Pearson': 
+                self.surveys[index].x0 = product_moment(survey.A,survey.b)
+        elif self.inix0 is not None:
+            if survey.inix0=='cst':
+                self.surveys[index].x0=np.ones(survey.b.shape)*0.1
+        self.x0 = np.copy(self.surveys[index].x0)
+        return self.surveys[index].x0
+    
+#%% PLOT fcts     
+
     def showEstimateM0(self,index=0,ax=None):
         """Show initial model m0 estimation.
         
@@ -683,27 +669,8 @@ class iCSD3d(object):
         plt.show()
         # plt.close(f)
 
-    def showCurrentStreamlines(self,index=0,ax=None):
-        """Show Current Streamlines.
-        
-        Parameters
-        ----------
-        index : int, optional
-            Index of the survey to plot.
-        ax : Matplotlib.Axes, optional
-            If specified, the graph will be plotted against this axis.
-        """
 
-        # fig, ax = plt.subplots()
-        if self.type=='2d':
-            f = current_streamlines(path)
-        else:
-            print('not yet implemented in 3d')
    
-
-#%% PLOT fcts     
-
-
     def showResults(self, ax=None, data=None, clim=None ,cmap='viridis_r',
                     plotElecs=False,sc=False,retElec=None,
                     mesh=None, gif3d=False, title=None, cut=False,**kwargs):
@@ -745,10 +712,7 @@ class iCSD3d(object):
             if key == 'index':
                 index = value
  
-                
-        # print(ax)
         if data is None:
-            #data = self.x.x
             data = self.surveys[index].solution.x
        
         if self.type=='2d':
@@ -761,7 +725,8 @@ class iCSD3d(object):
                               self.pareto,
                               retElec=None, sc=None,
                               ax=ax, title_wr=self.wr, 
-                              index=index)
+                              index=index,
+                              clim=self.clim)
         else:
             f = plotCSD3d(self.wr, 
                           self.surveys[index].coord,
@@ -784,7 +749,20 @@ class iCSD3d(object):
                              plotElecs=plotElecs, 
                              gif3d = self.surveys[index].gif3d, **kwargs)
         return ax, f
+
+
+    def showCurrentStreamlines(self,index=0,ax=None):
+        """Show Current Streamlines.
         
+        Parameters
+        ----------
+        """
+        if self.type=='2d':
+            print('not yet implemented in 3d')
+            # f = current_streamlines(path)
+        else:
+            print('not yet implemented in 3d')
+            
 #%% POST inversion analysis        
 
     def residualAnalysis(self):

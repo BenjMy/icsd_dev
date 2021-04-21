@@ -27,10 +27,13 @@ def _fig_Interpolation_(ax,coord, data, **kwargs):
                aspect = 'auto', origin = 'lower', cmap= 'jet')
     cbar = plt.colorbar(img,ax=ax, 
                         orientation='vertical',
-                        shrink=0.6)
-    
+                        shrink=0.6)       
+        
     if kwargs.get('clim') is not None:
-        plt.clim(clim[0],clim[1])
+        clim = kwargs.get('clim')
+    else:
+        clim = [min(data), max(data)]
+    img.set_clim(vmin=clim[0], vmax=clim[1])
     
     if kwargs.get('lgd_label') is not None:
         cbar.set_label(kwargs.get('lgd_label'), labelpad = 10)
@@ -55,10 +58,15 @@ def _fig_ReturnElec_(ax,retElec):
     retElecy = float(retElec.split(',')[1])
     plt.plot(retElecx, retElecy,'sw', markersize = 10)
 
-def _fig_VRTe_(ax,coord,data_sol):
+def _fig_VRTe_(ax,coord,data_sol,**kwargs):
     """ plot the VRTe current fractions """
     coord_x, coord_y = parseCoord(coord,dim='2d')
-    norm_z = (data_sol - min(data_sol)) / (max(data_sol) - min(data_sol))
+    
+    if kwargs.get('clim') is not None:
+        clim = kwargs.get('clim')
+        norm_z = (data_sol - clim[0]) / (clim[1] - clim[0])
+    else:
+        norm_z = (data_sol - min(data_sol)) / (max(data_sol) - min(data_sol))
     grey_cm = plt.cm.get_cmap('Greys')
     edgecolor_norm_z = grey_cm(norm_z)
     jet_cm = plt.cm.get_cmap('jet')
@@ -170,6 +178,10 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None,
     self
     """
 
+    clim = None
+    if kwargs.get('clim') is not None:
+        clim = kwargs.get('clim')
+        
     if kwargs.get('index') is not None:
         fig_name = 'CSD 2d T' + str(kwargs.get('index'))
     else:
@@ -184,8 +196,8 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None,
 
 
     
-    _fig_Interpolation_(ax,coord,data_sol)
-    _fig_VRTe_(ax,coord,data_sol)
+    _fig_Interpolation_(ax,coord,data_sol,clim=clim)
+    _fig_VRTe_(ax,coord,data_sol,clim=clim)
     _fig_RealSources_(ax,sc)
     _fig_ReturnElec_(ax,retElec)
     
@@ -405,24 +417,24 @@ def showObs2d(path, ax=None, **kwargs):
     self
     """
     filename='ObsData.txt'
-    
+    clim = None
     if ax==None:
         f = plt.figure('ObsData')
         ax = plt.gca()
     
     if kwargs.get('filename') is not None:
         filename = kwargs.get('filename')
-    
+    if kwargs.get('clim') is not None:
+        clim = kwargs.get('clim')
     if kwargs.get('index') is not None:
         index = kwargs.get('index')
     else: 
         index = 0
-        
-    
+
     RemLineNb, Injection, coordE, pointsE= load_geom(path) # geometry file containing electrodes position includinf remotes 
     data_obs = load_obs(path,filename,index)
     
-    _fig_Interpolation_(ax,pointsE,data_obs,lgd_label='U/I')
+    _fig_Interpolation_(ax,pointsE,data_obs,lgd_label='U/I',clim=clim)
     _fig_VRTe_(ax,pointsE,data_obs)
     # _fig_RealSources_(ax,sc=None)
     # _fig_ReturnElec_(ax,retElec=None)

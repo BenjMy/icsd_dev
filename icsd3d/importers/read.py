@@ -36,16 +36,16 @@ def load_obs(path, filename,index=None):
     ----------
 
     """       
-    if filename.endswith('.data'): #TDIP data importer
+    if filename.endswith('.data'): # TDIP data importer
         bfile = pg.load(filename)
         # b = (bfile['m'+str(index)]).array()
         # # print(str(index)+str(b[0]))
-        import matplotlib.pyplot as plt 
+        # import matplotlib.pyplot as plt 
         # fig, ax = plt.subplots()
         # ax.plot(b)
         b = (bfile['m'+str(index)]/bfile['k']).array()
-        fig, ax = plt.subplots()
-        ax.plot(b)
+        # fig, ax = plt.subplots()
+        # ax.plot(b)
 
     else:
         b = np.loadtxt(path+ filename)
@@ -134,7 +134,7 @@ def load_geom(path):
 #%% UTILS: LOAD from gimli or resipy format         
 
     
-def DataImport(SimFile=None,ObsFile=None):
+def dataImport(SimFile=None,ObsFile=None):
     """Data importer for common data files (Resipy and Gimli)
     Import and parse observation files, simulated file and geometry file
     
@@ -148,27 +148,73 @@ def DataImport(SimFile=None,ObsFile=None):
     if fileExt=='*.data':
         print('resipy format import') 
         
-def loadTDIPSurvey(fname,knorm=True):
-
-    tdip_data = pg.load(fname)
-    i=0 
-    Vs = []
-    if knorm == True:
-        while True:
-            try: 
-              Vs.append(((tdip_data['m'+str(i)])/tdip_data['k']).array())
-              i += 1
-            except:
-             break
-    else:
-        while True:
-            try: 
-              Vs.append((tdip_data['m'+str(i)]).array())
-              i += 1
-            except:
-             break
-    #tdip_data.MA
-    #tdip_data.t
+def loadTDIPSurvey(fname_obs,fname_sim, Vp_norm=True):
+    """Data importer for common data files (Gimli)
+    Import and parse observation files, simulated green fct file
     
-    return Vs
+    Parameters
+    ----------
+    - Vp_norm: True: normalise chargeability by multiplying with Vp
+    Return
+    ----------
+    - Vs containing all gates + utlimate gate is Vp
+    - Vs_green containing all gates + utlimate gate is Vp_green
+    """     
+
+    Vs = []
+    Vs_green = []
+    if isinstance(fname_obs, str):
+        if '.data' in fname_obs:
+            i=0 
+            tdip_obs = pg.load(fname_obs)
+            Vs.append(((tdip_obs['r'])).array())
+            if Vp_norm == True:
+                while True:
+                    try: 
+                      Vs.append(((tdip_obs['m'+str(i)])*tdip_obs['r']).array())
+                      i += 1
+                    except:
+                     break
+            else:
+                while True:
+                    try: 
+                      Vs.append((tdip_obs['m'+str(i)]).array())
+                      i += 1
+                    except:
+                        break
+            Vs = np.vstack(Vs) 
+            Vs = np.transpose(Vs) 
+        
+        if '.dat' in fname_sim:
+            i=0 
+            tdip_sim = pg.load(fname_sim)
+            Vs_green.append(((tdip_sim['r'])).array())
+            if Vp_norm == True:
+                while True:
+                    try: 
+                      Vs_green.append(((tdip_sim['m'+str(i)])*tdip_sim['r']).array())
+                      i += 1
+                    except:
+                     break
+            else:
+                while True:
+                    try: 
+                      Vs_green.append((tdip_sim['m'+str(i)]).array())
+                      i += 1
+                    except:
+                        break
+            Vs_green = np.vstack(Vs_green) 
+            Vs_green = np.transpose(Vs_green) 
+            print(np.shape(Vs_green))
+        else:
+            Vs_green = np.loadtxt(fname_sim)
+            Vs_green = Vs_green*np.ones([i+1,np.shape(Vs_green)[0]])
+            Vs_green = np.transpose(Vs_green) 
+            print(np.shape(Vs_green))
+    else:   
+        print('Can''t import numpy array data')
+
+
+       
+    return Vs, Vs_green
 

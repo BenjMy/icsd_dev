@@ -85,9 +85,16 @@ def obs_w_f(obs_err,b,errRmin,sd_rec=None):
     if obs_err == 'const':
         obs_w = np.ones(b.shape[0])
     elif obs_err == 'sqrt':
+
         obs_w = 1 / np.sqrt(np.abs(b))
-        print('Selfb = 0 could be a problem, check presence of 0 and filter if needed')
-        obs_w[obs_w >= errRmin] = 1    
+        if (b==0).any():
+            print('b = 0 could be a problem, check presence of 0 and filter if needed')
+        
+        if (obs_w >= 10*errRmin).any():
+            print('errRmin not correctly set, adjust')
+
+        obs_w[obs_w >= errRmin] = 1   
+
     elif obs_err == 'reciprocals': #[TO IMPLEMENT]
         obs_w = 1 / np.sqrt(np.abs(sd_rec))
         
