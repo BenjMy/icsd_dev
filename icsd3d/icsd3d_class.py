@@ -135,11 +135,22 @@ class iCSD3d(object):
         #Log transformation before inversion
         if self.logTrans==True:
             # check the min
-            TranslateMIN= np.min(np.array([min(survey.b),min(survey.A)])) 
-            survey.b = np.log(survey.b + 1 - TranslateMIN) # translate, then transform */
-            survey.A = np.log(survey.A+ 1 - TranslateMIN) # translate, then transform */
+            
+            # IF data and model are in the same range
+            # TranslateMIN= np.min(np.array([min(survey.b),min(survey.A)])) 
+            # survey.A = np.log(survey.A + 1 - TranslateMIN) # translate, then transform */
+            # survey.b = np.log(survey.b + 1 - TranslateMIN) # translate, then transform */
 
-           
+            # IF data is very small compare to the model
+
+            TranslateMIN_A= min(survey.A)
+            survey.A = np.log(survey.A+ 1 - TranslateMIN_A) # translate, then transform */
+            TranslateMIN_B= min(survey.b) 
+            survey.b = np.log(survey.b + 1 - TranslateMIN_B) # translate, then transform */
+            
+            print('TO DO need to log-trans data errors as well')
+            # TO DO need to log-trans data errors as well
+
         # load observations electrode coordinates
         if self.plotElecs==True:
             survey.RemLineNb, survey.Injection, survey.coordE, survey.pointsE= load_geom(self.path2load) # geometry file containing electrodes position includinf remotes 
@@ -196,7 +207,7 @@ class iCSD3d(object):
 
         """
         if (self.x0_ini_guess==True or self.x0_prior==True):
-            self._estimateM0_()
+            self._estimateM0_(index=index)
             
         
         # Create vector with weight (data weigth, constrainsts weight and regularisation weigth)
@@ -295,8 +306,7 @@ class iCSD3d(object):
         
         # constrainsted inversion
         if (self.x0_ini_guess == True or self.x0_prior == True):
-            self.x = iCSD(self.x0_ini_guess,
-                          self.A_w,self.b_w,
+            self.x = iCSD(self.A_w,self.b_w,
                           self.type,
                           self.surveys[index].coord,
                           self.surveys[index].path2load,
@@ -304,8 +314,7 @@ class iCSD3d(object):
 
         # UNconstrainsted inversion
         else:
-            self.x = iCSD(self.x0_ini_guess,
-                          self.A_w,self.b_w,
+            self.x = iCSD(self.A_w,self.b_w,
                           self.type,
                           self.surveys[index].coord,
                           self.surveys[index].path2load)
@@ -347,14 +356,13 @@ class iCSD3d(object):
                 # RUN ICSD
                 self.prepare4iCSD()
                 if (self.x0_ini_guess == True or self.x0_prior == True):
-                    self.x = iCSD(self.x0_ini_guess,self.A_w,self.b_w,
+                    self.x = iCSD(self.A_w,self.b_w,
                                   self.type,
                                   self.coord,
                                   self.path2load,
                                   x0=self.x0)
                 else:
-                    self.x = iCSD(self.x0_ini_guess,
-                                  self.A_w,self.b_w,
+                    self.x = iCSD(self.A_w,self.b_w,
                                   self.type,self.surveys[0].coord,
                                   self.surveys[0].path2load)
 
@@ -593,7 +601,7 @@ class iCSD3d(object):
 
 #%% INITIAL MODEL          
             
-    def estimateM0(self,method_m0='F1',show=True, ax=None):
+    def estimateM0(self,method_m0='F1',show=True, ax=None, index=None):
         """Estimate initial M0 model for constrainsted inversion
         
         Parameters
@@ -607,17 +615,20 @@ class iCSD3d(object):
         Returns:
     
         """
-        for i, survey in enumerate(self.surveys):
-            print(i)
-            m0 = self._parseM0_(method_m0, index=i) # define the method to estimate M0
-            self.surveys[i].physLabel=labels(method_m0) # lgd labeling for the plot
-            if show == True:
-                self.showEstimateM0(index=i,ax=ax)
+        if index is not None:
+            m0 = self._parseM0_(method_m0, index=index) # define the method to estimate M0
+            self.surveys[index].physLabel=labels(method_m0) # lgd labeling for the plot
+        else:
+            for i, survey in enumerate(self.surveys):
+                m0 = self._parseM0_(method_m0, index=i) # define the method to estimate M0
+                self.surveys[i].physLabel=labels(method_m0) # lgd labeling for the plot
+                if show == True:
+                    self.showEstimateM0(index=i,ax=ax)
             
         return m0
 
-    def _estimateM0_(self,show=True):
-        self.estimateM0(method_m0=self.method_m0)
+    def _estimateM0_(self,show=True, index=None):
+        self.estimateM0(method_m0=self.method_m0, index=index)
 
     def _parseM0_(self,method_m0, index=0):
         """ Parse M0 parameters
@@ -627,8 +638,14 @@ class iCSD3d(object):
         survey = self.surveys[index]
         # print(survey.b[0])
         if method_m0 is not None:
-            if method_m0=='F1':                     
-                self.surveys[index].norm_F1, self.surveys[index].x0 = misfitF1_2_initialX0(survey.A,survey.b)
+            if method_m0=='F1':  
+                # survey.path2load = self.dirName
+                # survey.RemLineNb, survey.Injection, survey.coordE, survey.pointsE= load_geom(survey.path2load) # geometry file containing electrodes position includinf remotes
+                # idelec = np.arange(0,72)
+                # idelec = np.delete(idelec,[41,42,52,61,62,71,70,69])
+                #42,43,53,62,63
+                self.surveys[index].norm_F1, self.surveys[index].x0 = misfitF1_2_initialX0(survey.A,survey.b) #,[survey.coordE[idelec], survey.coord])
+                # self.surveys[index].x0, self.surveys[index].norm_F1 = misfitF1_2_initialX0(survey.A,survey.b)
             elif method_m0=='Pearson': 
                 self.surveys[index].x0 = product_moment(survey.A,survey.b)
         elif self.inix0 is not None:

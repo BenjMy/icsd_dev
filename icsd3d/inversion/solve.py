@@ -11,7 +11,7 @@ from exporters.save import export_sol
 
 #%% Solve linear system Ax=b
 
-def iCSD(x0_ini_guess,A_w,b_w,dim,coord,path,**kwargs):
+def iCSD(A_w,b_w,dim,coord,path,**kwargs):
     """
     Solve linear system, given weigted A matrix (VRTe, constrain, regul) and weigted b (observations).
 
@@ -51,6 +51,9 @@ def iCSD(x0_ini_guess,A_w,b_w,dim,coord,path,**kwargs):
         # TO IMPLEMENT RETURN JAC Matrice to evaluate MALM sensitivity
     else:
         # Initial guess x0 use least_squares solver
+        # import matplotlib.pyplot as plt
+        # plt.figure()
+        # plt.plot(kwargs.get('x0'))
         a = A_w 
         b = b_w
         def func(x, a, b):
@@ -85,14 +88,11 @@ def obs_w_f(obs_err,b,errRmin,sd_rec=None):
     if obs_err == 'const':
         obs_w = np.ones(b.shape[0])
     elif obs_err == 'sqrt':
-
         obs_w = 1 / np.sqrt(np.abs(b))
         if (b==0).any():
             print('b = 0 could be a problem, check presence of 0 and filter if needed')
-        
         if (obs_w >= 10*errRmin).any():
             print('errRmin not correctly set, adjust')
-
         obs_w[obs_w >= errRmin] = 1   
 
     elif obs_err == 'reciprocals': #[TO IMPLEMENT]

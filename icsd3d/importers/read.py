@@ -164,15 +164,22 @@ def loadTDIPSurvey(fname_obs,fname_sim, Vp_norm=True):
     Vs = []
     Vs_green = []
     if isinstance(fname_obs, str):
-        if '.data' in fname_obs:
-            i=0 
+        if '.dat' in fname_obs:
+            i=1 
+            print('import obs')
             tdip_obs = pg.load(fname_obs)
             Vs.append(((tdip_obs['r'])).array())
             if Vp_norm == True:
+                # print('import obs')
+                # print(tdip_obs['M'+str(i)])
                 while True:
                     try: 
-                      Vs.append(((tdip_obs['m'+str(i)])*tdip_obs['r']).array())
+                      try:
+                          Vs.append(((tdip_obs['M'+str(i)])*tdip_obs['r']).array())
+                      except:
+                          Vs.append(((tdip_obs['m'+str(i)])*tdip_obs['r']).array())
                       i += 1
+                      print(i)
                     except:
                      break
             else:
@@ -186,7 +193,7 @@ def loadTDIPSurvey(fname_obs,fname_sim, Vp_norm=True):
             Vs = np.transpose(Vs) 
         
         if '.dat' in fname_sim:
-            i=0 
+            i=1
             tdip_sim = pg.load(fname_sim)
             Vs_green.append(((tdip_sim['r'])).array())
             if Vp_norm == True:
