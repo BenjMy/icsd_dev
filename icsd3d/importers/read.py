@@ -165,13 +165,13 @@ def loadTDIPSurvey(fname_obs,fname_sim, Vp_norm=True):
     Vs_green = []
     if isinstance(fname_obs, str):
         if '.dat' in fname_obs:
-            i=1 
+            i=0 
             print('import obs')
             tdip_obs = pg.load(fname_obs)
             Vs.append(((tdip_obs['r'])).array())
+            # print(np.shape(Vs))
             if Vp_norm == True:
                 # print('import obs')
-                # print(tdip_obs['M'+str(i)])
                 while True:
                     try: 
                       try:
@@ -179,7 +179,8 @@ def loadTDIPSurvey(fname_obs,fname_sim, Vp_norm=True):
                       except:
                           Vs.append(((tdip_obs['m'+str(i)])*tdip_obs['r']).array())
                       i += 1
-                      print(i)
+                      # print(i)
+                      # print(np.shape(Vs))
                     except:
                      break
             else:
@@ -190,10 +191,10 @@ def loadTDIPSurvey(fname_obs,fname_sim, Vp_norm=True):
                     except:
                         break
             Vs = np.vstack(Vs) 
-            Vs = np.transpose(Vs) 
-        
+            Vs = np.transpose(Vs)
+
         if '.dat' in fname_sim:
-            i=1
+            i=0
             tdip_sim = pg.load(fname_sim)
             Vs_green.append(((tdip_sim['r'])).array())
             if Vp_norm == True:
@@ -212,12 +213,12 @@ def loadTDIPSurvey(fname_obs,fname_sim, Vp_norm=True):
                         break
             Vs_green = np.vstack(Vs_green) 
             Vs_green = np.transpose(Vs_green) 
-            print(np.shape(Vs_green))
+            # print(np.shape(Vs_green))
         else:
             Vs_green = np.loadtxt(fname_sim)
             Vs_green = Vs_green*np.ones([i+1,np.shape(Vs_green)[0]])
             Vs_green = np.transpose(Vs_green) 
-            print(np.shape(Vs_green))
+            # print(np.shape(Vs_green))
     else:   
         print('Can''t import numpy array data')
 

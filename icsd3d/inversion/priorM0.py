@@ -19,29 +19,32 @@ def _normF1(A,b,**kwargs):
         F1i = LA.norm((b-A[:,i]))# norm between observation and simulated current source i
         F1.append(F1i)
         
-        # kwargs['TEST']
-        # if i in np.arange(0,len(TEST[1][:,0]),2):
-        #     fig, axs = plt.subplots(1, 2, figsize=(20,5))
-        #     # axs[0].plot(A[:,i])
-        #     # axs[0].set_title('A[:,i]')
-        #     # axs[0].legend(['b:'+ str(b[0])+ '  A: ' + str(A[1,i])])
-        #     # axs[1].plot(b)
-        #     # axs[1].set_title('b' + str(i))
-
-        #     sc=axs[0].scatter(TEST[0][:,1], TEST[0][:,2], c=b,
-        #                   cmap ='coolwarm',s=200) 
-        #     axs[0].set_ylabel('y [m]',fontsize=15)
-        #     axs[0].set_xlabel('x [m]',fontsize=15)
-        #     axs[0].set_title('b: ' + str(b[0]))
-        #     cbar = plt.colorbar(sc,ax=axs[0])
-            
-        #     sc=axs[1].scatter(TEST[0][:,1], TEST[0][:,2], c=A[:,i],
-        #                   cmap ='coolwarm',s=200)    #vmin=-200,vmax=200)            
-        #     axs[1].scatter(TEST[1][i,0], TEST[1][i,1], c='g')
-        #     axs[1].set_ylabel('y [m]',fontsize=15)
-        #     axs[1].set_xlabel('x [m]',fontsize=15)
-        #     axs[1].set_title('A[:,i], i=' + str(i) + '  A0:' + str(A[0,i]))
-        #     cbar = plt.colorbar(sc,ax=axs[1])
+        for key, value in kwargs.items():
+            if key == 'int_plot':
+                TEST = value
+                
+            # if i in np.arange(5,len(TEST[1][:,0]),50):
+            #     fig, axs = plt.subplots(1, 2, figsize=(20,5))
+            #     # axs[0].plot(A[:,i])
+            #     # axs[0].set_title('A[:,i]')
+            #     # axs[0].legend(['b:'+ str(b[0])+ '  A: ' + str(A[1,i])])
+            #     # axs[1].plot(b)
+            #     # axs[1].set_title('b' + str(i))
+    
+            #     sc=axs[0].scatter(TEST[0][:,1], TEST[0][:,2], c=b,
+            #                   cmap ='coolwarm',s=200) 
+            #     axs[0].set_ylabel('y [m]',fontsize=15)
+            #     axs[0].set_xlabel('x [m]',fontsize=15)
+            #     axs[0].set_title('b: ' + str(b[0]))
+            #     cbar = plt.colorbar(sc,ax=axs[0])
+                
+            #     sc=axs[1].scatter(TEST[0][:,1], TEST[0][:,2], c=A[:,i],
+            #                   cmap ='coolwarm',s=200)    #vmin=-200,vmax=200)            
+            #     axs[1].scatter(TEST[1][i,0], TEST[1][i,1], c='g')
+            #     axs[1].set_ylabel('y [m]',fontsize=15)
+            #     axs[1].set_xlabel('x [m]',fontsize=15)
+            #     axs[1].set_title('A[:,i], i=' + str(i) + '  A0:' + str(A[0,i]))
+            #     cbar = plt.colorbar(sc,ax=axs[1])
 
          
     # normalise such as the sum is equal to 1 for current conservation
@@ -60,9 +63,13 @@ def _normF1(A,b,**kwargs):
 def misfitF1_2_initialX0(A,b,**kwargs):
     """Transform the misfit F1 (punctual source inversion) to an initial solution M0  
     using a 1/x^2 transformation"""
-    
-    # kwargs['TEST']
-    norm_F1 = _normF1(A,b)
+
+    int_plot=None
+    for key, value in kwargs.items():
+        if key == 'int_plot':
+            int_plot = value
+                
+    norm_F1 = _normF1(A,b,int_plot=int_plot)
     # df = pd.DataFrame(data, columns = ['First Column Name','Second Column Name',...])
 
 

@@ -227,9 +227,8 @@ def regularize_w(reg_A,wr,x0_prior,**kwargs):
     .. math :: A = (G'*Wd*G + lambda*Wm)  
                b = G'*Wd*d + lambda*Wm*m0;   
      """
-
     if x0_prior==True:
-        
+
         print('reg Wm (smallness + spatial reg) * lambda=' + str(wr))
         reg_w_0_b = np.ones(reg_A.shape[0]) * kwargs.get('x0') * wr
         reg_w_0_A = np.ones(reg_A.shape[0])* wr

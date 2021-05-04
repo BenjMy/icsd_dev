@@ -70,6 +70,7 @@ class iCSD3d(object):
 
         # tdip option
         self.TDIP_flag=False # import tdip data
+        # self.sequential=False #if True run a sequential inversion using previsous gate as reference model m0
 
 
         # mesh type
@@ -206,27 +207,30 @@ class iCSD3d(object):
         (data weigth, constrainsts weight and regularisation weigth)
 
         """
-        if (self.x0_ini_guess==True or self.x0_prior==True):
+        if (self.surveys[index].x0_ini_guess==True or self.surveys[index].x0_prior==True):
             self._estimateM0_(index=index)
             
-        
+        # print(self.alphax0)
+        # print(self.x0)
         # Create vector with weight (data weigth, constrainsts weight and regularisation weigth)
-        if self.x0_prior==True: # if relative smallness 
+        if self.surveys[index].x0_prior==True: # if relative smallness 
+            # print('len(self.x0)')
+            # print(len(self.x0))
             self.reg_w_0_b, self.reg_w_0_A = regularize_w(self.surveys[index].reg_A,
                                                           self.wr,
-                                                          self.x0_prior,
+                                                          self.surveys[index].x0_prior,
                                                           x0=self.x0)
             
             # stack weight matrix
             self.W_s_A, self.W_s_b = stack_w(self.surveys[index].obs_w, 
                                              self.surveys[index].con_w, 
-                                             self.x0_prior, 
+                                              self.surveys[index].x0_prior, 
                                              reg_w_0_A=self.reg_w_0_A, 
                                              reg_w_0_b=self.reg_w_0_b)
 
             # apply weight to A and b (data weigth, constrainsts weight and regularisation weigth)
-            self.A_w = weight_A(self.x0_prior,self.surveys[index].A_s,W_s_A=self.W_s_A)
-            self.b_w = weight_b(self.x0_prior,self.surveys[index].b_s,W_s_b=self.W_s_b)
+            self.A_w = weight_A(self.surveys[index].x0_prior,self.surveys[index].A_s,W_s_A=self.W_s_A)
+            self.b_w = weight_b(self.surveys[index].x0_prior,self.surveys[index].b_s,W_s_b=self.W_s_b)
 
         else:
             self.reg_w = regularize_w(self.surveys[index].reg_A,
@@ -281,6 +285,7 @@ class iCSD3d(object):
             
                     
         if self.alphaSxy==True: # anisotropic smoothing
+            # print(self.alphax0)
             self.reg_smallx0 = ponderate_smallnessX0(self.alphaSxy,self.alphax0,reg_Ax=self.reg_Ax)
             self.reg_A = sum_smallness_smoothness(self.alphaSxy,self.x0_prior,reg_smallx0=self.reg_smallx0, reg_Ax=self.reg_Ax, reg_Ay=self.reg_Ay)
         else:
@@ -289,7 +294,44 @@ class iCSD3d(object):
             
         return self.reg_A
                 
+    def run_all_gates(self,showfig=False):
+        """ stack all the IP gates and invert simultaneously # Not tested 
+        """
+        # stack A and b
+
+        self.prepare4iCSD(index=0)
+        A_all_gates = self.A_w
+        b_all_gates = self.b_w        
+        for i in range(len(self.surveys)):
+            # print(i)
+            self.prepare4iCSD(index=i)
+            A_all_gates = np.vstack([A_all_gates,self.A_w])
+            b_all_gates = np.hstack([b_all_gates,self.b_w])
+
+        # constrainsted inversion
+        # if (self.x0_ini_guess == True or self.x0_prior == True):
+        #     self.x = iCSD(self.A_w,self.b_w,
+        #                   self.type,
+        #                   self.surveys[index].coord,
+        #                   self.surveys[index].path2load,
+        #                   x0=self.x0)
+
+        # UNconstrainsted inversion
+        # else:
+        self.x = iCSD(A_all_gates,b_all_gates,
+                      self.type,
+                      self.surveys[0].coord,
+                      self.surveys[0].path2load)
+
+        i_end = len(self.b_w)
+        i_s = 0
+        for i in range(len(self.surveys)):
+            self.surveys[i].solution=self.x
+            self.surveys[i].solution.x=self.x.x[i_s:i_end]
+            i_s = len(self.b_w)*(i+1) 
+            i_end = len(self.b_w)*(i+2)               
         
+
     def run_single(self,index=0,showfig=False):
         """Run a single inversion (unique regularisation weight)
         Equivalent to several steps::
@@ -299,13 +341,14 @@ class iCSD3d(object):
             
         """
         print('run_single i=' + str(index))
-        if not hasattr(self.surveys[index], 'A'):
-            self.icsd_init(self.surveys[index])
+        if not hasattr(self.surveys[index], 'A'): # if A matrix does not exist
+            self.icsd_init(self.surveys[index])          
             
         self.prepare4iCSD(index=index)
         
         # constrainsted inversion
-        if (self.x0_ini_guess == True or self.x0_prior == True):
+        if (self.surveys[index].x0_ini_guess == True or self.surveys[index].x0_prior == True):
+            print('constrainsted inversion')
             self.x = iCSD(self.A_w,self.b_w,
                           self.type,
                           self.surveys[index].coord,
@@ -314,6 +357,7 @@ class iCSD3d(object):
 
         # UNconstrainsted inversion
         else:
+            print('UNconstrainsted inversion')
             self.x = iCSD(self.A_w,self.b_w,
                           self.type,
                           self.surveys[index].coord,
@@ -462,11 +506,27 @@ class iCSD3d(object):
                         raise ValueError('weigted TL inversion not yet implemented')
                         # self.run_single_TL()
                 else: #TDIP survey
-                    # if kwargs['index']:
-                    #     self.run_single(index=kwargs['index'])     
-                    # else:
-                    for i, survey in enumerate(self.surveys):
-                        self.run_single(index=i)     
+                    if 'index' in kwargs:
+                        self.run_single(index=kwargs['index']) 
+                    elif 'simultaneous' in kwargs: # stack all the gates and invert simultaneously
+                        self.run_all_gates() 
+                    elif 'sequential' in kwargs: # use previous time steps/ IP gates as initial model m0
+                        for i, survey in enumerate(self.surveys):
+                            if i==0:
+                                self.run_single(index=i)   
+                            else:
+                                # self.sequential = True 
+                                self.surveys[i].x0_ini_guess = True
+                                self.surveys[i].x0_prior = True
+                                # print('change alpha value')
+                                # self.alphax0 = 100
+                                # self.TDIP_flag = True
+                                # self.icsd_init(self.surveys[i])
+                                self.x0 = self.surveys[0].solution.x
+                                self.run_single(index=i)   
+                    else:
+                        for i, survey in enumerate(self.surveys):
+                            self.run_single(index=i)   
 
         else:
              self.run_pareto()
@@ -639,12 +699,13 @@ class iCSD3d(object):
         # print(survey.b[0])
         if method_m0 is not None:
             if method_m0=='F1':  
-                # survey.path2load = self.dirName
-                # survey.RemLineNb, survey.Injection, survey.coordE, survey.pointsE= load_geom(survey.path2load) # geometry file containing electrodes position includinf remotes
-                # idelec = np.arange(0,72)
+                survey.path2load = self.dirName
+                survey.RemLineNb, survey.Injection, survey.coordE, survey.pointsE= load_geom(survey.path2load) # geometry file containing electrodes position includinf remotes
+                idelec = np.arange(0,len(survey.coordE))
                 # idelec = np.delete(idelec,[41,42,52,61,62,71,70,69])
+                idelec = np.delete(idelec,[71,70,69])
                 #42,43,53,62,63
-                self.surveys[index].norm_F1, self.surveys[index].x0 = misfitF1_2_initialX0(survey.A,survey.b) #,[survey.coordE[idelec], survey.coord])
+                self.surveys[index].norm_F1, self.surveys[index].x0 = misfitF1_2_initialX0(survey.A,survey.b,int_plot=[survey.coordE[idelec], survey.coord])
                 # self.surveys[index].x0, self.surveys[index].norm_F1 = misfitF1_2_initialX0(survey.A,survey.b)
             elif method_m0=='Pearson': 
                 self.surveys[index].x0 = product_moment(survey.A,survey.b)
