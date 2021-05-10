@@ -45,7 +45,7 @@ def iCSD(A_w,b_w,dim,coord,path,**kwargs):
 
     if kwargs.get('x0') is None:
         # No initial guess use lsq_linear solver
-        x = lsq_linear(A_w, b_w, bounds = (0, 1))
+        x = lsq_linear(A_w, b_w, bounds = (0, 1), verbose=0)
         print('*' * 20)
         print('CURRENT Sum=' + str(np.sum(x.x)))
         # TO IMPLEMENT RETURN JAC Matrice to evaluate MALM sensitivity

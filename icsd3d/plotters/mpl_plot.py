@@ -169,7 +169,7 @@ def plotFIT(b,b_w,xfun,path):
     plt.show()
 
     
-def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, 
+def plotCSD2d(coord,data_sol,b,b_w,path,pareto,retElec=None, sc=None, 
               ax=None, **kwargs):
     """ Plot CSD in 2d, using matplotlib and scipy interpolation
     
@@ -193,9 +193,7 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None,
         ax = plt.gca()
     else:
         f = plt.gcf()
-
-
-    
+ 
     _fig_Interpolation_(ax,coord,data_sol,clim=clim)
     _fig_VRTe_(ax,coord,data_sol,clim=clim)
     _fig_RealSources_(ax,sc)
@@ -209,6 +207,9 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None,
         _fig_Axis_Labels_(ax,title)
 
     return f, ax
+
+    if kwargs.get('xfun') is not None:
+            xfun=kwargs.get('xfun')
 
     if not pareto:
         plotFIT(b,b_w,xfun,path)

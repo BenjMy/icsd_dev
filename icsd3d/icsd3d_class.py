@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 from scipy.optimize import lsq_linear, least_squares
+from scipy.linalg import block_diag
 
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.colors import LogNorm
@@ -101,7 +102,7 @@ class iCSD3d(object):
         self.mesh=None # mesh3d .vtk to plot with the results of icsd
 
         # IMPLEMENT obs_err based on reciprocal analysis i.e. estimated standard deviation of the data errors;                         % estimated standard deviation of the traveltime data errors
-
+        # self.solution=None
         # processing outputs [To write]
         # self.models = []
         # self.rmses = []
@@ -302,12 +303,22 @@ class iCSD3d(object):
         self.prepare4iCSD(index=0)
         A_all_gates = self.A_w
         b_all_gates = self.b_w        
-        for i in range(len(self.surveys)):
+
+        idx = np.hstack([0, np.arange(1,len(self.surveys),2)])
+
+        # for i in range(1,len(self.surveys),2):
+        for i in idx:
+        # gateid = [1,2,3,8,16,20]
+        # gateid = [1,2]
+        # for i in gateid:
             # print(i)
             self.prepare4iCSD(index=i)
-            A_all_gates = np.vstack([A_all_gates,self.A_w])
+            A_all_gates = block_diag(A_all_gates,self.A_w)
             b_all_gates = np.hstack([b_all_gates,self.b_w])
 
+        # print(np.shape(A_all_gates))
+        # print(np.shape(b_all_gates))
+        
         # constrainsted inversion
         # if (self.x0_ini_guess == True or self.x0_prior == True):
         #     self.x = iCSD(self.A_w,self.b_w,
@@ -318,19 +329,65 @@ class iCSD3d(object):
 
         # UNconstrainsted inversion
         # else:
-        self.x = iCSD(A_all_gates,b_all_gates,
+        xsol = iCSD(A_all_gates,b_all_gates,
                       self.type,
                       self.surveys[0].coord,
                       self.surveys[0].path2load)
 
-        i_end = len(self.b_w)
+    
+        # split system to recover the solution for each gate
         i_s = 0
-        for i in range(len(self.surveys)):
-            self.surveys[i].solution=self.x
-            self.surveys[i].solution.x=self.x.x[i_s:i_end]
-            i_s = len(self.b_w)*(i+1) 
-            i_end = len(self.b_w)*(i+2)               
+        i_end = np.shape(self.A_w)[1]
+
+        # xsol_new = {}
+
+        # for i in range(0,3):
+
+        #     xsol_new[i] = xsol
+        #     xsol_new[i].x_split = xsol.x[i_s:i_end]
+        #     i_s = np.shape(self.A_w)[1]*(i+1) 
+        #     i_end = np.shape(self.A_w)[1]*(i+2)  
+            
+
+        # sol_backup = deepcopy(self.surveys[0])
+        xsol_backup = deepcopy(xsol)
+        # sol_backup.tmp = xsol
+        # sol_backup.tmp.xsol = xsol.x
+        # print(xsol)
+        # print(self.surveys[i].solution)
+
+        # for i in range(1,len(self.surveys),2):
+        for i in idx:
+            print(i)
+            xsol_backup = deepcopy(xsol)
+            xsol_backup.x = deepcopy(xsol.x)
+            # print(len(xsol.x))
+            # print(len(xsol_backup.x))
+            # print(self.surveys[i])
+            setattr(self.surveys[i], "solution", xsol_backup)
+            setattr(self.surveys[i].solution, "x", xsol_backup.x[i_s:i_end])
+            # print(xsol_backup.x)
+            # print(len(xsol_backup.x))
+            # print(i_s,i_end)
+            # print(xsol_backup.x[i_s:i_end])
+            # print(self.surveys[i].solution.xtest)
+            i_s = np.shape(self.A_w)[1]*(i+1) 
+            i_end = np.shape(self.A_w)[1]*(i+2)  
+            # del sol_backup
+            print(self.surveys[i].solution.x)
         
+        
+        # for i in range(0,3):
+        #     self.surveys[i].solution.x = sol_backup[i].solution.x 
+        #     # self.surveys[i].solution.x=sol_backup.x[:i_end]
+        #     self.surveys[i].solution.x = sol_backup[i].solution.x[i_s:i_end]
+        #     print(self.surveys[i].solution.x)
+        #     print(i)
+        #     print(sol_backup.x)
+
+            # i_s = np.shape(self.A_w)[1]*(i+1) 
+            # i_end = np.shape(self.A_w)[1]*(i+2)               
+        # del sol_backup
 
     def run_single(self,index=0,showfig=False):
         """Run a single inversion (unique regularisation weight)
@@ -415,7 +472,6 @@ class iCSD3d(object):
                     self.f, _ = plotCSD2d(self.surveys[0].coord,self.x.x,
                                           self.surveys[0].b,
                                           self.b_w,
-                                       self.x.fun,
                                        self.surveys[0].path2load,
                                        self.pareto,
                                        retElec=None, sc=None, 
@@ -798,7 +854,6 @@ class iCSD3d(object):
                               data,
                               self.surveys[index].b,
                               self.b_w,
-                              self.x.fun,
                               self.surveys[index].path2load,
                               self.pareto,
                               retElec=None, sc=None,
