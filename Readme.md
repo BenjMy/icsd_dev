@@ -1,6 +1,11 @@
 Current source density inversion for imaging of plant roots
 ===
 
+### Online documentation
+
+https://benjmy.github.io/icsd_dev/
+
+
 ## icsd_class
 
 actual code for the iCSD
