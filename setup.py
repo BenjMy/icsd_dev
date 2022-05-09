@@ -4,7 +4,7 @@ with open("Readme.md", "r") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="icsd_dev",
+    name="icsd3d",
     version="0.0.1",
     author="B. Mary",
     author_email="bmary@lbl.gov",
