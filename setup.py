@@ -1,24 +1,34 @@
-import setuptools
+#!/usr/bin/env python
+# import os
+# import glob
 
-with open("Readme.md", "r") as f:
-    long_description = f.read()
+from setuptools import setup, find_packages
 
-setuptools.setup(
-    name="icsd3d",
-    version="0.0.1",
-    author="B. Mary",
-    author_email="bmary@lbl.gov",
-    description="Python package for managing icsd processing, and visualization",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    url="https://github.com/BenjMy/icsd_dev",
-    packages=setuptools.find_packages(),
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GNU Lesser General Public License " + "v3 (LGPLv3)",
-        "Intended Audience :: Science/Research",
-        "Operating System :: OS Independent",
-    ],
-    python_requires='>=3.9',
-    install_requires=["numpy", "pandas", "pyvista"]
-) 
+version_long = '0.2.0.dev0'
+
+if __name__ == '__main__':
+    setup(
+        name='icsd3d',
+        version=version_long,
+        description='Inversion of current source density',
+        long_description=open('Readme.md', 'r').read(),
+        long_description_content_type="text/markdown",
+        author='Benjamin Mary',
+        author_email='benjamn.mary@unipd.it',
+        license='MIT',
+        # url='https://github.com/geophysics-ubonn/reda',
+        packages=find_packages("icsd3d"),
+        package_dir={'': 'icsd3d'},
+        install_requires=[
+            'scipy',
+            'numpy',
+            'matplotlib',
+            'kneed',
+            'pyvista',
+        ],
+        # classifiers=(
+        #     "Programming Language :: Python :: 3",
+        #     "License :: OSI Approved :: MIT License",
+        #     "Operating System :: OS Independent",
+        # ),
+    )

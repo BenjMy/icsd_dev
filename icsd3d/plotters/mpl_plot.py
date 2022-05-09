@@ -25,15 +25,20 @@ def _fig_Interpolation_(ax,coord, data, **kwargs):
     img = ax.imshow(grid,
                extent = (min (coord_x), max(coord_x), min(coord_y), max(coord_y)),
                aspect = 'auto', origin = 'lower', cmap= 'jet')
-    cbar = plt.colorbar(img,ax=ax, orientation='vertical')
+    cbar = plt.colorbar(img,ax=ax, 
+                        orientation='vertical',
+                        shrink=0.6)       
+        
+    if kwargs.get('clim') is not None:
+        clim = kwargs.get('clim')
+    else:
+        clim = [min(data), max(data)]
+    img.set_clim(vmin=clim[0], vmax=clim[1])
     
-    # if kwargs.get('clim') is not None:
-    #     plt.clim(clim[0],clim[1])
-    
-    # if kwargs.get('lgd_label') is not None:
-    #     cbar.set_label(kwargs.get('lgd_label'), labelpad = 10)
-    # else:
-    #     cbar.set_label('Fraction of Current Source', labelpad = 10)
+    if kwargs.get('lgd_label') is not None:
+        cbar.set_label(kwargs.get('lgd_label'), labelpad = 10)
+    else:
+        cbar.set_label('Fraction of Current Source', labelpad = 10)
 
 def _fig_RealSources_(ax,sc):
     """ add known point sources if present """
@@ -44,7 +49,7 @@ def _fig_RealSources_(ax,sc):
         sy = float(s.split(',')[1])
         ax.plot(sx, sy,'ow', markersize = 10, markeredgecolor = 'k')
 
-def _fig_ReturnElec_(retElec):
+def _fig_ReturnElec_(ax,retElec):
     """ plot the return electrode """
     if retElec == None:
         return
@@ -53,10 +58,15 @@ def _fig_ReturnElec_(retElec):
     retElecy = float(retElec.split(',')[1])
     plt.plot(retElecx, retElecy,'sw', markersize = 10)
 
-def _fig_VRTe_(ax,coord,data_sol):
-    """ plot the VRTe current franctions """
+def _fig_VRTe_(ax,coord,data_sol,**kwargs):
+    """ plot the VRTe current fractions """
     coord_x, coord_y = parseCoord(coord,dim='2d')
-    norm_z = (data_sol - min(data_sol)) / (max(data_sol) - min(data_sol))
+    
+    if kwargs.get('clim') is not None:
+        clim = kwargs.get('clim')
+        norm_z = (data_sol - clim[0]) / (clim[1] - clim[0])
+    else:
+        norm_z = (data_sol - min(data_sol)) / (max(data_sol) - min(data_sol))
     grey_cm = plt.cm.get_cmap('Greys')
     edgecolor_norm_z = grey_cm(norm_z)
     jet_cm = plt.cm.get_cmap('jet')
@@ -109,7 +119,7 @@ def plotRemotes(path,dim,pltRemotes=False):
 #%% Specific plot functions for ICSD outputs
 
 def plotPareto(wr,pareto_list_FitRes,pareto_list_RegRes,IdPtkneew,path):
-    p, ax = plt.subplots('L-curve')
+    p, ax = plt.subplots() #'L-curve'
     # ax.annotate('Wr=' + str(int(wr)), xy=(float(np.asarray(pareto_list_FitRes)[IdPtkneew]), 
     #                                  float(np.asarray(pareto_list_RegRes)[IdPtkneew])), 
     #                               xytext=(float(np.asarray(pareto_list_FitRes)[IdPtkneew])+max(pareto_list_FitRes)/3, 
@@ -159,7 +169,8 @@ def plotFIT(b,b_w,xfun,path):
     plt.show()
 
     
-def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, ax=None, **kwargs):
+def plotCSD2d(coord,data_sol,b,b_w,path,pareto,retElec=None, sc=None, 
+              ax=None, **kwargs):
     """ Plot CSD in 2d, using matplotlib and scipy interpolation
     
     Parameters
@@ -167,20 +178,38 @@ def plotCSD2d(coord,data_sol,b,b_w,xfun,path,pareto,retElec=None, sc=None, ax=No
     self
     """
 
+    clim = None
+    if kwargs.get('clim') is not None:
+        clim = kwargs.get('clim')
+        
+    if kwargs.get('index') is not None:
+        fig_name = 'CSD 2d T' + str(kwargs.get('index'))
+    else:
+        fig_name = 'CSD 2d'
+            
     if ax==None:
+        
         f = plt.figure('CSD 2d')
         ax = plt.gca()
-        
-    _fig_Interpolation_(ax,coord,data_sol)
-    _fig_VRTe_(ax,coord,data_sol)
+    else:
+        f = plt.gcf()
+ 
+    _fig_Interpolation_(ax,coord,data_sol,clim=clim)
+    _fig_VRTe_(ax,coord,data_sol,clim=clim)
     _fig_RealSources_(ax,sc)
-    _fig_ReturnElec_(retElec)
+    _fig_ReturnElec_(ax,retElec)
     
     if kwargs.get('title_wr') is not None:
-        title=r'$\lambda$=' + str(kwargs.get('title_wr') )
+        if kwargs.get('index') is not None:
+            title=fig_name + r'  $\lambda$=' + str(kwargs.get('title_wr') )
+        else:
+            title=r'$\lambda$=' + str(kwargs.get('title_wr') )
         _fig_Axis_Labels_(ax,title)
 
     return f, ax
+
+    if kwargs.get('xfun') is not None:
+            xfun=kwargs.get('xfun')
 
     if not pareto:
         plotFIT(b,b_w,xfun,path)
@@ -255,7 +284,7 @@ def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,ax=None,title=None,pltRemo
    
     plt.show()
     
-    return f
+    return ax
        
         
 #%% Generic plot functions
@@ -265,10 +294,11 @@ def scatter2d(coord, data, label, path, filename, pltRemotes=False, ax=None, **k
       
     coord_x, coord_y = parseCoord(coord,dim='2d')
 
-    f = plt.figure('volume')
+    #f = plt.figure('volume')
     
     if ax==None:
-        print('ax = None')
+       f = plt.figure('volume')
+       print('ax = None')
         
     step=(max(coord_x)-min(coord_x))/10
     xlin=np.arange(min(coord_x),max(coord_x),step)
@@ -289,7 +319,7 @@ def scatter2d(coord, data, label, path, filename, pltRemotes=False, ax=None, **k
     plt.savefig(path+  filename + '_icsd_scatter.png' , dpi=550,bbox_inches='tight',pad_inches = 0)
     plt.show()
     
-    return f
+    return ax
         
 
 def scatter3d(coord, data, label, path, filename, pltRemotes=False, ax=None, **kwargs):
@@ -338,22 +368,37 @@ def labels(method):
     return physLabel
             
             
-def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None, **kwargs):
+def plotContour2d(coord,data_sol,physLabel,path,retElec=None, 
+                  sc=None,ax=None, 
+                  **kwargs):
     """ Plot contour in 2d, using matplotlib and scipy interpolation
     
     Parameters
     ------------
     self
     """
-    f = plt.figure('2d')
-    ax = plt.gca()
+    
+    if kwargs.get('fig_name') is not None:
+        fig_name = kwargs.get('fig_name')
+    else:
+        fig_name = '2d'
+    
+    if kwargs.get('index') is not None:
+        fig_name += '  T' + str(kwargs.get('index'))
+        # print(fig_name)
 
-    # _fig_Interpolation_(coord,data_sol,lgd_label=physLabel)
+    if ax==None:
+        f = plt.figure(fig_name)
+        ax = plt.gca()
+
+    _fig_Interpolation_(ax,coord,data_sol,lgd_label=physLabel)
     _fig_VRTe_(ax,coord,data_sol)
     _fig_RealSources_(ax,sc)
-    _fig_ReturnElec_(retElec)
-    ax.set_xlabel('x [m]')
-    ax.set_ylabel('y [m]')
+    #_fig_ReturnElec_(ax,retElec)
+    # ax.set_xlabel('x [m]')
+    # ax.set_ylabel('y [m]')
+    # ax.set_aspect('equal', adjustable='box')
+    _fig_Axis_Labels_(ax,title=fig_name)
 
     if kwargs.get('jac') is not None:
         _fig_ModelParameter_mi_(coord,kwargs.get('jac'))
@@ -362,17 +407,53 @@ def plotContour2d(coord,data_sol,physLabel,path,retElec=None, sc=None, **kwargs)
         title=r'$\lambda$=' + str(title_wr)
         _fig_Axis_Labels_(title)
 
-    return f
+    return ax
 
 
-def showObs2d(path, **kwargs):
-    """ Plot contour in 2d, using matplotlib and scipy interpolation. Required surface and borehole electrode to make the 2d interpolation possible
-    
+def showObs2d(path, ax=None, **kwargs):
+    """ Plot contour in 2d, using matplotlib and scipy interpolation. 
+    Required surface and borehole electrode to make the 2d interpolation possible
     Parameters
     ------------
     self
     """
     filename='ObsData.txt'
+    clim = None
+    if ax==None:
+        f = plt.figure('ObsData')
+        ax = plt.gca()
+    
+    if kwargs.get('filename') is not None:
+        filename = kwargs.get('filename')
+    if kwargs.get('clim') is not None:
+        clim = kwargs.get('clim')
+    if kwargs.get('index') is not None:
+        index = kwargs.get('index')
+    else: 
+        index = 0
+
+    RemLineNb, Injection, coordE, pointsE= load_geom(path) # geometry file containing electrodes position includinf remotes 
+    data_obs = load_obs(path,filename,index)
+    
+    _fig_Interpolation_(ax,pointsE,data_obs,lgd_label='U/I',clim=clim)
+    _fig_VRTe_(ax,pointsE,data_obs)
+    # _fig_RealSources_(ax,sc=None)
+    # _fig_ReturnElec_(ax,retElec=None)
+    _fig_Axis_Labels_(ax,title='Obs T=' + str(index))
+
+    return ax
+
+def current_streamlines(path, Res=1, mesh=None, **kwargs):
+    """
+    Current streamlines
+    -------
+    Only suitable for MALM with fix potential electrodes.
+    Correction of resistivity Res
+
+    """
+    filename='ObsData.txt'
+    f = plt.figure('ObsData')
+    ax = plt.gca()
     
     if kwargs.get('filename') is not None:
         filename = kwargs.get('filename')
@@ -382,13 +463,67 @@ def showObs2d(path, **kwargs):
     # print(path)
 
     data_obs = load_obs(path,filename)
-    f = plt.figure('surface')
-    _fig_Interpolation_(pointsE,data_obs,lgd_label='U/I')
-    _fig_VRTe_(pointsE,data_obs)
-    _fig_RealSources_(sc=None)
-    _fig_ReturnElec_(retElec=None)
-    _fig_Axis_Labels_(title='Observations')
-    plt.show(f)
-    plt.close(f)
+    
+    xn = 30
+    yn = 30
 
-    return f
+    xx = np.linspace(min(coordE[:,1]), max(coordE[:,1]),xn)
+    yy = np.linspace(min(coordE[:,2]), max(coordE[:,2]),yn)
+
+    xx, yy = np.meshgrid(xx, yy)
+    points = np.transpose(np.vstack((coordE[:,1], coordE[:,2])))
+    u_interp = interpolate.griddata(points,
+                                    data_obs,
+                                    (xx, yy), 
+                                    method='cubic')
+    uu = np.reshape(u_interp,[xn*yn])
+    data = uu/Res
+
+    if mesh is None:
+        mesh = pg.createGrid(x=np.linspace(min(coordE[:,1]), max(coordE[:,1]),xn),
+                 y=np.linspace(min(coordE[:,2]), max(coordE[:,2]),yn))
+
+    if kwargs.get('vmin'):
+       vmin = kwargs.get('vmin')
+    else: 
+       vmin = min(Obs)
+       
+    if kwargs.get('vmax'):
+       vmax = kwargs.get('vmax')
+    else: 
+       vmax = max(Obs)
+
+    if kwargs.get('ax'):
+        ax = kwargs.get('ax')
+    else:
+        fig, ax = plt.subplots()
+        
+    sc=ax.scatter(coordE[:,1], coordE[:,2], c=Obs, 
+                  cmap ='coolwarm',s=5e2, vmin=vmin, vmax=vmax) # norm=matplotlib.colors.Normalize()
+    cbar = plt.colorbar(sc,ax=ax)
+    cbar.set_label('V')   
+    ax.set_ylabel('y [m]',fontsize=15)
+    ax.set_xlabel('x [m]',fontsize=15)
+    
+    # if len(kwargs.get('sensors'))>0:
+    #     sensors = kwargs.get('sensors')
+    #     ax.scatter(sensors[:,0],sensors[:,1],color='k',marker='.',label='pot. elec')
+    #     for i in range(len(sensors[:,0])):
+    #            ax.annotate(str(i+1), (sensors[i,0],sensors[i,1]))   
+    #     if kwargs.get('A'):
+    #         A = kwargs.get('A')
+    #         ax.scatter(sensors[A,0],sensors[A,1],color='r',marker='v',label='A. elec')
+    #     if kwargs.get('B'):
+    #         B = kwargs.get('B')
+    #         ax.scatter(sensors[B,0],sensors[B,1],color='b',marker='v',label='B. elec')
+    #     if kwargs.get('Nfix'):
+    #         Nfix = kwargs.get('Nfix')
+    #         ax.scatter(sensors[Nfix,0],sensors[Nfix,1],color='g',marker='v',label='Nfix. elec')
+
+    # if kwargs.get('gridCoarse'):
+    #     gridCoarse = pg.createGrid(x=np.linspace(min(sensors[:,0]), max(sensors[:,0]),xn/2),
+    #                      y=np.linspace(min(sensors[:,1]), max(sensors[:,1]),yn/2))
+    
+    drawStreams(ax, mesh, -pg.solver.grad(mesh, data),
+                 color='green', quiver=True, linewidth=3.0)
+        

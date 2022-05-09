@@ -8,6 +8,10 @@ Created on Mon May 11 15:18:31 2020
 import numpy as np
 import os 
 
+import pybert as pb
+from pybert import tdip
+import pygimli as pg
+
 #%% LOAD from ICSD3d format: .txt file tab separated         
 
 def load_coord(path, filename, dim):
@@ -25,25 +29,67 @@ def load_coord(path, filename, dim):
         coord_x, coord_y, coord_z = coord[:, 0], coord[:, 1], coord[:, 2]
         return coord_x, coord_y, coord_z, coord
 
-def load_obs(path, filename):
+def load_obs(path, filename,index=None):
     """ load the observations file (normalised voltages)
     
     Parameters
     ----------
 
-    """
-    b = np.loadtxt(path+ filename)
+    """       
+    if filename.endswith('.data'): # TDIP data importer
+        bfile = pg.load(filename)
+        # b = (bfile['m'+str(index)]).array()
+        # # print(str(index)+str(b[0]))
+        # import matplotlib.pyplot as plt 
+        # fig, ax = plt.subplots()
+        # ax.plot(b)
+        b = (bfile['m'+str(index)]/bfile['k']).array()
+        # fig, ax = plt.subplots()
+        # ax.plot(b)
+
+    else:
+        b = np.loadtxt(path+ filename)
+                
     return b
 
-def load_sim(path, filename):
+def load_sim(path, data_sim, knorm=True):
     """ load the simulated green functions file
     
     Parameters
     ----------
 
     """
-    A = np.loadtxt(path+ filename)
+    if isinstance(data_sim, str):
+        if '.data' in data_sim:
+            tdip_data_sim = pg.load(path + data_sim)
+            A = []
+            i=0
+            if knorm == True:
+                while True:
+                    try: 
+                      A.append(((tdip_data_sim['m'+str(i)])/tdip_data_sim['k']).array())
+                      i += 1
+                      # print(i)
+                    except:
+                     break
+            else:
+                while True:
+                    try: 
+                      A.append((tdip_data_sim['m'+str(i)]).array())
+                      i += 1
+                    except:
+                     break
+                 
+            A = np.vstack(A) 
+            A = np.transpose(A) 
+            
+        else:
+            A = np.loadtxt(path+ data_sim)
+    else:
+        A = data_sim
+    print(np.shape(A))
     print('*'*36)
+    
     return A
 
 def load_geom(path):
@@ -88,7 +134,7 @@ def load_geom(path):
 #%% UTILS: LOAD from gimli or resipy format         
 
     
-def DataImport(SimFile=None,ObsFile=None):
+def dataImport(SimFile=None,ObsFile=None):
     """Data importer for common data files (Resipy and Gimli)
     Import and parse observation files, simulated file and geometry file
     
@@ -101,3 +147,82 @@ def DataImport(SimFile=None,ObsFile=None):
         print('pygimli format import')
     if fileExt=='*.data':
         print('resipy format import') 
+        
+def loadTDIPSurvey(fname_obs,fname_sim, Vp_norm=True):
+    """Data importer for common data files (Gimli)
+    Import and parse observation files, simulated green fct file
+    
+    Parameters
+    ----------
+    - Vp_norm: True: normalise chargeability by multiplying with Vp
+    Return
+    ----------
+    - Vs containing all gates + utlimate gate is Vp
+    - Vs_green containing all gates + utlimate gate is Vp_green
+    """     
+
+    Vs = []
+    Vs_green = []
+    if isinstance(fname_obs, str):
+        if '.dat' in fname_obs:
+            i=0 
+            print('import obs')
+            tdip_obs = pg.load(fname_obs)
+            Vs.append(((tdip_obs['r'])).array())
+            # print(np.shape(Vs))
+            if Vp_norm == True:
+                # print('import obs')
+                while True:
+                    try: 
+                      try:
+                          Vs.append(((tdip_obs['M'+str(i)])*tdip_obs['r']).array())
+                      except:
+                          Vs.append(((tdip_obs['m'+str(i)])*tdip_obs['r']).array())
+                      i += 1
+                      # print(i)
+                      # print(np.shape(Vs))
+                    except:
+                     break
+            else:
+                while True:
+                    try: 
+                      Vs.append((tdip_obs['m'+str(i)]).array())
+                      i += 1
+                    except:
+                        break
+            Vs = np.vstack(Vs) 
+            Vs = np.transpose(Vs)
+
+        if '.dat' in fname_sim:
+            i=0
+            tdip_sim = pg.load(fname_sim)
+            Vs_green.append(((tdip_sim['r'])).array())
+            if Vp_norm == True:
+                while True:
+                    try: 
+                      Vs_green.append(((tdip_sim['m'+str(i)])*tdip_sim['r']).array())
+                      i += 1
+                    except:
+                     break
+            else:
+                while True:
+                    try: 
+                      Vs_green.append((tdip_sim['m'+str(i)]).array())
+                      i += 1
+                    except:
+                        break
+            Vs_green = np.vstack(Vs_green) 
+            Vs_green = np.transpose(Vs_green) 
+            # print(np.shape(Vs_green))
+        else:
+            Vs_green = np.loadtxt(fname_sim)
+            Vs_green = Vs_green*np.ones([i+1,np.shape(Vs_green)[0]])
+            Vs_green = np.transpose(Vs_green) 
+            # print(np.shape(Vs_green))
+    else:   
+        print('Can''t import numpy array data')
+
+
+       
+    return Vs, Vs_green
+

@@ -37,7 +37,7 @@ path2files="./nail1/"
 
 # -----------------------------------#
 # apply here a smallness contrainst to the regularisation
-from icsd3d_class import iCSD3d_Class as i3d
+from icsd3d_class import iCSD3d as i3d
 from plotters import mpl_plot
 
 # mpl_plot.showObs2d(path2files)
@@ -51,16 +51,19 @@ icsd.obs_err='sqrt' # choose between constant weight and w = 1/sqrt(abs(obs))
 icsd.wr=1 #weight regularization
 icsd.alphaSxy=True
 icsd.x0_prior=True
-icsd.x0_ini_guess=True # initial guess
-icsd.icsd_init()
-# icsd.plotElecs=True
+icsd.x0_ini_guess=False # initial guess
+#icsd.icsd_init()
+
+icsd.createSurvey(fname_obs='ObsData.txt',fname_sim='VRTeSim.txt')
+# icsd.plotElecs=False
 
 m0 = icsd.estimateM0(method_m0='F1',show=True)
+m0 = icsd.estimateM0(method_m0='Pearson',show=True)
 
 # icsd.clim=[0,0.1]
 # icsd.run_single()
 
-sol= icsd.invert(x0_prior=False,wr=1e3)
+sol= icsd.invert(x0_prior=False,wr=1)
 # icsd.invert(pareto=True, regMesh='strc',x0_prior=True, 
 #             pareto_MinErr=1, pareto_MaxErr=100)
 
