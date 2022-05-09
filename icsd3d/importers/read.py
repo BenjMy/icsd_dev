@@ -8,9 +8,9 @@ Created on Mon May 11 15:18:31 2020
 import numpy as np
 import os 
 
-import pybert as pb
-from pybert import tdip
-import pygimli as pg
+#import pybert as pb
+#from pybert import tdip
+#import pygimli as pg
 
 #%% LOAD from ICSD3d format: .txt file tab separated         
 

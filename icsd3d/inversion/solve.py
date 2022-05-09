@@ -7,7 +7,7 @@ Created on Tue May 12 09:35:37 2020
 import numpy as np
 from scipy.optimize import lsq_linear, least_squares
 
-from exporters.save import export_sol
+from icsd3d.exporters.save import export_sol
 
 #%% Solve linear system Ax=b
 

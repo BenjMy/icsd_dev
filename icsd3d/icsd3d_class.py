@@ -12,18 +12,18 @@ from kneed import KneeLocator
 import matplotlib.pyplot as plt
 import pyvista as pv
 
-from plotters.mpl_plot import (plotCSD3d, plotCSD2d, 
+from icsd3d.plotters.mpl_plot import (plotCSD3d, plotCSD2d, 
                                 scatter3d, scatter2d, 
                                 plotContour2d, plotPareto, 
                                 plot_knee_icsd,labels)
 
-from plotters.pv_plot import plotCSD3d_pv
-from inversion.regularize import *
-from inversion.priorM0 import *
-from inversion.solve import *
-from importers.read import *
-from exporters.save import * 
-from gridder.mkgrid import mkGrid_XI_YI 
+from icsd3d.plotters.pv_plot import plotCSD3d_pv
+from icsd3d.inversion.regularize import *
+from icsd3d.inversion.priorM0 import *
+from icsd3d.inversion.solve import *
+from icsd3d.importers.read import *
+from icsd3d.exporters.save import * 
+from icsd3d.gridder.mkgrid import mkGrid_XI_YI 
 
 from copy import copy, deepcopy
 
