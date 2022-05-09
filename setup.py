@@ -16,9 +16,7 @@ if __name__ == '__main__':
         author='Benjamin Mary',
         author_email='benjamn.mary@unipd.it',
         license='MIT',
-        # url='https://github.com/geophysics-ubonn/reda',
-        packages=find_packages("icsd3d"),
-        package_dir={'': 'icsd3d'},
+        packages=find_packages(),
         install_requires=[
             'scipy',
             'numpy',
