@@ -12,33 +12,54 @@ from scipy.interpolate import griddata
 
 from icsd3d.importers.read import *
 from icsd3d.gridder.mkgrid import mkGrid_XI_YI 
+from scipy import stats
+import matplotlib.transforms as mtransforms
 
        
-def _fig_Interpolation_(ax,coord, data, **kwargs):
+def _fig_Interpolation_(ax,f,coord,data,**kwargs):
     """ plot the interpolation of the VRTe current fractions """
     
     coord_x, coord_y = parseCoord(coord,dim='2d')
     XI, YI= mkGrid_XI_YI(coord_x,coord_y)
     points = np.column_stack((coord_x, coord_y))
     
-    grid = griddata(points, data, (XI, YI), method = 'linear') # grid is a np array
+    len(data)
+    
+    np.shape(coord)
+    grid = griddata(points, data, (XI, YI), method = 'nearest') # grid is a np array
     img = ax.imshow(grid,
-               extent = (min (coord_x), max(coord_x), min(coord_y), max(coord_y)),
-               aspect = 'auto', origin = 'lower', cmap= 'jet')
-    cbar = plt.colorbar(img,ax=ax, 
-                        orientation='vertical',
-                        shrink=0.6)       
+                    # interpolation='spline16',
+                    extent = (min (coord_x), max(coord_x), min(coord_y), max(coord_y)),
+                    aspect = 'auto', origin = 'lower', cmap= 'jet'
+                    )
+    
+    # img = ax.matshow(grid,
+    #            extent = (min (coord_x), max(coord_x), min(coord_y), max(coord_y)),
+    #            aspect = 'auto', origin = 'lower', cmap= 'jet')
+    
+    # cbar = f.colorbar(img,ax=ax, 
+    #                     orientation='vertical',
+    #                     shrink=0.6)     
+    
+    cbarplot = True
+    if 'cbarplot' in kwargs:
+        cbarplot = kwargs['cbarplot']
         
+    if cbarplot:
+        cbar = plt.colorbar(img,ax=ax, 
+                            orientation='vertical',
+                            shrink=0.6)    
+    clim = None   
     if kwargs.get('clim') is not None:
         clim = kwargs.get('clim')
     else:
         clim = [min(data), max(data)]
     img.set_clim(vmin=clim[0], vmax=clim[1])
     
-    if kwargs.get('lgd_label') is not None:
-        cbar.set_label(kwargs.get('lgd_label'), labelpad = 10)
-    else:
-        cbar.set_label('Fraction of Current Source', labelpad = 10)
+    # if kwargs.get('lgd_label') is not None:
+    #     cbar.set_label(kwargs.get('lgd_label'), labelpad = 10)
+    # else:
+    #     cbar.set_label('Fraction of Current Source', labelpad = 10)
 
 def _fig_RealSources_(ax,sc):
     """ add known point sources if present """
@@ -51,17 +72,15 @@ def _fig_RealSources_(ax,sc):
 
 def _fig_ReturnElec_(ax,retElec):
     """ plot the return electrode """
-    if retElec == None:
-        return
-    print('reading return electrode: ', retElec)
-    retElecx = float(retElec.split(',')[0])
-    retElecy = float(retElec.split(',')[1])
-    plt.plot(retElecx, retElecy,'sw', markersize = 10)
+    if retElec is not None:   
+        print('reading return electrode: ', retElec)
+        plt.plot(retElec[0], retElec[1],'sw', markersize = 10)
 
 def _fig_VRTe_(ax,coord,data_sol,**kwargs):
     """ plot the VRTe current fractions """
     coord_x, coord_y = parseCoord(coord,dim='2d')
     
+    clim = None
     if kwargs.get('clim') is not None:
         clim = kwargs.get('clim')
         norm_z = (data_sol - clim[0]) / (clim[1] - clim[0])
@@ -71,7 +90,8 @@ def _fig_VRTe_(ax,coord,data_sol,**kwargs):
     edgecolor_norm_z = grey_cm(norm_z)
     jet_cm = plt.cm.get_cmap('jet')
     facecolor_norm_z = jet_cm(norm_z)
-    ax.scatter(coord_x, coord_y, facecolor = facecolor_norm_z, edgecolor = edgecolor_norm_z, cmap = 'jet')
+    ax.scatter(coord_x, coord_y, facecolor = facecolor_norm_z, edgecolor = edgecolor_norm_z, cmap = 'jet',
+               )
 
             
 def _fig_Axis_Labels_(ax,title):
@@ -151,26 +171,68 @@ def plot_knee_icsd(wr,kn):
     # run_single()
 
 
-def plotFIT(b,b_w,xfun,path):
-    stopat=len(b) # 204
-    plt.figure()
-    plt.subplot(121)
-    plt.plot(xfun[:stopat] + b_w[:stopat], 'or', label = 'Inverted CSD')
-    plt.plot(b_w[:stopat], 'ob', label = 'True model')
-    plt.xlabel('Measurement number')
-    plt.ylabel('R [Ohm]')
-    plt.legend()
-    plt.subplot(122)
-    plt.plot(xfun[:stopat] + b_w[:stopat], b_w[:stopat], 'or')
-    plt.xlabel('Inverted CSD, R [Ohm]')
-    plt.ylabel('True model, R [Ohm]')
-    plt.tight_layout()
-    plt.savefig(path+'Fit.png', dpi = 600)
-    plt.show()
+def plotFIT(b,b_w,xfun,path,prefix_name='',**kwargs):
+    
+    
+    stopat=len(b) 
+    
+    # plt.figure()
+    mosaic = 'ab'
+    fig, axs = plt.subplot_mosaic(mosaic,
+                                  constrained_layout=True,
+                                  sharey=True
+                                  )
+    
+    # plt.subplot(121)
+    axs['a'].plot(xfun[:stopat] + b_w[:stopat], 'or', label = 'Inverted CSD')
+    # axs['a'].plot(b_w[:stopat], 'ob', label = 'True model')
+    axs['a'].plot(b_w[:stopat], 'ob', label = 'Measured')
+    axs['a'].set_xlabel('Measurement number')
+    axs['a'].set_ylabel('R [Ohm]')
+    axs['a'].legend()
+    # plt.subplot(122)
+    axs['b'].plot(xfun[:stopat] + b_w[:stopat], b_w[:stopat], 'or')
+    axs['b'].set_xlabel('Inverted CSD, R [Ohm]')
+    # axs['b'].set_ylabel('True model, R [Ohm]')
+    axs['b'].set_ylabel('Measured, R [Ohm]')
+    # plt.tight_layout()
+    if 'title' in kwargs:
+        axs['b'].set_title(kwargs['title'])
+    
+
+    slope, intercept, r_value, p_value, std_err = stats.linregress(xfun[:stopat] + b_w[:stopat],
+                                                                   b_w[:stopat]
+                                                                   )
+    
+    # r_value_text = '$R^{2}$=' + str(np.round(r_value,2))
+    r_value_text = '$R^{2}$=' + '{:1.3f}'.format(r_value)
+
+    axs['b'].text(min(xfun[:stopat] + b_w[:stopat]),
+             max(b_w[:stopat]),
+             r_value_text,
+             c='grey'
+             )
+    
+    # plt.tight_layout()
+    for label, ax in axs.items():
+        # label physical distance in and down:
+        trans = mtransforms.ScaledTranslation(10/72, -5/72, fig.dpi_scale_trans)
+        ax.text(1, 0, label, transform=ax.transAxes + trans,
+                fontsize='medium', verticalalignment='top', fontfamily='serif',
+                bbox=dict(facecolor='0.7', edgecolor='none', pad=3.0))
+
+
+
+    plt.savefig(path+prefix_name+'Fit.png', dpi = 350)
+
+    return r_value, p_value
+    # plt.show()
 
     
-def plotCSD2d(coord,data_sol,b,b_w,path,pareto,retElec=None, sc=None, 
-              ax=None, **kwargs):
+def plotCSD2d(coord,data_sol,b,b_w,path,retElec=None,sc=None, 
+              ax=None, 
+              index=0,
+              **kwargs):
     """ Plot CSD in 2d, using matplotlib and scipy interpolation
     
     Parameters
@@ -178,41 +240,41 @@ def plotCSD2d(coord,data_sol,b,b_w,path,pareto,retElec=None, sc=None,
     self
     """
 
-    clim = None
-    if kwargs.get('clim') is not None:
-        clim = kwargs.get('clim')
+    # clim = None
+    # if kwargs.get('clim') is not None:
+    #     clim = kwargs.get('clim')
         
     if kwargs.get('index') is not None:
         fig_name = 'CSD 2d T' + str(kwargs.get('index'))
     else:
         fig_name = 'CSD 2d'
+        
+        
+    if 'fig_name' in kwargs:
+        fig_name = kwargs['fig_name']
             
     if ax==None:
-        
         f = plt.figure('CSD 2d')
-        ax = plt.gca()
+        ax = plt.subplot()
     else:
         f = plt.gcf()
- 
-    _fig_Interpolation_(ax,coord,data_sol,clim=clim)
-    _fig_VRTe_(ax,coord,data_sol,clim=clim)
-    _fig_RealSources_(ax,sc)
-    _fig_ReturnElec_(ax,retElec)
+        
+    _fig_Interpolation_(ax,f,coord,data_sol,**kwargs)
+    
+    vrte_pos = True
+    if 'vrte_pos' in kwargs:
+        vrte_pos = kwargs['vrte_pos']
+    if vrte_pos:
+        _fig_VRTe_(ax,coord,data_sol,**kwargs)
+        _fig_RealSources_(ax,sc)
+        _fig_ReturnElec_(ax,retElec)
     
     if kwargs.get('title_wr') is not None:
-        if kwargs.get('index') is not None:
-            title=fig_name + r'  $\lambda$=' + str(kwargs.get('title_wr') )
-        else:
-            title=r'$\lambda$=' + str(kwargs.get('title_wr') )
+        title=fig_name + r'  $\lambda$=' + str(kwargs.get('title_wr') )
         _fig_Axis_Labels_(ax,title)
 
     return f, ax
 
-    if kwargs.get('xfun') is not None:
-            xfun=kwargs.get('xfun')
-
-    if not pareto:
-        plotFIT(b,b_w,xfun,path)
 
             
 def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,ax=None,title=None,pltRemotes=False,**kwargs):
@@ -226,7 +288,7 @@ def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,ax=None,title=None,pltRemo
     kwargs (to add) : 'sc' (plot source position (for a synthetic case experiment)
 
     """
-
+            
     coord_x, coord_y, coord_z = parseCoord(coord,dim='3d')
 
     if ax==None:
@@ -244,8 +306,20 @@ def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,ax=None,title=None,pltRemo
     X,Y,Z=np.meshgrid(xlin,ylin,zlin)
     
     data_2_plot= data  
-    sc=ax.scatter(coord_x, coord_y, coord_z, c=data_2_plot, cmap ='coolwarm', s=data_2_plot*1e4,
+    # fig = plt.figure()
+    # ax = fig.add_subplot(projection='3d')
+
+    # fig = plt.figure()
+    # ax = fig.add_subplot(projection='3d')
+
+    # sc=ax.scatter(coord_x, coord_y, coord_z, c=data_2_plot, cmap ='coolwarm', s=data_2_plot*1e4,
+    #           )
+    sc=ax.scatter(coord_x, coord_y, coord_z, c=data_2_plot, cmap ='coolwarm', s=10,
               )
+    ax.view_init(azim=0, elev=90)
+
+    # sc=ax.scatter(coord_x, coord_y, coord_z, c=data_2_plot, cmap ='coolwarm', s=data_2_plot*1e4,
+    #           )
     # if self.clim is None:
     #     print('none clim')
     # sc.set_clim(self.clim)
@@ -284,7 +358,7 @@ def plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,ax=None,title=None,pltRemo
    
     plt.show()
     
-    return ax
+    return f, ax
        
         
 #%% Generic plot functions
@@ -334,7 +408,8 @@ def scatter3d(coord, data, label, path, filename, pltRemotes=False, ax=None, **k
         print('no Axis')
         ax = plt.gca()
     # ax=f.gca(projection='3d')
-        
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
         
     step=(max(coord_x)-min(coord_x))/10
     xlin=np.arange(min(coord_x),max(coord_x),step)
@@ -391,7 +466,7 @@ def plotContour2d(coord,data_sol,physLabel,path,retElec=None,
         f = plt.figure(fig_name)
         ax = plt.gca()
 
-    _fig_Interpolation_(ax,coord,data_sol,lgd_label=physLabel)
+    _fig_Interpolation_(ax,f,coord,data_sol,lgd_label=physLabel)
     _fig_VRTe_(ax,coord,data_sol)
     _fig_RealSources_(ax,sc)
     #_fig_ReturnElec_(ax,retElec)
@@ -407,7 +482,7 @@ def plotContour2d(coord,data_sol,physLabel,path,retElec=None,
         title=r'$\lambda$=' + str(title_wr)
         _fig_Axis_Labels_(title)
 
-    return ax
+    return ax, f
 
 
 def showObs2d(path, ax=None, **kwargs):

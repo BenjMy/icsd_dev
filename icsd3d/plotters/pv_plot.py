@@ -10,7 +10,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from importers.read import *
+# from importers.read import *
 
 
 #%% Plot CSD in 3d using pyvista package

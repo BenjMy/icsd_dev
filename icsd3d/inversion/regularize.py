@@ -6,6 +6,8 @@ Created on Mon May 11 17:29:01 2020
 
 import numpy as np
 from scipy.sparse import diags
+import matplotlib.pyplot as plt
+
 
 #%%
 def nx_ny(coord):
@@ -147,7 +149,7 @@ def regularize_A_UnstructuredMesh2d(coord,nVRTe,k_neighbors=2):
     return reg_A
 
 
-def regularize_A_UnstructuredMesh3d(coord,nVRTe,k_neighbors=4): 
+def regularize_A_UnstructuredMesh3d(coord,nVRTe,k_neighbors=9): 
     """model smoothing consisting in creating and appending rows for spatial regularization to A. 
     Adapted for unstructured mesh since it uses the k_neighbors method, default k=4. Also working on regular grid 2d"""
     reg = []
@@ -155,6 +157,8 @@ def regularize_A_UnstructuredMesh3d(coord,nVRTe,k_neighbors=4):
         dist =  np.linalg.norm(coord[VRTEnb]-coord, axis=1)
         closest = np.argsort(dist)
         k = k_neighbors  # For each point, find the k closest current sources
+        # print('kkkkkkkkkkkkkkkkkkkkkkkk')
+        # print(k_neighbors)
         Ind = closest[1:k+1]
         row = np.zeros(nVRTe) # add a line to the regularisation A with k non-null coefficients
         knorm = dist[closest[1:k+1]]/dist[closest[1:k+1]].sum(axis=0,keepdims=1)
@@ -168,15 +172,15 @@ def regularize_A_UnstructuredMesh3d(coord,nVRTe,k_neighbors=4):
             # self.fc = plt.figure('TEST regularisation')
             # ax = self.fc.add_subplot(111, projection='3d')
             # ax.scatter(self.coord[VRTEnb,0], self.coord[VRTEnb,1], self.coord[VRTEnb,2], linewidths=12,
-            #            facecolor = 'green', edgecolor = 'green')
+            #             facecolor = 'green', edgecolor = 'green')
             # ax.scatter(self.coord[Ind,0], self.coord[Ind,1], self.coord[Ind,2], linewidths=12,
-            #            facecolor = 'red', edgecolor = 'red')
+            #             facecolor = 'red', edgecolor = 'red')
             # ax.set_xlim([min(self.coord_x),max(self.coord_x)])
             # ax.set_ylim([min(self.coord_y),max(self.coord_y)])
             # ax.set_zlim([min(self.coord_z),max(self.coord_z)])
             # self.fc.savefig(self.path2save+ 'TEST regularisation', dpi = 600)
-            # #plt.show()
-            # #plt.close()
+            #plt.show()
+            #plt.close()
         reg_A = np.array(reg)
         
     return reg_A

@@ -37,8 +37,8 @@ path2files="./nail1/"
 
 # -----------------------------------#
 # apply here a smallness contrainst to the regularisation
-from icsd3d_class import iCSD3d as i3d
-from plotters import mpl_plot
+from icsd3d.icsd3d_class import iCSD3d as i3d 
+from icsd3d.plotters import mpl_plot
 
 # mpl_plot.showObs2d(path2files)
 

@@ -5,17 +5,14 @@ from scipy.optimize import lsq_linear, least_squares
 from scipy.linalg import block_diag
 
 from matplotlib.backends.backend_pdf import PdfPages
-from matplotlib.colors import LogNorm
-
 from kneed import KneeLocator
 
 import matplotlib.pyplot as plt
-import pyvista as pv
-
 from icsd3d.plotters.mpl_plot import (plotCSD3d, plotCSD2d, 
                                 scatter3d, scatter2d, 
                                 plotContour2d, plotPareto, 
-                                plot_knee_icsd,labels)
+                                plot_knee_icsd,labels,
+                                plotFIT)
 
 from icsd3d.plotters.pv_plot import plotCSD3d_pv
 from icsd3d.inversion.regularize import *
@@ -64,7 +61,7 @@ class iCSD3d(object):
         self.KneeWr=[]
         
         self.logTrans=False
-            # time lapse option
+        # time lapse option
         # self.iTimeLapse = False # to enable timelapse inversion [Not implemented yet]
         self.TL=False # Time lapse inversion (see slides VIU Venice to implement)
         self.TL_gamma=1 # Time lapse inversion weight
@@ -211,12 +208,8 @@ class iCSD3d(object):
         if (self.surveys[index].x0_ini_guess==True or self.surveys[index].x0_prior==True):
             self._estimateM0_(index=index)
             
-        # print(self.alphax0)
-        # print(self.x0)
         # Create vector with weight (data weigth, constrainsts weight and regularisation weigth)
         if self.surveys[index].x0_prior==True: # if relative smallness 
-            # print('len(self.x0)')
-            # print(len(self.x0))
             self.reg_w_0_b, self.reg_w_0_A = regularize_w(self.surveys[index].reg_A,
                                                           self.wr,
                                                           self.surveys[index].x0_prior,
@@ -265,8 +258,8 @@ class iCSD3d(object):
                     else:
                         self.reg_A = regularize_A(survey.coord,
                                                   survey.nVRTe)
-            else: # 3d mesh
-                 self.reg_A = regularize_A_UnstructuredMesh3d(self.surveys[0].coord,
+            else: 
+                 self.reg_A = regularize_A_UnstructuredMesh3d(survey.coord,
                                                               self.nVRTe,self.k)
         
         
@@ -389,7 +382,7 @@ class iCSD3d(object):
             # i_end = np.shape(self.A_w)[1]*(i+2)               
         # del sol_backup
 
-    def run_single(self,index=0,showfig=False):
+    def run_single(self,index=0,show=False,**kwargs):
         """Run a single inversion (unique regularisation weight)
         Equivalent to several steps::
             self.prepare4iCSD()
@@ -422,45 +415,46 @@ class iCSD3d(object):
         
         self.surveys[index].solution=self.x
             
-        if showfig == True:
-            ax, f = self.showResults(index=index)
-            # self.RMSAnalysis()
+        if show == True:
+            ax, f = self.showResults(index=index,**kwargs)
             self.misfit()
-            # f.savefig(self.path2save+'iCSD', dpi = 600)
             plt.tight_layout()
-            plt.show()
-            plt.close(self.f)
-        # add result to container
-        # _add_to_container(self.x)
+            plt.close(f)
+
+            return ax, f
+        else:
+            pass
         
-        # plt.close(f)
-        # self.ModelResolution()
-        
-    def run_pareto(self):
+    def run_pareto(self,show,**kwargs):
         """
         run iCSD multiple times while changing the weights to explore the L-curve
         """ 
         #self.icsd_init(self.surveys[0])
-        self.pareto_weights = np.linspace(self.pareto_MinErr, self.pareto_MaxErr, self.pareto_nSteps)
+        if hasattr(self, 'pareto_weights') is False:
+            self.pareto_weights = np.linspace(self.pareto_MinErr, self.pareto_MaxErr, self.pareto_nSteps)
+            
         print('pareto weights are\n', self.pareto_weights)
 
         self.pareto_list_FitRes = []
         self.pareto_list_RegRes = []
+
         
-        
-        with PdfPages(self.surveys[0].path2save+ self.obs +'iCSD_pareto.pdf') as pdf:
+        savename = self.surveys[0].path2save +'iCSD_pareto.pdf'
+        if self.x0_prior:
+            savename = self.surveys[0].path2save+'_xprior_iCSD_pareto.pdf'
+
+        with PdfPages(savename) as pdf:
             
             # LOOP ON REG WEIGHTS
             for self.wr in self.pareto_weights:              
-              
-                
+                            
                 # RUN ICSD
                 self.prepare4iCSD()
                 if (self.x0_ini_guess == True or self.x0_prior == True):
                     self.x = iCSD(self.A_w,self.b_w,
                                   self.type,
-                                  self.coord,
-                                  self.path2load,
+                                  self.surveys[0].coord,
+                                  self.surveys[0].path2load,
                                   x0=self.x0)
                 else:
                     self.x = iCSD(self.A_w,self.b_w,
@@ -472,27 +466,36 @@ class iCSD3d(object):
                     self.f, _ = plotCSD2d(self.surveys[0].coord,self.x.x,
                                           self.surveys[0].b,
                                           self.b_w,
-                                       self.surveys[0].path2load,
-                                       self.pareto,
-                                       retElec=None, sc=None, 
-                                       title_wr=self.wr)
+                                          self.surveys[0].path2load,
+                                          sc=None, 
+                                          title_wr=self.wr,
+                                          **kwargs
+                                          )
                 else:
-                    self.f, _ = plotCSD3d(self.wr,self.coord,self.x.x,
-                                       self.path2load,
-                                       self.obs,
-                                       self.knee,self.KneeWr,
-                                       title=None)
+                    # pass
+                    # plotCSD3d(wr,coord,data,path,filename,knee,KneeWr,ax=None,title=None,pltRemotes=False,**kwargs)
+                    self.f, _  = plotCSD3d(self.wr,
+                                        self.surveys[0].coord,
+                                        self.x.x,
+                                        self.surveys[0].path2load,
+                                        self.obs,
+                                        self.knee,self.KneeWr,
+                                        title=None)
 
                 pdf.savefig(self.f)
                 # print(self.f)
-                plt.show()
-                plt.close(self.f)
+                # plt.show()
+                # plt.close(self.f)
 
                 self.residualAnalysis()
                 self.misfit()
             
-            # Detect knee point wr of the L-curve
-            self.detectKneePt()
+            try:
+                # Detect knee point wr of the L-curve
+                self.detectKneePt()
+            except:
+                print('Can''t find a knee')
+                
             self.wr=float(self.pareto_weights[self.IdPtkneew])
             print('Knee detected for wr=' + str(self.wr))
             
@@ -506,9 +509,17 @@ class iCSD3d(object):
             # plt.close(self.p)
 
             # Plot knee curve
-            if self.knee==True:
+            if self.knee:
                plot_knee_icsd(self.wr,self.kn)
-               self.run_single()
+               # self.run_single()
+               if show:
+                    ax, f = self.run_single(show=show,**kwargs)
+                    return ax, f
+               else:
+                    self.run_single(show=show,**kwargs)
+        pass
+               
+            
 
 
     def detectKneePt(self):
@@ -520,9 +531,11 @@ class iCSD3d(object):
              self.IdPtkneew=1
              print('No knee detection possible, put 1 as default')
 #            raise ValueError('No knee detection possible')
+        else:
+            self.knee = True
                
         
-    def invert(self,**kwargs):
+    def invert(self,show=False,**kwargs):
         """Invert voltage to current densities.
         
         Parameters
@@ -550,14 +563,18 @@ class iCSD3d(object):
          
         if self.pareto==False:
             if len(self.surveys)<2:
-                self.run_single()
-                return self.x
+                if show:
+                    ax, f = self.run_single(show=show,**kwargs)
+                    return self.x, ax, f
+                else:
+                    self.run_single(show=show,**kwargs)
+                    return self.x                 
 
             else:
                 if self.TL==True: # flag for time-lapse inversion
                     if self.TL_gamma==1:
                         for i, survey in enumerate(self.surveys):
-                            self.run_single(index=i)  
+                            self.run_single(index=i,**kwargs)  
                     else:
                         raise ValueError('weigted TL inversion not yet implemented')
                         # self.run_single_TL()
@@ -574,20 +591,22 @@ class iCSD3d(object):
                                 # self.sequential = True 
                                 self.surveys[i].x0_ini_guess = True
                                 self.surveys[i].x0_prior = True
-                                # print('change alpha value')
-                                # self.alphax0 = 100
-                                # self.TDIP_flag = True
-                                # self.icsd_init(self.surveys[i])
                                 self.x0 = self.surveys[0].solution.x
-                                self.run_single(index=i)   
+                                self.run_single(index=i,show=show)   
                     else:
                         for i, survey in enumerate(self.surveys):
-                            self.run_single(index=i)   
+                            self.run_single(index=i,show=show,**kwargs)   
 
         else:
-             self.run_pareto()
+            if show:
+                 ax, f = self.run_pareto(show=show,**kwargs)
+                 return self.x, ax, f
+            else:
+                 self.run_pareto(show=show,**kwargs)
+                 return self.x
+
             
-        return self.surveys
+        # return self.surveys
              
        
         
@@ -596,7 +615,7 @@ class iCSD3d(object):
 #%% DEFINE SURVEY container for observations and simulations     
 
         
-    def createSurvey(self,fname_obs,fname_sim,append=False):
+    def createSurvey(self,fname_obs='ObsData.txt',fname_sim='VRTeSim.txt',append=False):
         '''
         Parameters
         ----------
@@ -739,7 +758,8 @@ class iCSD3d(object):
                 m0 = self._parseM0_(method_m0, index=i) # define the method to estimate M0
                 self.surveys[i].physLabel=labels(method_m0) # lgd labeling for the plot
                 if show == True:
-                    self.showEstimateM0(index=i,ax=ax)
+                    ax, f = self.showEstimateM0(index=i,ax=ax)
+                    return m0, ax, f
             
         return m0
 
@@ -756,19 +776,14 @@ class iCSD3d(object):
         if method_m0 is not None:
             if method_m0=='F1':  
                 survey.path2load = self.dirName
-                survey.RemLineNb, survey.Injection, survey.coordE, survey.pointsE= load_geom(survey.path2load) # geometry file containing electrodes position includinf remotes
-                idelec = np.arange(0,len(survey.coordE))
-                # idelec = np.delete(idelec,[41,42,52,61,62,71,70,69])
-                idelec = np.delete(idelec,[71,70,69])
-                #42,43,53,62,63
-                self.surveys[index].norm_F1, self.surveys[index].x0 = misfitF1_2_initialX0(survey.A,survey.b,int_plot=[survey.coordE[idelec], survey.coord])
-                # self.surveys[index].x0, self.surveys[index].norm_F1 = misfitF1_2_initialX0(survey.A,survey.b)
+                self.surveys[index].norm_F1, self.surveys[index].x0 = misfitF1_2_initialX0(survey.A,survey.b)
             elif method_m0=='Pearson': 
                 self.surveys[index].x0 = product_moment(survey.A,survey.b)
         elif self.inix0 is not None:
             if survey.inix0=='cst':
                 self.surveys[index].x0=np.ones(survey.b.shape)*0.1
         self.x0 = np.copy(self.surveys[index].x0)
+        
         return self.surveys[index].x0
     
 #%% PLOT fcts     
@@ -786,28 +801,31 @@ class iCSD3d(object):
 
         # fig, ax = plt.subplots()
         if self.type=='2d':
-            f = plotContour2d(self.surveys[index].coord,
+            ax, f = plotContour2d(self.surveys[index].coord,
                               self.surveys[index].x0,
                               self.surveys[index].physLabel,
                               path=self.surveys[index].path2load,
                               retElec=None, sc=None,index=index,
                               ax=ax,fig_name='Estimated m0')
         else:
-            f = scatter3d(self.surveys[index].coord, 
+            ax, f = scatter3d(self.surveys[index].coord, 
                           self.surveys[index].x0,
                           self.surveys[index].physLabel,
                           self.surveys[index].path2load, 
                           self.surveys[index].obs, 
                           ax=ax)
         plt.tight_layout()
-        plt.show()
+        # plt.show()
         # plt.close(f)
+        
+        return ax, f
 
 
    
     def showResults(self, ax=None, data=None, clim=None ,cmap='viridis_r',
                     plotElecs=False,sc=False,retElec=None,
-                    mesh=None, gif3d=False, title=None, cut=False,**kwargs):
+                    mesh=None, gif3d=False, title=None, cut=False,
+                    index=0, **kwargs):
         """Show inverted model.
         
         Parameters
@@ -841,10 +859,10 @@ class iCSD3d(object):
         self.gif3d=gif3d # animated
         self.title=title # plot title
         
-        index=0
-        for key, value in kwargs.items():
-            if key == 'index':
-                index = value
+        # index=0
+        # for key, value in kwargs.items():
+        #     if key == 'index':
+        #         index = value
  
         if data is None:
             data = self.surveys[index].solution.x
@@ -855,11 +873,11 @@ class iCSD3d(object):
                               self.surveys[index].b,
                               self.b_w,
                               self.surveys[index].path2load,
-                              self.pareto,
-                              retElec=None, sc=None,
+                              retElec=retElec, sc=None,
                               ax=ax, title_wr=self.wr, 
-                              index=index,
-                              clim=self.clim)
+                              clim=self.clim,
+                              index = index,
+                              **kwargs)
         else:
             f = plotCSD3d(self.wr, 
                           self.surveys[index].coord,
@@ -906,10 +924,17 @@ class iCSD3d(object):
         self.fit_sum = np.sum(np.square(fitting_res))
         self.pareto_list_FitRes.append(self.fit_sum)
         self.pareto_list_RegRes.append(self.reg_sum)
+        
+        
+        
 
-    def RMSAnalysis(self):
+    def RMSAnalysis(self,path,prefix_name,**kwargs):
         self.rms = np.sum(np.square(self.x.fun))/len(self.x.fun)
         print('RMS error='+ str(self.rms))
+        
+        plotFIT(self.surveys[0].b,self.b_w,self.x.fun,path,prefix_name,**kwargs)
+
+        return self.rms
 
 
     def misfit(self):

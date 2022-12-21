@@ -64,29 +64,33 @@ def misfitF1_2_initialX0(A,b,**kwargs):
     """Transform the misfit F1 (punctual source inversion) to an initial solution M0  
     using a 1/x^2 transformation"""
 
-    int_plot=None
-    for key, value in kwargs.items():
-        if key == 'int_plot':
-            int_plot = value
-                
-    norm_F1 = _normF1(A,b,int_plot=int_plot)
-    # df = pd.DataFrame(data, columns = ['First Column Name','Second Column Name',...])
-
-
+    # diff_Ab = []
+    # plt.figure()  
+    # for i in range(np.shape(A)[1]):
+    # # for i in list(np.arange(0, 90, 20)):
+    #     plt.plot(A[:,i],'*')
+    #     # diff_Ab.append(abs(A[:,i])-abs(b))
+    #     diff_Ab.append(A[:,i]-b)
+    # plt.plot(b,'-.')
     
+    
+    # # diff_Ab = np.vstack(diff_Ab)
+    # # np.argmin(np.sum(abs(diff_Ab),axis=1))
+    # # np.argmin(np.mean(diff_Ab,axis=0))
+    
+    # diff_Ab[40]
+    # # diff_Ab[0]
+
+    # plt.figure()  
+    # # plt.plot(A[:,np.argmin(np.sum(diff_Ab,axis=0))],'*')
+    # plt.plot(A[:,40],'*')
+    # plt.plot(b,'-.')
+  
+    norm_F1 = _normF1(A,b)
+
     # x0F1_2=1./((norm_F1+1)*(norm_F1+1)) # Inverse misfit using a 1/x^2 transformation
     # x0F1=1./((norm_F1+1)) # Inverse misfit using a 1/x^2 transformation
     x0F1=1/norm_F1 # Inverse misfit using a 1/x^2 transformation
-
-    # print(x0F1)
-    # plt.figure()
-    # plt.plot(x0F1_2)
-    # plt.title('1/x^2')    
-    
-    # plt.figure()
-    # plt.plot(x0F1)
-    # plt.title('1/x, x0F1[0]=' + str(x0F1[0]))
-
     x0F1_sum= x0F1/sum(x0F1) # normalize such as sum equal to 1
     M0=x0F1_sum
 
